@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vadd Studio - Platform Streaming Animasi</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Montserrat:wght@500;700;800;900&display=swap" rel="stylesheet">
+    <!-- Path disesuaikan dengan folder css/ -->
+    <link rel="stylesheet" href="css/layout.css">
+</head>
+<body>
+
+    <!-- Navbar & Navigation Header -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <!-- Navigasi Kiri -->
+            <div class="nav-left">
+                <button class="menu-btn" id="mobile-menu-btn" aria-label="Buka Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a href="home.html" class="brand-logo">
+                    <div class="brand-icon">
+                        <i class="fas fa-fox"></i>
+                    </div>
+                    <span class="brand-text">vadd<span>studio</span></span>
+                </a>
+                
+                <!-- Menu Desktop -->
+                <div class="desktop-menu">
+                    <a href="home.html" class="active">Jelajahi</a>
+                    <a href="#">Kategori <i class="fas fa-chevron-down" style="font-size: 0.6rem;"></i></a>
+                    <a href="detail.html">Detail Film</a>
+                    <a href="player.html">Pemutar Video</a>
+                </div>
+            </div>
+
+            <!-- Navigasi Kanan -->
+            <div class="nav-right">
+                <div class="nav-right-icons">
+                    <button aria-label="Pencarian">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button class="user-avatar" aria-label="Profil Akun">
+                        <i class="fas fa-user"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar Drawer (Khusus Mobile) -->
+        <div id="sidebar-overlay"></div>
+        <div id="sidebar-drawer">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div class="brand-icon" style="width: 36px; height: 36px;">
+                        <i class="fas fa-fox"></i>
+                    </div>
+                    <span class="brand-text" style="font-size: 1.1rem;">vadd<span>studio</span></span>
+                </div>
+                <button id="sidebar-close-btn" class="sidebar-close" aria-label="Tutup Menu">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="sidebar-body">
+                <div>
+                    <p class="sidebar-group-title">Menu Utama</p>
+                    <div class="sidebar-menu-list">
+                        <a href="home.html" class="sidebar-item active">
+                            <i class="fas fa-compass" style="width: 20px; text-align: center;"></i> Jelajahi
+                        </a>
+                        <a href="detail.html" class="sidebar-item">
+                            <i class="fas fa-film" style="width: 20px; text-align: center; color: var(--vadd-accent);"></i> Detail Film
+                        </a>
+                        <a href="player.html" class="sidebar-item">
+                            <i class="fas fa-play-circle" style="width: 20px; text-align: center; color: var(--vadd-light);"></i> Pemutar Video
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <p>Vadd Studio v1.2.0</p>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Slot Konten Utama Halaman (Akan Diisi oleh home.html / detail.html / player.html) -->
+    <main id="main-content-slot">
+        <!-- Tempat injeksi konten halaman -->
+    </main>
+
+    <!-- Footer Global -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div>
+                    <a href="home.html" class="brand-logo" style="margin-bottom: 1rem;">
+                        <div class="brand-icon" style="width: 36px; height: 36px;">
+                            <i class="fas fa-fox"></i>
+                        </div>
+                        <span class="brand-text" style="font-size: 1.25rem;">vadd<span>studio</span></span>
+                    </a>
+                    <p class="footer-desc">Platform streaming animasi & film independen terbaik dengan kualitas tajam.</p>
+                    <div class="social-icons">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="Youtube"><i class="fab fa-youtube"></i></a>
+                        <a href="#" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="footer-col-title">Navigasi</h4>
+                    <ul class="footer-links">
+                        <li><a href="home.html">Jelajahi</a></li>
+                        <li><a href="detail.html">Detail Film</a></li>
+                        <li><a href="player.html">Pemutar Video</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="footer-col-title">Bantuan</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Hubungi Kami</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p class="copyright">&copy; 2026 Vadd Studio. Hak Cipta Dilindungi.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Path disesuaikan dengan folder js/ -->
+    <script src="js/layout.js"></script>
+</body>
+</html>
+
