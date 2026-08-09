@@ -8,8 +8,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Montserrat:wght@500;700;800;900&display=swap" rel="stylesheet">
-    <!-- Path disesuaikan dengan folder css/ -->
+    <!-- CSS Layout Global -->
     <link rel="stylesheet" href="css/layout.css">
+    <!-- CSS Dinamis untuk Halaman Aktif (Diisi otomatis oleh JS) -->
+    <link id="page-css" rel="stylesheet" href="css/home.css">
 </head>
 <body>
 
@@ -21,7 +23,7 @@
                 <button class="menu-btn" id="mobile-menu-btn" aria-label="Buka Menu">
                     <i class="fas fa-bars"></i>
                 </button>
-                <a href="home.html" class="brand-logo">
+                <a href="?page=home" class="brand-logo">
                     <div class="brand-icon">
                         <i class="fas fa-fox"></i>
                     </div>
@@ -30,10 +32,10 @@
                 
                 <!-- Menu Desktop -->
                 <div class="desktop-menu">
-                    <a href="home.html" class="active">Jelajahi</a>
+                    <a href="?page=home" data-page="home">Jelajahi</a>
                     <a href="#">Kategori <i class="fas fa-chevron-down" style="font-size: 0.6rem;"></i></a>
-                    <a href="detail.html">Detail Film</a>
-                    <a href="player.html">Pemutar Video</a>
+                    <a href="?page=detail" data-page="detail">Detail Film</a>
+                    <a href="?page=player" data-page="player">Pemutar Video</a>
                 </div>
             </div>
 
@@ -69,13 +71,13 @@
                 <div>
                     <p class="sidebar-group-title">Menu Utama</p>
                     <div class="sidebar-menu-list">
-                        <a href="home.html" class="sidebar-item active">
+                        <a href="?page=home" data-page="home" class="sidebar-item">
                             <i class="fas fa-compass" style="width: 20px; text-align: center;"></i> Jelajahi
                         </a>
-                        <a href="detail.html" class="sidebar-item">
+                        <a href="?page=detail" data-page="detail" class="sidebar-item">
                             <i class="fas fa-film" style="width: 20px; text-align: center; color: var(--vadd-accent);"></i> Detail Film
                         </a>
-                        <a href="player.html" class="sidebar-item">
+                        <a href="?page=player" data-page="player" class="sidebar-item">
                             <i class="fas fa-play-circle" style="width: 20px; text-align: center; color: var(--vadd-light);"></i> Pemutar Video
                         </a>
                     </div>
@@ -88,9 +90,9 @@
         </div>
     </nav>
 
-    <!-- Slot Konten Utama Halaman (Akan Diisi oleh home.html / detail.html / player.html) -->
+    <!-- Slot Konten Utama Halaman -->
     <main id="main-content-slot">
-        <!-- Tempat injeksi konten halaman -->
+        <!-- Konten home.html / detail.html / player.html otomatis masuk ke sini -->
     </main>
 
     <!-- Footer Global -->
@@ -98,7 +100,7 @@
         <div class="footer-container">
             <div class="footer-grid">
                 <div>
-                    <a href="home.html" class="brand-logo" style="margin-bottom: 1rem;">
+                    <a href="?page=home" class="brand-logo" style="margin-bottom: 1rem;">
                         <div class="brand-icon" style="width: 36px; height: 36px;">
                             <i class="fas fa-fox"></i>
                         </div>
@@ -116,9 +118,9 @@
                 <div>
                     <h4 class="footer-col-title">Navigasi</h4>
                     <ul class="footer-links">
-                        <li><a href="home.html">Jelajahi</a></li>
-                        <li><a href="detail.html">Detail Film</a></li>
-                        <li><a href="player.html">Pemutar Video</a></li>
+                        <li><a href="?page=home">Jelajahi</a></li>
+                        <li><a href="?page=detail">Detail Film</a></li>
+                        <li><a href="?page=player">Pemutar Video</a></li>
                     </ul>
                 </div>
 
@@ -137,8 +139,7 @@
         </div>
     </footer>
 
-    <!-- Path disesuaikan dengan folder js/ -->
+    <!-- Script Utama Router & Layout -->
     <script src="js/layout.js"></script>
 </body>
 </html>
-
