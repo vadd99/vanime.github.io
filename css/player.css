@@ -1,10 +1,10 @@
 /* ==========================================
-   STYLESHEET KHUSUS PLAYER VIDEO (CSS/PLAYER.CSS)
+   STYLESHEET KHUSUS PLAYER VIDEO (css/player.css)
    ========================================== */
 
 .player-page-container {
     max-width: 1280px;
-    margin: 64px auto 2rem auto;
+    margin: 64px auto 2rem auto; /* 64px mengkompensasi navbar fixed */
     padding: 0;
 }
 
@@ -45,10 +45,6 @@
     z-index: 5;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-}
-
-.video-watermark i {
-    color: var(--vadd-primary, #60d381);
 }
 
 .video-watermark span {
@@ -210,8 +206,14 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    display: block;
+    display: inline-block;
     margin-bottom: 0.25rem;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.series-subtitle:hover {
+    color: #ffffff;
 }
 
 .episode-main-title {
@@ -447,31 +449,6 @@
 
 .all-episodes-btn:hover {
     background-color: rgba(255, 255, 255, 0.15);
-}
-
-/* Toast */
-#vadd-toast {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%) translateY(100px);
-    background-color: #11331e;
-    color: var(--vadd-primary, #60d381);
-    border: 1px solid var(--vadd-primary, #60d381);
-    padding: 0.6rem 1.2rem;
-    border-radius: 0.5rem;
-    font-size: 0.85rem;
-    font-weight: bold;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    z-index: 100;
-    opacity: 0;
-    transition: all 0.3s ease;
-    pointer-events: none;
-}
-
-#vadd-toast.show {
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
 }
 
 /* Responsive Desktop */

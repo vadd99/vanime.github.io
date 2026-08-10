@@ -1,8 +1,11 @@
 // ==========================================
-// SCRIPT LOGIKA PLAYER VIDEO (JS/PLAYER.JS)
+// SCRIPT LOGIKA PLAYER VIDEO (js/player.js)
 // ==========================================
 
-document.addEventListener('DOMContentLoaded', () => {
+// Ganti DOMContentLoaded dengan layoutReady (Sesuai arsitektur Injeksi Vadd Studio)
+window.addEventListener('layoutReady', () => {
+    console.log("Halaman Pemutar Video berhasil dimuat beserta layout!");
+
     const video = document.getElementById('main-video');
     const videoContainer = document.getElementById('video-container');
     const bigPlayBtn = document.getElementById('big-play-btn');
@@ -27,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. Play / Pause Toggle
     function togglePlay() {
+        if (!video) return;
         if (video.paused) {
             video.play();
         } else {
@@ -35,12 +39,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updatePlayState() {
+        if (!video) return;
         if (video.paused) {
-            btnPlayPause.innerHTML = '<i class="fas fa-play"></i>';
-            bigPlayBtn.classList.remove('hidden');
+            if(btnPlayPause) btnPlayPause.innerHTML = '<i class="fas fa-play"></i>';
+            if(bigPlayBtn) bigPlayBtn.classList.remove('hidden');
         } else {
-            btnPlayPause.innerHTML = '<i class="fas fa-pause"></i>';
-            bigPlayBtn.classList.add('hidden');
+            if(btnPlayPause) btnPlayPause.innerHTML = '<i class="fas fa-pause"></i>';
+            if(bigPlayBtn) bigPlayBtn.classList.add('hidden');
         }
     }
 
@@ -54,13 +59,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnPlayPause) btnPlayPause.addEventListener('click', togglePlay);
 
     // 3. Skip +/- 10 Detik
-    if (btnSkipBackward) {
+    if (btnSkipBackward && video) {
         btnSkipBackward.addEventListener('click', () => {
             video.currentTime = Math.max(0, video.currentTime - 10);
         });
     }
 
-    if (btnSkipForward) {
+    if (btnSkipForward && video) {
         btnSkipForward.addEventListener('click', () => {
             video.currentTime = Math.min(video.duration, video.currentTime + 10);
         });
@@ -69,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 4. Progress Bar & Time Update
     if (video) {
         video.addEventListener('timeupdate', () => {
-            if (video.duration) {
+            if (video.duration && progressBar && videoTime) {
                 const pct = (video.currentTime / video.duration) * 100;
                 progressBar.style.width = `${pct}%`;
                 videoTime.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
@@ -77,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         video.addEventListener('progress', () => {
-            if (video.buffered.length > 0 && video.duration) {
+            if (video.buffered.length > 0 && video.duration && bufferBar) {
                 const bufferedEnd = video.buffered.end(video.buffered.length - 1);
                 const pct = (bufferedEnd / video.duration) * 100;
                 bufferBar.style.width = `${pct}%`;
@@ -86,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Scrub / Click pada Progress Bar
-    if (progressContainer) {
+    if (progressContainer && video) {
         progressContainer.addEventListener('click', (e) => {
             const rect = progressContainer.getBoundingClientRect();
             const clickPos = (e.clientX - rect.left) / rect.width;
@@ -97,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 5. Pengaturan Volume
-    if (volumeSlider) {
+    if (volumeSlider && video) {
         volumeSlider.addEventListener('input', (e) => {
             video.volume = e.target.value;
             video.muted = (e.target.value === '0');
@@ -105,19 +110,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (btnVolume) {
+    if (btnVolume && video) {
         btnVolume.addEventListener('click', () => {
             video.muted = !video.muted;
             if (video.muted) {
-                volumeSlider.value = 0;
+                if(volumeSlider) volumeSlider.value = 0;
             } else {
-                volumeSlider.value = video.volume || 1;
+                if(volumeSlider) volumeSlider.value = video.volume || 1;
             }
             updateVolumeIcon();
         });
     }
 
     function updateVolumeIcon() {
+        if(!video || !btnVolume) return;
         if (video.muted || video.volume === 0) {
             btnVolume.innerHTML = '<i class="fas fa-volume-mute"></i>';
         } else if (video.volume < 0.5) {
@@ -140,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 7. Auto Hide Controls saat idle
     let idleTimer;
-    if (videoContainer) {
+    if (videoContainer && video) {
         videoContainer.addEventListener('mousemove', () => {
             videoContainer.classList.remove('user-idle');
             clearTimeout(idleTimer);
@@ -164,6 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnLike = document.getElementById('btn-like');
     const btnDislike = document.getElementById('btn-dislike');
     const btnDownload = document.getElementById('btn-download');
+    const btnMiniDownload = document.querySelector('.btn-download-mini');
 
     if (btnLike) {
         btnLike.addEventListener('click', () => {
@@ -182,6 +189,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnDownload) {
         btnDownload.addEventListener('click', () => {
             showToast('Memulai pengunduhan video...');
+        });
+    }
+    
+    if (btnMiniDownload) {
+        btnMiniDownload.addEventListener('click', (e) => {
+            e.preventDefault(); // Mencegah pindah halaman saat klik ikon download
+            showToast('Memulai pengunduhan episode...');
         });
     }
 });

@@ -2,7 +2,6 @@
 // SCRIPT LOGIKA DETAIL FILM (js/detail.js)
 // ==========================================
 
-// Menunggu event 'layoutReady' dari js/main.js
 window.addEventListener('layoutReady', () => {
     console.log("Halaman Detail berhasil dimuat beserta layout!");
 
@@ -74,5 +73,23 @@ window.addEventListener('layoutReady', () => {
             }
         });
     }
+
+    // 5. Mengarahkan tombol "Mulai Menonton" ke halaman pemutar video (player.html)
+    const watchButtons = document.querySelectorAll('.btn-watch-main');
+    watchButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'player.html';
+        });
+    });
+
+    // 6. Mengarahkan kartu-kartu episode ke halaman pemutar video (player.html)
+    const episodeCards = document.querySelectorAll('.episode-card');
+    episodeCards.forEach(card => {
+        card.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'player.html';
+        });
+    });
 
 });

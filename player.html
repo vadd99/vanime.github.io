@@ -1,162 +1,181 @@
-<!-- ==========================================
-     HALAMAN PLAYER VIDEO (PLAYER.HTML)
-     Modular - Dihubungkan ke layout.html
-     ========================================== -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pemutar Video - Vadd Studio</title>
+    <!-- Font Awesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Montserrat:wght@500;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- CSS Modular -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/player.css">
+</head>
+<body>
 
-<!-- CSS Khusus Halaman Player Video -->
-<link rel="stylesheet" href="css/player.css">
-<!-- CSS Khusus Halaman Utama -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Montserrat:wght@500;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/layout.css">
-<link rel="stylesheet" href="css/home.css">
+    <!-- Container Utama Layout (Diisi otomatis oleh js/main.js dari layout.html) -->
+    <div id="layout-wrapper"></div>
 
-<div class="player-page-container">
+    <!-- Template Konten Halaman Player -->
+    <template id="page-content">
+        <div class="player-page-container">
 
-    <!-- 1. Video Player Container -->
-    <div class="video-player-wrapper">
-        <div class="video-container" id="video-container">
-            
-            <!-- Mock Video / Poster Canvas Pemutaran Video -->
-            <video id="main-video" poster="https://images.unsplash.com/photo-1618336753174-89b25208b8b0?auto=format&fit=crop&q=80&w=1200">
-                <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
-                Browser Anda tidak mendukung pemutar video.
-            </video>
+            <!-- 1. Video Player Container -->
+            <div class="video-player-wrapper">
+                <div class="video-container" id="video-container">
+                    
+                    <!-- Mock Video / Poster Canvas Pemutaran Video -->
+                    <video id="main-video" poster="https://images.unsplash.com/photo-1618336753174-89b25208b8b0?auto=format&fit=crop&q=80&w=1200">
+                        <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+                        Browser Anda tidak mendukung pemutar video.
+                    </video>
 
-            <!-- Overlay Watermark Logo Vadd Studio -->
-            <div class="video-watermark">
-                <i class="fas fa-fox"></i> vadd<span>studio</span>
-            </div>
+                    <!-- Overlay Watermark Logo Vadd Studio -->
+                    <div class="video-watermark">
+                        <!-- Menggunakan logo image sama seperti layout -->
+                        <img src="logo.png" alt="Logo" style="width: 20px; height: 20px; border-radius: 50%; vertical-align: middle; margin-right: 4px; border: 1px solid var(--vadd-primary);">
+                        vadd<span>studio</span>
+                    </div>
 
-            <!-- Big Play Overlay Button (Muncul saat pause) -->
-            <button class="big-play-btn" id="big-play-btn" aria-label="Putar Video">
-                <i class="fas fa-play"></i>
-            </button>
+                    <!-- Big Play Overlay Button (Muncul saat pause) -->
+                    <button class="big-play-btn" id="big-play-btn" aria-label="Putar Video">
+                        <i class="fas fa-play"></i>
+                    </button>
 
-            <!-- Custom Video Controls -->
-            <div class="video-controls" id="video-controls">
-                <div class="progress-bar-container" id="progress-container">
-                    <div class="buffer-bar" id="buffer-bar"></div>
-                    <div class="progress-bar" id="progress-bar"></div>
-                </div>
-
-                <div class="controls-row">
-                    <div class="controls-left">
-                        <button class="control-btn" id="btn-play-pause" title="Putar/Jeda">
-                            <i class="fas fa-play"></i>
-                        </button>
-                        <button class="control-btn" id="btn-skip-backward" title="Mundur 10 Detik">
-                            <i class="fas fa-undo-alt"></i>
-                        </button>
-                        <button class="control-btn" id="btn-skip-forward" title="Maju 10 Detik">
-                            <i class="fas fa-redo-alt"></i>
-                        </button>
-
-                        <div class="volume-container">
-                            <button class="control-btn" id="btn-volume" title="Suara">
-                                <i class="fas fa-volume-up"></i>
-                            </button>
-                            <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="1" class="volume-slider">
+                    <!-- Custom Video Controls -->
+                    <div class="video-controls" id="video-controls">
+                        <div class="progress-bar-container" id="progress-container">
+                            <div class="buffer-bar" id="buffer-bar"></div>
+                            <div class="progress-bar" id="progress-bar"></div>
                         </div>
 
-                        <span class="video-time" id="video-time">00:00 / 00:00</span>
-                    </div>
+                        <div class="controls-row">
+                            <div class="controls-left">
+                                <button class="control-btn" id="btn-play-pause" title="Putar/Jeda">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                                <button class="control-btn" id="btn-skip-backward" title="Mundur 10 Detik">
+                                    <i class="fas fa-undo-alt"></i>
+                                </button>
+                                <button class="control-btn" id="btn-skip-forward" title="Maju 10 Detik">
+                                    <i class="fas fa-redo-alt"></i>
+                                </button>
 
-                    <div class="controls-right">
-                        <button class="control-btn badge-btn" title="Subtitles/Takarir">CC</button>
-                        <button class="control-btn" title="Pengaturan Kualitas"><i class="fas fa-cog"></i></button>
-                        <button class="control-btn" id="btn-fullscreen" title="Layar Penuh"><i class="fas fa-expand"></i></button>
+                                <div class="volume-container">
+                                    <button class="control-btn" id="btn-volume" title="Suara">
+                                        <i class="fas fa-volume-up"></i>
+                                    </button>
+                                    <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="1" class="volume-slider">
+                                </div>
+
+                                <span class="video-time" id="video-time">00:00 / 00:00</span>
+                            </div>
+
+                            <div class="controls-right">
+                                <button class="control-btn badge-btn" title="Subtitles/Takarir">CC</button>
+                                <button class="control-btn" title="Pengaturan Kualitas"><i class="fas fa-cog"></i></button>
+                                <button class="control-btn" id="btn-fullscreen" title="Layar Penuh"><i class="fas fa-expand"></i></button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- 2. Informasi Episode & Detail Pemutaran -->
-    <div class="player-info-container">
+            <!-- 2. Informasi Episode & Detail Pemutaran -->
+            <div class="player-info-container">
 
-        <!-- Judul Seri Anime / Film -->
-        <span class="series-subtitle">The World's Strongest Rearguard</span>
+                <!-- Judul Seri Anime / Film -->
+                <a href="detail.html" class="series-subtitle">The World's Strongest Rearguard</a>
 
-        <!-- Judul Episode -->
-        <h1 class="episode-main-title">E2 - The First Hurdle</h1>
+                <!-- Judul Episode -->
+                <h1 class="episode-main-title">E2 - The First Hurdle</h1>
 
-        <!-- Metadata Tag (Usia, Subtitle) -->
-        <div class="episode-tags">
-            <span class="age-tag">14+</span>
-            <span class="sub-status"><i class="fas fa-closed-captioning"></i> Dengan Takarir</span>
-        </div>
+                <!-- Metadata Tag (Usia, Subtitle) -->
+                <div class="episode-tags">
+                    <span class="age-tag">14+</span>
+                    <span class="sub-status"><i class="fas fa-closed-captioning"></i> Dengan Takarir</span>
+                </div>
 
-        <!-- Toolbar Tombol Aksi (Like, Dislike, Download, Share) -->
-        <div class="interaction-toolbar">
-            <div class="like-dislike-group">
-                <button class="toolbar-btn" id="btn-like">
-                    <i class="far fa-thumbs-up"></i>
-                    <span id="like-count">15R</span>
-                </button>
-                <div class="divider"></div>
-                <button class="toolbar-btn" id="btn-dislike">
-                    <i class="far fa-thumbs-down"></i>
-                    <span id="dislike-count">330</span>
-                </button>
-            </div>
-
-            <div class="action-tools">
-                <button class="toolbar-btn circle-btn" title="Unduh Offline" id="btn-download">
-                    <i class="fas fa-download"></i>
-                </button>
-                <button class="toolbar-btn circle-btn" title="Opsi Lainnya" id="btn-more-options">
-                    <i class="fas fa-ellipsis-v"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Deskripsi Ringkas Episode -->
-        <div class="episode-description">
-            <p>Arihito finds Kyouka under attack by a powerful Named monster and must find a way to save her.</p>
-        </div>
-
-        <!-- Peringatan Konten -->
-        <div class="content-warning-box">
-            <h3 class="warning-title">Peringatan Konten</h3>
-            <p class="warning-tags">14+</p>
-            <p class="warning-details">Kekerasan, Ketelanjangan</p>
-        </div>
-
-        <!-- Section Episode Berikutnya -->
-        <div class="next-episode-section">
-            <h3 class="section-label">Episode Berikutnya</h3>
-
-            <a href="player.html" class="next-episode-card">
-                <div class="next-thumb-wrapper">
-                    <img src="https://images.unsplash.com/photo-1542204165-65bf26472b9b?auto=format&fit=crop&q=80&w=350" alt="Thumbnail Episode Berikutnya">
-                    <div class="play-overlay-mini">
-                        <i class="fas fa-play"></i>
+                <!-- Toolbar Tombol Aksi (Like, Dislike, Download, Share) -->
+                <div class="interaction-toolbar">
+                    <div class="like-dislike-group">
+                        <button class="toolbar-btn" id="btn-like">
+                            <i class="far fa-thumbs-up"></i>
+                            <span id="like-count">15R</span>
+                        </button>
+                        <div class="divider"></div>
+                        <button class="toolbar-btn" id="btn-dislike">
+                            <i class="far fa-thumbs-down"></i>
+                            <span id="dislike-count">330</span>
+                        </button>
                     </div>
-                    <span class="time-tag">23m</span>
+
+                    <div class="action-tools">
+                        <button class="toolbar-btn circle-btn" title="Unduh Offline" id="btn-download">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button class="toolbar-btn circle-btn" title="Opsi Lainnya" id="btn-more-options">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </div>
                 </div>
 
-                <div class="next-episode-info">
-                    <h4 class="next-title">3. The Little Tyrant Girl</h4>
+                <!-- Deskripsi Ringkas Episode -->
+                <div class="episode-description">
+                    <p>Arihito finds Kyouka under attack by a powerful Named monster and must find a way to save her. Dia menggunakan seluruh kemampuannya untuk melindungi barisan belakang dari kehancuran total.</p>
                 </div>
 
-                <button class="btn-download-mini" title="Unduh Episode Ini">
-                    <i class="fas fa-download"></i>
-                </button>
-            </a>
+                <!-- Peringatan Konten -->
+                <div class="content-warning-box">
+                    <h3 class="warning-title">Peringatan Konten</h3>
+                    <p class="warning-tags">14+</p>
+                    <p class="warning-details">Kekerasan, Ketelanjangan Ringan</p>
+                </div>
 
-            <!-- Tombol Navigasi Ke Semua Episode -->
-            <div class="all-episodes-link-wrapper">
-                <a href="detail.html" class="all-episodes-btn">Semua Episode</a>
+                <!-- Section Episode Berikutnya -->
+                <div class="next-episode-section">
+                    <h3 class="section-label">Episode Berikutnya</h3>
+
+                    <!-- Arahkan kembali ke diri sendiri (re-render / pindah episode) -->
+                    <a href="player.html" class="next-episode-card">
+                        <div class="next-thumb-wrapper">
+                            <img src="https://images.unsplash.com/photo-1542204165-65bf26472b9b?auto=format&fit=crop&q=80&w=350" alt="Thumbnail Episode Berikutnya">
+                            <div class="play-overlay-mini">
+                                <i class="fas fa-play"></i>
+                            </div>
+                            <span class="time-tag">23m</span>
+                        </div>
+
+                        <div class="next-episode-info">
+                            <h4 class="next-title">E3 - The Little Tyrant Girl</h4>
+                        </div>
+
+                        <button class="btn-download-mini" title="Unduh Episode Ini">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </a>
+
+                    <!-- Tombol Navigasi Ke Semua Episode -->
+                    <div class="all-episodes-link-wrapper">
+                        <a href="detail.html" class="all-episodes-btn">Lihat Semua Episode</a>
+                    </div>
+                </div>
+
             </div>
+
+            <!-- Toast Pop-up Notifikasi -->
+            <div id="vadd-toast">Berhasil ditambahkan ke Daftarku!</div>
+
         </div>
+    </template>
 
-    </div>
+    <!-- Script Utama (Mengatur Injeksi Layout) -->
+    <script src="js/main.js"></script>
+    <!-- Script Spesifik Halaman Player -->
+    <script type="module" src="js/player.js"></script>
+</body>
+</html>
 
-</div>
-
-<!-- Toast Notifikasi Sederhana -->
-<div id="vadd-toast"></div>
-
-<!-- JS Khusus Halaman Player Video -->
-<script src="js/player.js"></script>
