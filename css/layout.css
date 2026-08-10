@@ -18,18 +18,31 @@ nav#navbar.scrolled {
 
 .nav-left, .nav-right, .nav-right-icons { display: flex; align-items: center; }
 
+/* PERBAIKAN: Tombol Sidebar sekarang ditampilkan di mobile */
 .menu-btn {
-    color: #ffffff; font-size: 1.25rem; margin-right: 1rem; display: none;
+    color: #ffffff; 
+    font-size: 1.25rem; 
+    margin-right: 1rem; 
+    display: block; 
+    background: transparent;
+    border: none;
+    cursor: pointer;
 }
 
 .brand-logo { display: flex; align-items: center; gap: 0.5rem; }
-.brand-icon {
-    width: 40px; height: 40px; border-radius: 50%;
-    background-color: var(--vadd-card); border: 2px solid var(--vadd-primary);
-    display: flex; align-items: center; justify-content: center;
-    color: var(--vadd-accent); font-size: 1.2rem; transition: transform 0.3s ease;
+
+/* PERBAIKAN: Styling untuk image logo agar melingkar sempurna */
+.brand-image {
+    width: 40px; 
+    height: 40px; 
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: var(--vadd-card); 
+    border: 2px solid var(--vadd-primary);
+    transition: transform 0.3s ease;
 }
-.brand-logo:hover .brand-icon { transform: scale(1.1); }
+.brand-logo:hover .brand-image { transform: scale(1.1); }
+
 .brand-text { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--vadd-primary); }
 .brand-text span { color: #ffffff; font-size: 1rem; margin-left: 0.25rem; }
 
@@ -82,6 +95,7 @@ footer.footer { background-color: var(--vadd-nav); border-top: 1px solid var(--v
 .footer-bottom { border-top: 1px solid #1f2937; padding-top: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; align-items: center; gap: 1rem; }
 .copyright { color: #6b7280; font-size: 0.75rem; }
 
+/* Hide mobile menu button on desktop */
 @media (min-width: 768px) {
     .menu-btn { display: none; }
     .desktop-menu { display: flex; }
