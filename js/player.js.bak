@@ -43,22 +43,6 @@ function getResponsiveEmbedHTML(rawUrl) {
     return embedHTML;
 }
 
-function renderEmbed(url) {
-    const embedContainer = document.getElementById('embed-container');
-    const mainVideo = document.getElementById('main-video');
-    const videoControls = document.getElementById('video-controls');
-    const bigPlayBtn = document.getElementById('big-play-btn');
-
-    if (!embedContainer) return;
-    
-    if (mainVideo) mainVideo.style.display = 'none';
-    if (videoControls) videoControls.style.display = 'none';
-    if (bigPlayBtn) bigPlayBtn.style.display = 'none';
-
-    embedContainer.style.display = 'block';
-    embedContainer.innerHTML = getResponsiveEmbedHTML(url);
-}
-
 window.addEventListener('layoutReady', async () => {
     console.log("Halaman Pemutar Video dimuat!");
 
@@ -75,6 +59,11 @@ window.addEventListener('layoutReady', async () => {
     const epSeriesTitle = document.getElementById('ep-series-title');
     const epMainTitle = document.getElementById('ep-main-title');
     const epDesc = document.getElementById('ep-desc');
+    
+    const embedContainer = document.getElementById('embed-container');
+    const mainVideo = document.getElementById('main-video');
+    const videoControls = document.getElementById('video-controls');
+    const bigPlayBtn = document.getElementById('big-play-btn');
 
     try {
         const epDoc = await getDoc(doc(db, "episodes", epId));
@@ -100,34 +89,15 @@ window.addEventListener('layoutReady', async () => {
             epDesc.innerText = seriesDoc.data().description || "Selamat menonton episode ini di Vadd Studio!";
         }
 
-        // --- RENDER SERVER SELECTOR ---
-        const serverSelector = document.getElementById('server-selector-container');
-        
-        // AMBIL DATA SERVER (Dukung data lama 'embedUrl' atau data baru 'servers')
-        let servers = epData.servers || [];
-        if (servers.length === 0 && epData.embedUrl) {
-             servers = [{ name: "Google Drive", url: epData.embedUrl }]; // Fallback data lama
-        }
+        if (epData.embedUrl) {
+            if (mainVideo) mainVideo.style.display = 'none';
+            if (videoControls) videoControls.style.display = 'none';
+            if (bigPlayBtn) bigPlayBtn.style.display = 'none';
 
-        if (serverSelector && servers.length > 0) {
-            serverSelector.innerHTML = '';
-            servers.forEach((srv, index) => {
-                const btn = document.createElement('button');
-                btn.className = `server-btn ${index === 0 ? 'active' : ''}`;
-                btn.innerHTML = `<i class="fas fa-server"></i> ${srv.name}`;
-                btn.onclick = () => {
-                    document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    renderEmbed(srv.url);
-                };
-                serverSelector.appendChild(btn);
-            });
-
-            // Render Server pertama secara default
-            renderEmbed(servers[0].url);
-        } else {
-             // Fallback jika tidak ada server sama sekali
-             renderEmbed("");
+            if (embedContainer) {
+                embedContainer.style.display = 'block';
+                embedContainer.innerHTML = getResponsiveEmbedHTML(epData.embedUrl);
+            }
         }
 
         // --- MENGAMBIL SEMUA DAFTAR EPISODE ---
@@ -199,6 +169,7 @@ window.addEventListener('layoutReady', async () => {
 
     const btnLike = document.getElementById('btn-like');
     const btnDislike = document.getElementById('btn-dislike');
+    const btnDownload = document.getElementById('btn-download');
 
     if (btnLike) {
         btnLike.addEventListener('click', () => {
@@ -212,5 +183,9 @@ window.addEventListener('layoutReady', async () => {
             btnDislike.classList.toggle('active');
             if (btnLike) btnLike.classList.remove('active');
         });
+    }
+
+    if (btnDownload) {
+        btnDownload.addEventListener('click', () => showToast('Memulai pengunduhan video...'));
     }
 });

@@ -90,14 +90,10 @@
                             <i class="far fa-thumbs-down"></i> <span id="dislike-count">0</span>
                         </button>
                     </div>
-                    
-                    <!-- CONTAINER SERVER SELECTOR -->
-                    <div class="server-selector-container" id="server-selector-container">
-                        <!-- Tombol server akan disuntikkan via JS -->
-                    </div>
 
                     <div class="action-tools">
-                        <!-- Removed Download and More Options buttons -->
+                        <button class="toolbar-btn circle-btn" title="Unduh Offline" id="btn-download"><i class="fas fa-download"></i></button>
+                        <button class="toolbar-btn circle-btn" title="Opsi Lainnya" id="btn-more-options"><i class="fas fa-ellipsis-v"></i></button>
                     </div>
                 </div>
 
