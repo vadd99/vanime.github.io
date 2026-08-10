@@ -1,0 +1,48 @@
+/* Variabel & Reset Dasar */
+:root {
+    --vadd-bg: #05120a;
+    --vadd-nav: #0a2214;
+    --vadd-card: #11331e;
+    --vadd-light: #a1e8b9;
+    --vadd-primary: #60d381;
+    --vadd-accent: #f27329;
+    --vadd-gold: #fcd34d;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--vadd-bg);
+    color: #ffffff;
+    font-family: 'Lato', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    background: none;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 10px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--vadd-bg); }
+::-webkit-scrollbar-thumb { background: var(--vadd-card); border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: var(--vadd-primary); }
+
+.hide-scroll::-webkit-scrollbar { display: none; }
+.hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
