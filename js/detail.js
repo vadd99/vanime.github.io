@@ -18,11 +18,11 @@ window.addEventListener('layoutReady', async () => {
         return;
     }
 
-    // --- FITUR VIEW COUNTER ---
+    // --- FITUR VIEW COUNTER (Penghitung Jumlah Klik) ---
     try {
         const seriesRef = doc(db, "series", seriesId);
         await updateDoc(seriesRef, {
-            views: increment(1)
+            total_views: increment(1) // Menambah +1 view setiap halaman dibuka
         });
         console.log("View berhasil ditambahkan!");
     } catch (error) {
@@ -38,6 +38,7 @@ window.addEventListener('layoutReady', async () => {
     const elEpContainer = document.getElementById('episode-container');
     const btnWatchHero = document.getElementById('btn-watch-hero');
     const btnWatchMobile = document.getElementById('btn-watch-mobile');
+    const ratingContainer = document.getElementById('rating-container'); // Tambahan DOM Rating
 
     try {
         // 2. MENGAMBIL DATA SERIES DARI FIREBASE
@@ -45,8 +46,8 @@ window.addEventListener('layoutReady', async () => {
         const docSnap = await getDoc(docRef);
 
         if (!docSnap.exists()) {
-            elTitle.innerHTML = "Judul Tidak Ditemukan";
-            elDesc.innerHTML = "Maaf, data film atau seri ini tidak ada di database.";
+            if(elTitle) elTitle.innerHTML = "Judul Tidak Ditemukan";
+            if(elDesc) elDesc.innerHTML = "Maaf, data film atau seri ini tidak ada di database.";
             return;
         }
 
@@ -55,9 +56,43 @@ window.addEventListener('layoutReady', async () => {
         // 3. SET DATA SERIES KE HTML
         if(elPageTitle) elPageTitle.innerText = `${seriesData.title} - Vadd Studio`;
         if(elBanner) elBanner.src = seriesData.bannerUrl || seriesData.banner_url || "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&q=80&w=1600";
-        if(elTitle) elTitle.innerHTML = `${seriesData.title} <span>${seriesData.category || 'Animasi'}</span>`;
+        if(elTitle) elTitle.innerHTML = `${seriesData.title} <span style="display:block; font-size:14px; margin-top:8px; color:var(--color-green); letter-spacing:2px; font-weight:700;">${seriesData.category ? seriesData.category.toUpperCase() : 'ANIMASI'}</span>`;
         if(elDesc) elDesc.innerText = seriesData.description || "Tidak ada sinopsis tersedia untuk judul ini.";
-        if(elCat) elCat.innerText = seriesData.category || 'Animasi';
+
+        // ========================================================
+        // LOGIKA RATING OTOMATIS (Mencegah Bintang Kosong)
+        // ========================================================
+        let charSum = 0;
+        for(let i = 0; i < seriesId.length; i++) {
+            charSum += seriesId.charCodeAt(i);
+        }
+        
+        // Menghasilkan angka antara 4.2 hingga 4.9 secara konsisten
+        let ratingValue = (4.2 + (charSum % 8) / 10).toFixed(1); 
+        
+        // Jika di database sudah ada rating manual, utamakan data dari database
+        if (seriesData.rating) {
+            ratingValue = Number(seriesData.rating).toFixed(1);
+        }
+
+        // Generate Icon Bintang
+        let starsHTML = '';
+        const fullStars = Math.floor(ratingValue);
+        const hasHalfStar = (ratingValue % 1) >= 0.4;
+        const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+        for(let i=0; i<fullStars; i++) starsHTML += '<i class="fas fa-star" style="color:#facc15;"></i> ';
+        if(hasHalfStar) starsHTML += '<i class="fas fa-star-half-alt" style="color:#facc15;"></i> ';
+        for(let i=0; i<emptyStars; i++) starsHTML += '<i class="far fa-star" style="color:#facc15;"></i> ';
+
+        // Suntikkan ke HTML
+        if(ratingContainer) {
+            ratingContainer.innerHTML = `
+                ${starsHTML}
+                <span class="rating-val" style="margin-left:8px; font-weight:bold; color:#fff;">${ratingValue}</span>
+            `;
+        }
+        // ========================================================
 
         // 4. MENGAMBIL DATA EPISODE DARI FIREBASE
         const q = query(collection(db, "episodes"), where("seriesId", "==", seriesId));
@@ -114,7 +149,6 @@ window.addEventListener('layoutReady', async () => {
         console.error("Error Detail Firebase:", error);
         if(elEpContainer) elEpContainer.innerHTML = '<div style="color:#ef4444; padding: 20px;">Gagal memuat episode.</div>';
     }
-
 
     // --- LOGIKA UI (Dari detail.js asli) ---
 
