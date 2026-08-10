@@ -100,7 +100,7 @@
         .ep-title-text { font-size: 15px; font-weight: bold; color: #fff; }
         .ep-sub-text { font-size: 12px; color: var(--color-text-muted); margin-top: 4px; }
 
-        /* --- RESPONSIVE MOBILE --- */
+        /* --- RESPONSIVE MOBILE (YANG SEMPAT HILANG) --- */
         .overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 40; }
         .overlay.active { display: block; }
 
@@ -127,6 +127,7 @@
                 <div class="logo-icon">VS</div>
                 <div class="logo-text"><span>vadd</span> <span>studio</span></div>
             </div>
+            <!-- TOMBOL CLOSE SIDEBAR DI HP -->
             <button class="close-sidebar-btn" id="closeSidebar"><i class="ph ph-x"></i></button>
         </div>
         <nav class="nav-menu">
@@ -144,6 +145,7 @@
     <div class="main-wrapper">
         <header class="top-header">
             <div class="header-left">
+                <!-- TOMBOL BUKA SIDEBAR DI HP -->
                 <button class="menu-btn" id="openSidebar"><i class="ph ph-list"></i></button>
                 <h1 class="page-title" id="headerTitle">Ringkasan Dashboard</h1>
             </div>
@@ -208,7 +210,7 @@
 
     <script type="module">
         import { db } from './js/firebase-init.js';
-        import { collection, getDocs, deleteDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { collection, getDocs, deleteDoc, doc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // --- LOGIKA UI MOBILE SIDEBAR ---
         const sidebar = document.getElementById('sidebar');
@@ -274,13 +276,13 @@
                         <div class="post-info">
                             <div class="post-title">${item.title || 'Tanpa Judul'}</div>
                             <div class="post-meta">
-                                <span class="post-category">${item.genres || item.category || 'Uncategorized'}</span>
+                                <span class="post-category">${item.category || 'Uncategorized'}</span>
                                 <span class="ep-badge"><i class="ph ph-video-camera"></i> ${totalEp} Episode</span>
                             </div>
                         </div>
                         <div class="post-actions">
                             <button class="action-btn" style="color:var(--color-green);" title="Lihat Episode" onclick="openEpModal('${item.id}', '${item.title}')"><i class="ph ph-list-numbers"></i></button>
-                            <button class="action-btn" title="Edit Judul" onclick="editSeries('${item.id}')"><i class="ph ph-pencil-simple"></i></button>
+                            <button class="action-btn" title="Edit Judul"><i class="ph ph-pencil-simple"></i></button>
                             <button class="action-btn delete" title="Hapus Judul" onclick="deleteSeriesData('${item.id}')"><i class="ph ph-trash"></i></button>
                         </div>
                     </div>
@@ -300,6 +302,7 @@
             epModal.classList.add('active');
 
             try {
+                // PERBAIKAN: Hapus "orderBy" di query Firebase untuk mencegah Error Index
                 const q = query(collection(db, "episodes"), where("seriesId", "==", seriesId));
                 const snapshot = await getDocs(q);
                 
@@ -308,6 +311,7 @@
                     return;
                 }
 
+                // PERBAIKAN: Masukkan data ke array, lalu urutkan angkanya menggunakan JavaScript
                 let epArray = [];
                 snapshot.forEach(doc => epArray.push({ id: doc.id, ...doc.data() }));
                 
@@ -318,6 +322,7 @@
                 epArray.forEach(ep => {
                     const thumb = ep.thumbnailUrl || 'https://via.placeholder.com/100x56?text=No+Thumb';
                     
+                    // PERBAIKAN: Mengamankan format tanggal agar tidak error jika data baru disubmit
                     let dateStr = 'Baru saja';
                     if (ep.createdAt && typeof ep.createdAt.toDate === 'function') {
                         dateStr = new Date(ep.createdAt.toDate()).toLocaleDateString('id-ID');
@@ -340,6 +345,7 @@
                 });
             } catch(e) {
                 console.error(e);
+                // Menampilkan detail error di layar agar lebih mudah dilacak jika terjadi lagi
                 modalList.innerHTML = `<div class="empty-state">Gagal memuat daftar episode.<br><span style="font-size:10px; color:red;">${e.message}</span></div>`;
             }
         }
@@ -352,11 +358,6 @@
         });
 
         // --- EDIT & HAPUS ---
-        // Penambahan Edit Judul Series
-        window.editSeries = (seriesId) => {
-            window.location.href = `post.html?editSeries=${seriesId}`;
-        }
-        
         window.editEpisode = (epId) => {
             window.location.href = `post.html?editEp=${epId}`;
         }
