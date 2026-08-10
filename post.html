@@ -67,26 +67,47 @@
                 <div>
                     <!-- FORM 1: SERI -->
                     <form id="form-series" class="bg-vs-panel border border-vs-border rounded-xl p-6 space-y-5 shadow-xl">
-                        <!-- Konten Form Seri (Sama dengan sebelumnya) -->
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-1">Judul Anime/Seri <span class="text-red-500">*</span></label>
                             <input type="text" id="seriesTitle" required class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-1 flex justify-between">
-                                <span>Kategori</span>
-                                <button type="button" class="text-xs text-vs-green hover:underline flex items-center gap-1"><i data-lucide="plus" class="w-3 h-3"></i> Baru</button>
-                            </label>
-                            <select id="seriesCategory" required class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none"><option value="Animasi">Animasi</option></select>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Genre</label>
+                                <input type="text" id="seriesGenre" placeholder="Drama, Fantasi, Seinen" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Rating Usia</label>
+                                <input type="text" id="seriesAge" placeholder="13+, 16+, 18+" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                            </div>
                         </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Audio Languages</label>
+                            <input type="text" id="seriesAudio" placeholder="Japanese, Bahasa Indonesia, English" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Subtitle Languages</label>
+                            <input type="text" id="seriesSubtitle" placeholder="Bahasa Indonesia, English, Melayu" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Peringatan Konten</label>
+                            <input type="text" id="seriesWarning" placeholder="Kekerasan, Konten Seksual, Perkataan Kasar" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                        </div>
+
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-1">Banner (Path Github)</label>
                             <input type="text" id="seriesBanner" placeholder="banner/1.jpg" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
                         </div>
+
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-1">Deskripsi</label>
                             <textarea id="seriesDesc" rows="3" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none resize-y"></textarea>
                         </div>
+
                         <div class="pt-4 flex justify-end">
                             <button type="submit" class="bg-vs-green hover:bg-green-500 text-vs-bg px-6 py-2.5 rounded-lg font-bold flex items-center gap-2">
                                 <i data-lucide="save" class="w-4 h-4"></i> Simpan Judul
@@ -128,7 +149,7 @@
                     </form>
                 </div>
 
-                <!-- PREVIEW (Sama seperti sebelumnya) -->
+                <!-- PREVIEW -->
                 <div class="bg-vs-panel border border-vs-border rounded-xl p-6 shadow-xl hidden lg:block">
                     <h2 class="text-sm font-bold text-gray-400 mb-4 uppercase tracking-wider flex items-center gap-2">
                         <i data-lucide="eye" class="w-4 h-4"></i> Live Preview
@@ -277,19 +298,28 @@
                 }
             });
 
-            // (Kode submit untuk Form Seri tetap sama, disingkat untuk menghemat baris)
+            // --- SUBMIT FORM SERI (DENGAN FIELD TAMBAHAN) ---
             document.getElementById('form-series').addEventListener('submit', async(e)=>{
                e.preventDefault();
                try {
                    await addDoc(collection(db, "series"), {
                         title: document.getElementById('seriesTitle').value.trim(), 
-                        category: document.getElementById('seriesCategory').value,
+                        genres: document.getElementById('seriesGenre').value.trim(),
+                        ageRating: document.getElementById('seriesAge').value.trim(),
+                        audioLanguages: document.getElementById('seriesAudio').value.trim(),
+                        subtitleLanguages: document.getElementById('seriesSubtitle').value.trim(),
+                        contentWarnings: document.getElementById('seriesWarning').value.trim(),
                         bannerUrl: document.getElementById('seriesBanner').value.trim(), 
                         description: document.getElementById('seriesDesc').value.trim(),
                         createdAt: serverTimestamp()
                     });
-                    alert('Judul Tersimpan!'); e.target.reset(); loadSeriesData(); switchTab('episode');
-               } catch(err) { alert(err.message); }
+                    alert('Judul Seri Berhasil Tersimpan!'); 
+                    e.target.reset(); 
+                    loadSeriesData(); 
+                    switchTab('episode');
+               } catch(err) { 
+                   alert("Gagal menyimpan seri: " + err.message); 
+               }
             });
         });
     </script>
