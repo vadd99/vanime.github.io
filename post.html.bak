@@ -11,7 +11,6 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Konfigurasi Tema Tailwind Kustom -->
     <script>
         tailwind.config = {
             theme: {
@@ -47,7 +46,7 @@
             </a>
             <div class="flex items-center gap-2 border-l border-vs-border pl-3 ml-1">
                 <div class="w-8 h-8 rounded-full bg-vs-border border-2 border-vs-green flex items-center justify-center overflow-hidden">
-                   <!-- Menggunakan Logo Anda -->
+                   <!-- Pastikan nama file persis logo.png (huruf kecil semua) di GitHub -->
                    <img src="logo.png" alt="Logo" class="w-full h-full object-cover">
                 </div>
                 <span class="text-lg font-bold tracking-tight hidden sm:block">
@@ -61,7 +60,6 @@
     <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 relative">
         <div class="max-w-5xl mx-auto space-y-6 animate-[fadeIn_0.5s_ease-out]">
             
-            <!-- Page Title & Tabs -->
             <div class="border-b border-vs-border pb-0">
                 <h1 class="text-2xl font-bold text-white mb-4">Kelola Konten Video</h1>
                 <div class="flex gap-6">
@@ -75,16 +73,10 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                
                 <!-- BAGIAN KIRI: FORM -->
                 <div>
-                    <!-- FORM 1: TAMBAH JUDUL SERI (ANIMASI BARU) -->
+                    <!-- FORM 1: TAMBAH JUDUL SERI -->
                     <form id="form-series" class="bg-vs-panel border border-vs-border rounded-xl p-6 space-y-5 shadow-xl">
-                        <div class="bg-vs-hover/50 border border-vs-border p-3 rounded-lg flex gap-3 mb-2">
-                            <i data-lucide="info" class="text-vs-green w-5 h-5 shrink-0 mt-0.5"></i>
-                            <p class="text-xs text-gray-300 leading-relaxed">Buat entri Judul Anime/Seri baru di sini. Nantinya data ini akan tampil di bagian atas <span class="text-vs-green font-bold">detail.html</span>.</p>
-                        </div>
-
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-1">Judul Anime/Seri <span class="text-red-500">*</span></label>
                             <input type="text" id="seriesTitle" required placeholder="Cth: Mushoku Tensei" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
@@ -121,11 +113,6 @@
 
                     <!-- FORM 2: TAMBAH EPISODE -->
                     <form id="form-episode" class="bg-vs-panel border border-vs-border rounded-xl p-6 space-y-5 shadow-xl hidden">
-                        <div class="bg-vs-hover/50 border border-vs-border p-3 rounded-lg flex gap-3 mb-2">
-                            <i data-lucide="video" class="text-vs-orange w-5 h-5 shrink-0 mt-0.5"></i>
-                            <p class="text-xs text-gray-300 leading-relaxed">Tambahkan episode ke judul yang sudah ada. Akan tampil sebagai daftar di <span class="text-vs-green font-bold">detail.html</span> dan diputar di <span class="text-vs-green font-bold">player.html</span>.</p>
-                        </div>
-
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-1 flex justify-between">
                                 <span>Pilih Judul Seri <span class="text-red-500">*</span></span>
@@ -156,7 +143,7 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-1">URL Embed Video (Youtube/Iframe) <span class="text-red-500">*</span></label>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">URL Embed Video <span class="text-red-500">*</span></label>
                             <input type="url" id="epEmbed" required placeholder="https://www.youtube.com/embed/xxxxx" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
                         </div>
 
@@ -174,7 +161,6 @@
                         <i data-lucide="eye" class="w-4 h-4"></i> Live Preview
                     </h2>
                     
-                    <!-- Preview Judul Seri (Detail.html look) -->
                     <div id="preview-series" class="relative w-full aspect-video rounded-xl overflow-hidden border border-vs-border bg-vs-bg shadow-2xl group">
                         <div id="prev-s-bg" class="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat opacity-60"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-vs-bg via-vs-bg/70 to-transparent"></div>
@@ -182,13 +168,12 @@
                             <h1 id="prev-s-title" class="text-2xl sm:text-3xl font-black text-white leading-tight mb-2 uppercase">Nama Anime</h1>
                             <div class="flex justify-center gap-2 text-xs text-gray-300 mb-4">
                                 <span class="border border-vs-green text-vs-green px-1.5 py-0.5 rounded">16+</span>
-                                <span id="prev-s-cat" class="px-1.5 py-0.5 border border-transparent">Animasi</span>
+                                <span id="prev-s-cat" class="px-1.5 py-0.5 border border-transparent">Kategori</span>
                             </div>
                             <p id="prev-s-desc" class="text-gray-300 text-xs line-clamp-2">Sinopsis akan muncul di sini saat Anda mengetik...</p>
                         </div>
                     </div>
 
-                    <!-- Preview Episode (Player.html / Card look) -->
                     <div id="preview-episode" class="hidden space-y-4">
                         <div class="flex gap-4 p-3 rounded-lg bg-vs-hover/40 border border-transparent">
                             <div class="relative w-32 aspect-video rounded bg-vs-bg overflow-hidden shrink-0 border border-vs-border">
@@ -202,7 +187,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -223,7 +207,7 @@
             
             <div class="flex justify-end gap-3">
                 <button type="button" id="btn-cancel-category" class="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Batal</button>
-                <button type="button" id="btn-save-category" class="bg-vs-green hover:bg-green-500 text-vs-bg px-5 py-2 rounded-lg font-bold text-sm flex items-center gap-2 transition-all shadow-lg shadow-green-900/20">
+                <button type="button" id="btn-save-category" class="bg-vs-green hover:bg-green-500 text-vs-bg px-5 py-2 rounded-lg font-bold text-sm flex items-center gap-2 transition-all">
                     <i data-lucide="save" class="w-4 h-4"></i> Simpan
                 </button>
             </div>
@@ -231,98 +215,70 @@
     </div>
 
     <script type="module">
-        // 1. IMPORT FIREBASE (Sesuaikan path file firebase-init.js)
         import { db } from './js/firebase-init.js'; 
         import { collection, addDoc, getDocs, query, orderBy, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
 
-            // --- ELEMEN UI & TABS ---
+            // --- TABS LOGIC ---
             const tabSeriesBtn = document.getElementById('tab-btn-series');
             const tabEpisodeBtn = document.getElementById('tab-btn-episode');
             const formSeries = document.getElementById('form-series');
             const formEpisode = document.getElementById('form-episode');
-            
             const previewSeries = document.getElementById('preview-series');
             const previewEpisode = document.getElementById('preview-episode');
-            const shortcutSeriesBtn = document.getElementById('btn-shortcut-series');
 
-            // Fungsi Pindah Tab
             function switchTab(tab) {
                 if (tab === 'series') {
                     tabSeriesBtn.className = "pb-3 tab-active transition-colors flex items-center gap-2";
                     tabEpisodeBtn.className = "pb-3 tab-inactive transition-colors flex items-center gap-2";
-                    formSeries.classList.remove('hidden');
-                    formEpisode.classList.add('hidden');
-                    previewSeries.classList.remove('hidden');
-                    previewEpisode.classList.add('hidden');
+                    formSeries.classList.remove('hidden'); formEpisode.classList.add('hidden');
+                    previewSeries.classList.remove('hidden'); previewEpisode.classList.add('hidden');
                 } else {
                     tabSeriesBtn.className = "pb-3 tab-inactive transition-colors flex items-center gap-2";
                     tabEpisodeBtn.className = "pb-3 tab-active transition-colors flex items-center gap-2";
-                    formSeries.classList.add('hidden');
-                    formEpisode.classList.remove('hidden');
-                    previewSeries.classList.add('hidden');
-                    previewEpisode.classList.remove('hidden');
+                    formSeries.classList.add('hidden'); formEpisode.classList.remove('hidden');
+                    previewSeries.classList.add('hidden'); previewEpisode.classList.remove('hidden');
                     loadSeriesData(); 
                 }
             }
 
             tabSeriesBtn.addEventListener('click', () => switchTab('series'));
             tabEpisodeBtn.addEventListener('click', () => switchTab('episode'));
-            shortcutSeriesBtn.addEventListener('click', () => switchTab('series'));
+            document.getElementById('btn-shortcut-series').addEventListener('click', () => switchTab('series'));
 
-
-            // --- LOGIKA KATEGORI (DATABASE & MODAL) ---
+            // --- KATEGORI LOGIC ---
             const sCat = document.getElementById('seriesCategory');
-            const btnAddCategory = document.getElementById('btn-add-category');
             const modalCategory = document.getElementById('modal-category');
             const modalCatContent = document.getElementById('modal-category-content');
-            const btnCloseCategory = document.getElementById('btn-close-category');
-            const btnCancelCategory = document.getElementById('btn-cancel-category');
-            const btnSaveCategory = document.getElementById('btn-save-category');
             const newCategoryName = document.getElementById('newCategoryName');
+            const btnSaveCategory = document.getElementById('btn-save-category');
 
-            // Load kategori dari Firebase
             async function loadCategories(autoSelectValue = null) {
                 try {
                     const q = query(collection(db, "categories"), orderBy("name", "asc"));
-                    const querySnapshot = await getDocs(q);
+                    const snapshot = await getDocs(q);
                     
                     sCat.innerHTML = '<option value="" disabled selected>Pilih Kategori...</option>';
-                    
-                    if (querySnapshot.empty) {
-                        sCat.innerHTML = '<option value="" disabled>Belum ada kategori, silakan tambah!</option>';
+                    if (snapshot.empty) {
+                        sCat.innerHTML = '<option value="" disabled>Belum ada kategori</option>';
                         return;
                     }
 
-                    querySnapshot.forEach((doc) => {
-                        const catName = doc.data().name;
-                        const option = document.createElement('option');
-                        option.value = catName;
-                        option.textContent = catName;
-                        sCat.appendChild(option);
+                    snapshot.forEach((doc) => {
+                        const opt = document.createElement('option');
+                        opt.value = doc.data().name;
+                        opt.textContent = doc.data().name;
+                        sCat.appendChild(opt);
                     });
 
-                    // Jika ada parameter autoSelect, pilih opsi tersebut
-                    if(autoSelectValue) {
-                        sCat.value = autoSelectValue;
-                        updatePreviewSeries();
-                    }
-
+                    if(autoSelectValue) sCat.value = autoSelectValue;
+                    updatePreviewSeries();
                 } catch (error) {
-                    console.error("Gagal memuat kategori: ", error);
                     sCat.innerHTML = '<option value="" disabled>Gagal memuat kategori</option>';
+                    console.error(error);
                 }
-            }
-
-            // Fungsi Buka Tutup Modal Kategori
-            function openCategoryModal() {
-                modalCategory.classList.remove('opacity-0', 'pointer-events-none');
-                modalCatContent.classList.remove('scale-95');
-                modalCatContent.classList.add('scale-100');
-                newCategoryName.value = ''; // Kosongkan input
-                newCategoryName.focus();
             }
 
             function closeCategoryModal() {
@@ -331,45 +287,40 @@
                 modalCatContent.classList.add('scale-95');
             }
 
-            btnAddCategory.addEventListener('click', openCategoryModal);
-            btnCloseCategory.addEventListener('click', closeCategoryModal);
-            btnCancelCategory.addEventListener('click', closeCategoryModal);
+            document.getElementById('btn-add-category').addEventListener('click', () => {
+                modalCategory.classList.remove('opacity-0', 'pointer-events-none');
+                modalCatContent.classList.remove('scale-95');
+                modalCatContent.classList.add('scale-100');
+                newCategoryName.value = '';
+                newCategoryName.focus();
+            });
 
-            // Simpan Kategori Baru ke Firebase
+            document.getElementById('btn-close-category').addEventListener('click', closeCategoryModal);
+            document.getElementById('btn-cancel-category').addEventListener('click', closeCategoryModal);
+
+            // SIMPAN KATEGORI
             btnSaveCategory.addEventListener('click', async () => {
                 const catVal = newCategoryName.value.trim();
-                if (!catVal) {
-                    alert("Nama kategori tidak boleh kosong!");
-                    return;
-                }
+                if (!catVal) return alert("Nama kategori kosong!");
 
                 const origText = btnSaveCategory.innerHTML;
-                btnSaveCategory.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Menyimpan...';
+                btnSaveCategory.innerHTML = 'Menyimpan...';
                 btnSaveCategory.disabled = true;
-                lucide.createIcons();
 
                 try {
-                    // Simpan ke koleksi 'categories'
-                    await addDoc(collection(db, "categories"), {
-                        name: catVal,
-                        createdAt: serverTimestamp()
-                    });
-                    
+                    await addDoc(collection(db, "categories"), { name: catVal, createdAt: serverTimestamp() });
                     closeCategoryModal();
-                    // Muat ulang daftar kategori dan otomatis pilih yang baru dibuat
                     await loadCategories(catVal); 
-                    
                 } catch (error) {
-                    alert("Gagal menyimpan kategori: " + error.message);
+                    console.error(error);
+                    alert("Pastikan Aturan Firebase Firestore sudah diizinkan (allow read, write: if true;). Error: " + error.message);
                 } finally {
                     btnSaveCategory.innerHTML = origText;
                     btnSaveCategory.disabled = false;
-                    lucide.createIcons();
                 }
             });
 
-
-            // --- LOGIKA FORM SERI (JUDUL BARU) ---
+            // --- FORM SERI ---
             const sTitle = document.getElementById('seriesTitle');
             const sBanner = document.getElementById('seriesBanner');
             const sDesc = document.getElementById('seriesDesc');
@@ -380,162 +331,112 @@
                 document.getElementById('prev-s-desc').textContent = sDesc.value || 'Sinopsis akan muncul di sini...';
                 document.getElementById('prev-s-bg').style.backgroundImage = sBanner.value ? `url('${sBanner.value}')` : 'none';
             }
-
             [sTitle, sCat, sBanner, sDesc].forEach(el => el.addEventListener('input', updatePreviewSeries));
 
-            // Submit Seri ke Firebase
-            formSeries.addEventListener('submit', async (e) => {
+            document.getElementById('form-series').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const btn = e.target.querySelector('button[type="submit"]');
                 const origText = btn.innerHTML;
-                btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Menyimpan...';
-                btn.disabled = true;
-                lucide.createIcons();
+                btn.innerHTML = 'Menyimpan...'; btn.disabled = true;
 
                 try {
                     await addDoc(collection(db, "series"), {
-                        title: sTitle.value.trim(),
-                        category: sCat.value,
-                        bannerUrl: sBanner.value.trim(),
-                        description: sDesc.value.trim(),
+                        title: sTitle.value.trim(), category: sCat.value,
+                        bannerUrl: sBanner.value.trim(), description: sDesc.value.trim(),
                         createdAt: serverTimestamp()
                     });
                     alert('Judul Seri Baru Berhasil Disimpan!');
-                    e.target.reset();
-                    updatePreviewSeries();
-                    switchTab('episode'); // Otomatis arahkan ke form episode
+                    e.target.reset(); updatePreviewSeries(); switchTab('episode');
                 } catch (error) {
-                    alert("Gagal menyimpan: " + error.message);
+                    console.error(error);
+                    alert("Pastikan Aturan Firebase Firestore sudah diizinkan. Error: " + error.message);
                 } finally {
-                    btn.innerHTML = origText;
-                    btn.disabled = false;
-                    lucide.createIcons();
+                    btn.innerHTML = origText; btn.disabled = false;
                 }
             });
 
-            // --- LOGIKA FORM EPISODE ---
+            // --- FORM EPISODE ---
             const eSeries = document.getElementById('epSeriesSelect');
             const eNum = document.getElementById('epNumber');
             const eTitle = document.getElementById('epTitle');
             const eThumb = document.getElementById('epThumb');
             const eEmbed = document.getElementById('epEmbed');
-            const existingEpInfo = document.getElementById('existing-episodes-info');
             const epListText = document.getElementById('ep-list-text');
 
-            // Ambil data Judul Seri dari Firebase untuk Dropdown
             async function loadSeriesData() {
                 try {
                     const q = query(collection(db, "series"), orderBy("title", "asc"));
-                    const querySnapshot = await getDocs(q);
+                    const snapshot = await getDocs(q);
                     
                     eSeries.innerHTML = '<option value="" disabled selected>Pilih Judul Seri...</option>';
-                    if(querySnapshot.empty) {
-                        eSeries.innerHTML = '<option value="" disabled>Belum ada judul seri. Buat dulu!</option>';
-                        return;
-                    }
+                    if(snapshot.empty) return eSeries.innerHTML = '<option value="" disabled>Belum ada judul seri</option>';
 
-                    querySnapshot.forEach((doc) => {
-                        const data = doc.data();
-                        const option = document.createElement('option');
-                        option.value = doc.id; 
-                        option.textContent = data.title;
-                        option.dataset.title = data.title; 
-                        eSeries.appendChild(option);
+                    snapshot.forEach((doc) => {
+                        const opt = document.createElement('option');
+                        opt.value = doc.id; opt.textContent = doc.data().title;
+                        opt.dataset.title = doc.data().title; 
+                        eSeries.appendChild(opt);
                     });
                 } catch (error) {
-                    console.error("Gagal memuat seri: ", error);
-                    eSeries.innerHTML = '<option value="" disabled>Gagal memuat data</option>';
+                    console.error(error);
                 }
             }
 
-            // Saat milih judul, cek episode apa saja yang sudah ada di database
             eSeries.addEventListener('change', async () => {
-                const seriesId = eSeries.value;
-                if(!seriesId) return;
-
-                // Update text preview
-                const selectedOption = eSeries.options[eSeries.selectedIndex];
-                document.getElementById('prev-e-series').textContent = selectedOption.dataset.title;
+                document.getElementById('prev-e-series').textContent = eSeries.options[eSeries.selectedIndex].dataset.title;
                 updatePreviewEpisode();
 
-                // Cek episode yang ada
                 try {
-                    const q = query(collection(db, "episodes"), where("seriesId", "==", seriesId), orderBy("episodeNumber", "asc"));
-                    const querySnapshot = await getDocs(q);
+                    const q = query(collection(db, "episodes"), where("seriesId", "==", eSeries.value), orderBy("episodeNumber", "asc"));
+                    const snapshot = await getDocs(q);
                     
-                    if(!querySnapshot.empty) {
+                    if(!snapshot.empty) {
                         let eps = [];
-                        querySnapshot.forEach(doc => eps.push(doc.data().episodeNumber));
+                        snapshot.forEach(doc => eps.push(doc.data().episodeNumber));
                         epListText.textContent = eps.join(', ');
-                        existingEpInfo.classList.remove('hidden');
-                        
-                        // Auto saran nomor episode berikutnya
+                        document.getElementById('existing-episodes-info').classList.remove('hidden');
                         eNum.value = Math.max(...eps) + 1; 
                     } else {
-                        existingEpInfo.classList.add('hidden');
+                        document.getElementById('existing-episodes-info').classList.add('hidden');
                         eNum.value = 1;
                     }
                     updatePreviewEpisode();
-                } catch (error) {
-                    console.error("Gagal cek episode: ", error);
-                }
+                } catch (error) { console.error(error); }
             });
 
             function updatePreviewEpisode() {
-                const num = eNum.value || '?';
-                const title = eTitle.value || 'Judul Episode';
-                document.getElementById('prev-e-title').textContent = `E${num} - ${title}`;
+                document.getElementById('prev-e-title').textContent = `E${eNum.value || '?'} - ${eTitle.value || 'Judul Episode'}`;
                 document.getElementById('prev-e-bg').style.backgroundImage = eThumb.value ? `url('${eThumb.value}')` : 'none';
             }
-
             [eNum, eTitle, eThumb].forEach(el => el.addEventListener('input', updatePreviewEpisode));
 
-            // Submit Episode ke Firebase
-            formEpisode.addEventListener('submit', async (e) => {
+            document.getElementById('form-episode').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const btn = e.target.querySelector('button[type="submit"]');
                 const origText = btn.innerHTML;
-                btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Memposting...';
-                btn.disabled = true;
-                lucide.createIcons();
-
-                const selectedOption = eSeries.options[eSeries.selectedIndex];
+                btn.innerHTML = 'Memposting...'; btn.disabled = true;
 
                 try {
                     await addDoc(collection(db, "episodes"), {
-                        seriesId: eSeries.value,
-                        seriesTitle: selectedOption.dataset.title, 
-                        episodeNumber: Number(eNum.value),
-                        episodeTitle: eTitle.value.trim(),
-                        thumbnailUrl: eThumb.value.trim(),
-                        embedUrl: eEmbed.value.trim(),
+                        seriesId: eSeries.value, seriesTitle: eSeries.options[eSeries.selectedIndex].dataset.title, 
+                        episodeNumber: Number(eNum.value), episodeTitle: eTitle.value.trim(),
+                        thumbnailUrl: eThumb.value.trim(), embedUrl: eEmbed.value.trim(),
                         createdAt: serverTimestamp()
                     });
                     
                     alert(`Episode ${eNum.value} berhasil diposting!`);
-                    
-                    // Reset input episode
-                    eNum.value = '';
-                    eTitle.value = '';
-                    eThumb.value = '';
-                    eEmbed.value = '';
-                    
-                    // Update daftar episode via event change
+                    eNum.value = ''; eTitle.value = ''; eThumb.value = ''; eEmbed.value = '';
                     eSeries.dispatchEvent(new Event('change')); 
-
                 } catch (error) {
-                    alert("Gagal memposting episode: " + error.message);
+                    console.error(error);
+                    alert("Pastikan Aturan Firebase Firestore sudah diizinkan. Error: " + error.message);
                 } finally {
-                    btn.innerHTML = origText;
-                    btn.disabled = false;
-                    lucide.createIcons();
+                    btn.innerHTML = origText; btn.disabled = false;
                 }
             });
 
-            // Jalankan saat load pertama kali
-            loadCategories(); 
-            updatePreviewSeries();
-            loadSeriesData();
+            // Initial load
+            loadCategories(); updatePreviewSeries(); loadSeriesData();
         });
     </script>
 </body>

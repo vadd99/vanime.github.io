@@ -46,7 +46,6 @@
             </a>
             <div class="flex items-center gap-2 border-l border-vs-border pl-3 ml-1">
                 <div class="w-8 h-8 rounded-full bg-vs-border border-2 border-vs-green flex items-center justify-center overflow-hidden">
-                   <!-- Pastikan nama file persis logo.png (huruf kecil semua) di GitHub -->
                    <img src="logo.png" alt="Logo" class="w-full h-full object-cover">
                 </div>
                 <span class="text-lg font-bold tracking-tight hidden sm:block">
@@ -95,8 +94,9 @@
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-1">URL Banner (Poster Utama)</label>
-                            <input type="url" id="seriesBanner" placeholder="URL gambar landscape..." class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Banner (URL / Path Lokal Repo)</label>
+                            <!-- Diubah ke type="text" agar bisa menerima "banner/1.jpg" maupun link URL web -->
+                            <input type="text" id="seriesBanner" placeholder="Cth: banner/1.jpg atau https://..." class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
                         </div>
 
                         <div>
@@ -138,8 +138,9 @@
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-1">URL Thumbnail Episode</label>
-                            <input type="url" id="epThumb" placeholder="URL gambar untuk thumbnail episode..." class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Thumbnail Episode (URL / Path Lokal Repo)</label>
+                            <!-- Diubah ke type="text" agar bisa menerima "thumbnail/1.jpg" maupun link URL web -->
+                            <input type="text" id="epThumb" placeholder="Cth: thumbnail/1.jpg atau https://..." class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
                         </div>
 
                         <div>
@@ -221,7 +222,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
 
-            // --- TABS LOGIC ---
             const tabSeriesBtn = document.getElementById('tab-btn-series');
             const tabEpisodeBtn = document.getElementById('tab-btn-episode');
             const formSeries = document.getElementById('form-series');
@@ -298,7 +298,6 @@
             document.getElementById('btn-close-category').addEventListener('click', closeCategoryModal);
             document.getElementById('btn-cancel-category').addEventListener('click', closeCategoryModal);
 
-            // SIMPAN KATEGORI
             btnSaveCategory.addEventListener('click', async () => {
                 const catVal = newCategoryName.value.trim();
                 if (!catVal) return alert("Nama kategori kosong!");
@@ -313,7 +312,7 @@
                     await loadCategories(catVal); 
                 } catch (error) {
                     console.error(error);
-                    alert("Pastikan Aturan Firebase Firestore sudah diizinkan (allow read, write: if true;). Error: " + error.message);
+                    alert("Gagal menyimpan kategori. Error: " + error.message);
                 } finally {
                     btnSaveCategory.innerHTML = origText;
                     btnSaveCategory.disabled = false;
@@ -349,7 +348,7 @@
                     e.target.reset(); updatePreviewSeries(); switchTab('episode');
                 } catch (error) {
                     console.error(error);
-                    alert("Pastikan Aturan Firebase Firestore sudah diizinkan. Error: " + error.message);
+                    alert("Gagal menyimpan seri. Error: " + error.message);
                 } finally {
                     btn.innerHTML = origText; btn.disabled = false;
                 }
@@ -429,17 +428,14 @@
                     eSeries.dispatchEvent(new Event('change')); 
                 } catch (error) {
                     console.error(error);
-                    alert("Pastikan Aturan Firebase Firestore sudah diizinkan. Error: " + error.message);
+                    alert("Gagal memposting episode. Error: " + error.message);
                 } finally {
                     btn.innerHTML = origText; btn.disabled = false;
                 }
             });
 
-            // Initial load
             loadCategories(); updatePreviewSeries(); loadSeriesData();
         });
     </script>
 </body>
 </html>
-
-
