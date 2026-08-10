@@ -109,7 +109,7 @@
                         </div>
 
                         <div class="pt-4 flex justify-end">
-                            <button type="submit" class="bg-vs-green hover:bg-green-500 text-vs-bg px-6 py-2.5 rounded-lg font-bold flex items-center gap-2">
+                            <button type="submit" id="btn-submit-series" class="bg-vs-green hover:bg-green-500 text-vs-bg px-6 py-2.5 rounded-lg font-bold flex items-center gap-2">
                                 <i data-lucide="save" class="w-4 h-4"></i> Simpan Judul
                             </button>
                         </div>
@@ -188,7 +188,9 @@
             // Variabel Status Edit
             const urlParams = new URLSearchParams(window.location.search);
             const editEpId = urlParams.get('editEp'); 
-            let isEditMode = false;
+            const editSeriesId = urlParams.get('editSeries'); // Tangkap URL parameter ID Series
+            let isEditEpMode = false;
+            let isEditSeriesMode = false;
 
             function switchTab(tab) {
                 if (tab === 'series') {
@@ -223,34 +225,30 @@
                 });
             }
 
-            // --- LOGIKA EDIT EPISODE OTOMATIS JIKA ADA URL ?editEp= ---
             await loadSeriesData(); // Wajib tunggu dropdown seri selesai dimuat dulu
 
+            // --- LOGIKA EDIT EPISODE ---
             if(editEpId) {
-                isEditMode = true;
-                switchTab('episode'); // Otomatis pindah tab ke Episode
+                isEditEpMode = true;
+                switchTab('episode'); 
                 document.getElementById('page-main-title').innerText = "Edit Episode";
                 
-                // Ubah teks tombol
                 const btnSubmit = document.getElementById('btn-submit-ep');
                 btnSubmit.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Simpan Perubahan';
                 btnSubmit.classList.replace('bg-vs-orange', 'bg-vs-green');
                 btnSubmit.classList.replace('hover:bg-vs-orange-hover', 'hover:bg-green-500');
 
                 try {
-                    // Tarik data lama dari Firebase
                     const epDoc = await getDoc(doc(db, "episodes", editEpId));
                     if(epDoc.exists()) {
                         const data = epDoc.data();
                         
-                        // Isi otomatis kolom input dengan data lama
                         eSeries.value = data.seriesId;
                         document.getElementById('epNumber').value = data.episodeNumber;
                         document.getElementById('epTitle').value = data.episodeTitle || '';
                         document.getElementById('epThumb').value = data.thumbnailUrl || '';
                         document.getElementById('epEmbed').value = data.embedUrl || '';
                         
-                        // Update preview (opsional)
                         document.getElementById('prev-e-series').textContent = data.seriesTitle;
                         document.getElementById('prev-e-title').textContent = `E${data.episodeNumber} - ${data.episodeTitle}`;
                         document.getElementById('prev-e-bg').style.backgroundImage = `url('${data.thumbnailUrl}')`;
@@ -260,9 +258,39 @@
                 } catch(e) {
                     console.error("Gagal menarik data edit:", e);
                 }
+            } 
+            // --- LOGIKA EDIT JUDUL SERIES ---
+            else if (editSeriesId) {
+                isEditSeriesMode = true;
+                switchTab('series'); // Pastikan tab Seri terbuka
+                document.getElementById('page-main-title').innerText = "Edit Judul Seri";
+                
+                const btnSubmitSeries = document.getElementById('btn-submit-series');
+                btnSubmitSeries.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Simpan Perubahan';
+                
+                try {
+                    const seriesDoc = await getDoc(doc(db, "series", editSeriesId));
+                    if(seriesDoc.exists()) {
+                        const data = seriesDoc.data();
+                        
+                        // Isi data dari database ke form otomatis
+                        document.getElementById('seriesTitle').value = data.title || '';
+                        document.getElementById('seriesGenre').value = data.genres || '';
+                        document.getElementById('seriesAge').value = data.ageRating || '';
+                        document.getElementById('seriesAudio').value = data.audioLanguages || '';
+                        document.getElementById('seriesSubtitle').value = data.subtitleLanguages || '';
+                        document.getElementById('seriesWarning').value = data.contentWarnings || '';
+                        document.getElementById('seriesBanner').value = data.bannerUrl || '';
+                        document.getElementById('seriesDesc').value = data.description || '';
+                    } else {
+                        alert("Judul seri tidak ditemukan di Database.");
+                    }
+                } catch(e) {
+                    console.error("Gagal menarik data edit:", e);
+                }
             }
 
-            // --- SUBMIT FORM EPISODE (HANDLE TAMBAH & UPDATE) ---
+            // --- SUBMIT FORM EPISODE ---
             document.getElementById('form-episode').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const btn = document.getElementById('btn-submit-ep');
@@ -279,14 +307,12 @@
                 };
 
                 try {
-                    if(isEditMode) {
-                        // UPDATE DATA LAMA
+                    if(isEditEpMode) {
                         await updateDoc(doc(db, "episodes", editEpId), epData);
                         alert(`Perubahan Episode ${epData.episodeNumber} berhasil disimpan!`);
-                        window.location.href = 'admin.html'; // Kembali ke admin setelah selesai ngedit
+                        window.location.href = 'admin.html';
                     } else {
-                        // TAMBAH DATA BARU
-                        epData.createdAt = serverTimestamp(); // Tambah timestamp hanya untuk data baru
+                        epData.createdAt = serverTimestamp();
                         await addDoc(collection(db, "episodes"), epData);
                         alert(`Episode ${epData.episodeNumber} berhasil diposting!`);
                         document.getElementById('form-episode').reset();
@@ -298,27 +324,41 @@
                 }
             });
 
-            // --- SUBMIT FORM SERI (DENGAN FIELD TAMBAHAN) ---
+            // --- SUBMIT FORM SERI ---
             document.getElementById('form-series').addEventListener('submit', async(e)=>{
                e.preventDefault();
+               const btn = document.getElementById('btn-submit-series');
+               const origText = btn.innerHTML;
+               btn.innerHTML = 'Memproses...'; btn.disabled = true;
+               
+               const seriesData = {
+                    title: document.getElementById('seriesTitle').value.trim(), 
+                    genres: document.getElementById('seriesGenre').value.trim(),
+                    ageRating: document.getElementById('seriesAge').value.trim(),
+                    audioLanguages: document.getElementById('seriesAudio').value.trim(),
+                    subtitleLanguages: document.getElementById('seriesSubtitle').value.trim(),
+                    contentWarnings: document.getElementById('seriesWarning').value.trim(),
+                    bannerUrl: document.getElementById('seriesBanner').value.trim(), 
+                    description: document.getElementById('seriesDesc').value.trim()
+               };
+
                try {
-                   await addDoc(collection(db, "series"), {
-                        title: document.getElementById('seriesTitle').value.trim(), 
-                        genres: document.getElementById('seriesGenre').value.trim(),
-                        ageRating: document.getElementById('seriesAge').value.trim(),
-                        audioLanguages: document.getElementById('seriesAudio').value.trim(),
-                        subtitleLanguages: document.getElementById('seriesSubtitle').value.trim(),
-                        contentWarnings: document.getElementById('seriesWarning').value.trim(),
-                        bannerUrl: document.getElementById('seriesBanner').value.trim(), 
-                        description: document.getElementById('seriesDesc').value.trim(),
-                        createdAt: serverTimestamp()
-                    });
-                    alert('Judul Seri Berhasil Tersimpan!'); 
-                    e.target.reset(); 
-                    loadSeriesData(); 
-                    switchTab('episode');
+                   if (isEditSeriesMode) {
+                       await updateDoc(doc(db, "series", editSeriesId), seriesData);
+                       alert('Perubahan Judul Seri Berhasil Disimpan!');
+                       window.location.href = 'admin.html'; // Kembali ke dashboard setelah diupdate
+                   } else {
+                       seriesData.createdAt = serverTimestamp();
+                       await addDoc(collection(db, "series"), seriesData);
+                       alert('Judul Seri Baru Berhasil Tersimpan!'); 
+                       e.target.reset(); 
+                       loadSeriesData(); 
+                       switchTab('episode');
+                   }
                } catch(err) { 
                    alert("Gagal menyimpan seri: " + err.message); 
+               } finally {
+                   btn.innerHTML = origText; btn.disabled = false;
                }
             });
         });

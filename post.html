@@ -74,28 +74,51 @@
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-1">Genre</label>
-                                <input type="text" id="seriesGenre" placeholder="Drama, Fantasi, Seinen" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Genre / Kategori</label>
+                                <div class="flex gap-2">
+                                    <select id="seriesGenre" class="flex-1 w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                                        <option value="" disabled selected>Pilih Genre...</option>
+                                        <!-- Opsi dari DB akan masuk ke sini -->
+                                    </select>
+                                    <button type="button" id="addGenreBtn" class="bg-vs-hover border border-vs-border p-2.5 rounded-lg text-vs-green hover:bg-vs-green hover:text-vs-bg transition-colors" title="Tambah Genre Baru"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                </div>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-300 mb-1">Rating Usia</label>
-                                <input type="text" id="seriesAge" placeholder="13+, 16+, 18+" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                                <select id="seriesAge" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                                    <option value="" disabled selected>Pilih Rating Usia...</option>
+                                    <option value="13+">13+ (Remaja)</option>
+                                    <option value="16+">16+ (Dewasa Muda)</option>
+                                    <option value="18+">18+ (Dewasa)</option>
+                                </select>
                             </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-1">Audio Languages</label>
-                            <input type="text" id="seriesAudio" placeholder="Japanese, Bahasa Indonesia, English" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-1">Subtitle Languages</label>
-                            <input type="text" id="seriesSubtitle" placeholder="Bahasa Indonesia, English, Melayu" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-1">Peringatan Konten</label>
                             <input type="text" id="seriesWarning" placeholder="Kekerasan, Konten Seksual, Perkataan Kasar" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Audio Languages</label>
+                                <div class="flex gap-2">
+                                    <select id="seriesAudio" class="flex-1 w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                                        <option value="" disabled selected>Pilih Audio...</option>
+                                    </select>
+                                    <button type="button" id="addAudioBtn" class="bg-vs-hover border border-vs-border p-2.5 rounded-lg text-vs-green hover:bg-vs-green hover:text-vs-bg transition-colors" title="Tambah Audio Baru"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Subtitle Languages</label>
+                                <div class="flex gap-2">
+                                    <select id="seriesSubtitle" class="flex-1 w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                                        <option value="" disabled selected>Pilih Subtitle...</option>
+                                    </select>
+                                    <button type="button" id="addSubtitleBtn" class="bg-vs-hover border border-vs-border p-2.5 rounded-lg text-vs-green hover:bg-vs-green hover:text-vs-bg transition-colors" title="Tambah Subtitle Baru"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                </div>
+                            </div>
                         </div>
 
                         <div>
@@ -188,7 +211,7 @@
             // Variabel Status Edit
             const urlParams = new URLSearchParams(window.location.search);
             const editEpId = urlParams.get('editEp'); 
-            const editSeriesId = urlParams.get('editSeries'); // Tangkap URL parameter ID Series
+            const editSeriesId = urlParams.get('editSeries'); 
             let isEditEpMode = false;
             let isEditSeriesMode = false;
 
@@ -211,21 +234,101 @@
             tabSeriesBtn.addEventListener('click', () => switchTab('series'));
             tabEpisodeBtn.addEventListener('click', () => switchTab('episode'));
 
-            // Memuat Daftar Seri ke Select Input
+            // Fungsi Untuk Memasukkan Nilai ke Dalam Dropdown Select
+            function populateSelect(elementId, items) {
+                const select = document.getElementById(elementId);
+                const firstOption = select.options[0]; // Simpan opsi placeholder "Pilih..."
+                select.innerHTML = ''; 
+                select.appendChild(firstOption);
+                
+                items.filter(i => i).sort().forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item;
+                    opt.textContent = item;
+                    select.appendChild(opt);
+                });
+            }
+
+            // Memuat Daftar Seri & Mengekstrak Data Kategori, Audio, Subtitle yang sudah ada
             const eSeries = document.getElementById('epSeriesSelect');
             async function loadSeriesData() {
                 const q = query(collection(db, "series"), orderBy("title", "asc"));
                 const snapshot = await getDocs(q);
                 eSeries.innerHTML = '<option value="" disabled selected>Pilih Judul Seri...</option>';
+                
+                // Gunakan Set untuk menyaring agar tidak ada data duplikat (ganda)
+                let genresSet = new Set();
+                let audiosSet = new Set();
+                let subsSet = new Set();
+
                 snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    
+                    // Masukkan Judul ke Dropdown Episode
                     const opt = document.createElement('option');
-                    opt.value = doc.id; opt.textContent = doc.data().title;
-                    opt.dataset.title = doc.data().title; 
+                    opt.value = doc.id; opt.textContent = data.title;
+                    opt.dataset.title = data.title; 
                     eSeries.appendChild(opt);
+
+                    // Ekstrak data untuk dijadikan dropdown
+                    if(data.genres) data.genres.split(',').forEach(i => genresSet.add(i.trim()));
+                    if(data.audioLanguages) data.audioLanguages.split(',').forEach(i => audiosSet.add(i.trim()));
+                    if(data.subtitleLanguages) data.subtitleLanguages.split(',').forEach(i => subsSet.add(i.trim()));
                 });
+
+                // Terapkan ke dropdown list
+                populateSelect('seriesGenre', Array.from(genresSet));
+                populateSelect('seriesAudio', Array.from(audiosSet));
+                populateSelect('seriesSubtitle', Array.from(subsSet));
             }
 
-            await loadSeriesData(); // Wajib tunggu dropdown seri selesai dimuat dulu
+            await loadSeriesData(); // Wajib tunggu selesai dimuat dulu
+
+            // --- LOGIKA TOMBOL TAMBAH (+) CUSTOM DROPDOWN ---
+            function handleAddOption(btnId, selectId, promptText) {
+                document.getElementById(btnId).addEventListener('click', () => {
+                    const newVal = prompt(promptText);
+                    if(newVal && newVal.trim() !== '') {
+                        const select = document.getElementById(selectId);
+                        const opt = document.createElement('option');
+                        opt.value = newVal.trim();
+                        opt.textContent = newVal.trim();
+                        select.appendChild(opt);
+                        select.value = newVal.trim(); // Otomatis pilih yang baru ditambahkan
+                    }
+                });
+            }
+            handleAddOption('addGenreBtn', 'seriesGenre', 'Masukkan Genre / Kategori Baru:');
+            handleAddOption('addAudioBtn', 'seriesAudio', 'Masukkan Bahasa Audio Baru (Contoh: Japanese):');
+            handleAddOption('addSubtitleBtn', 'seriesSubtitle', 'Masukkan Bahasa Subtitle Baru (Contoh: Bahasa Indonesia):');
+
+            // --- LOGIKA OTOMATISASI PERINGATAN KONTEN BERDASARKAN RATING USIA ---
+            document.getElementById('seriesAge').addEventListener('change', function(e) {
+                const warningInput = document.getElementById('seriesWarning');
+                if (e.target.value === '13+') {
+                    warningInput.value = 'Kekerasan Ringan, Bahasa Kasar Ringan';
+                } else if (e.target.value === '16+') {
+                    warningInput.value = 'Kekerasan, Bahasa Kasar, Tema Dewasa';
+                } else if (e.target.value === '18+') {
+                    warningInput.value = 'Kekerasan Ekstrem, Konten Seksual, Darah, Bahasa Kasar';
+                }
+            });
+
+            // Fungsi Bantuan untuk menyeleksi otomatis dropdown saat Edit Mode
+            function setSelectValue(selectId, value) {
+                const select = document.getElementById(selectId);
+                // Cek apakah opsi tersebut sudah ada di dalam dropdown
+                let optionExists = Array.from(select.options).some(opt => opt.value === value);
+                
+                // Jika tidak ada tapi punya nilai, paksa tambahkan sebagai opsi baru agar tidak error/kosong
+                if(value && !optionExists) {
+                    const opt = document.createElement('option');
+                    opt.value = value;
+                    opt.textContent = value;
+                    select.appendChild(opt);
+                }
+                select.value = value || '';
+            }
 
             // --- LOGIKA EDIT EPISODE ---
             if(editEpId) {
@@ -262,7 +365,7 @@
             // --- LOGIKA EDIT JUDUL SERIES ---
             else if (editSeriesId) {
                 isEditSeriesMode = true;
-                switchTab('series'); // Pastikan tab Seri terbuka
+                switchTab('series'); 
                 document.getElementById('page-main-title').innerText = "Edit Judul Seri";
                 
                 const btnSubmitSeries = document.getElementById('btn-submit-series');
@@ -273,12 +376,11 @@
                     if(seriesDoc.exists()) {
                         const data = seriesDoc.data();
                         
-                        // Isi data dari database ke form otomatis
                         document.getElementById('seriesTitle').value = data.title || '';
-                        document.getElementById('seriesGenre').value = data.genres || '';
-                        document.getElementById('seriesAge').value = data.ageRating || '';
-                        document.getElementById('seriesAudio').value = data.audioLanguages || '';
-                        document.getElementById('seriesSubtitle').value = data.subtitleLanguages || '';
+                        setSelectValue('seriesGenre', data.genres);
+                        setSelectValue('seriesAge', data.ageRating);
+                        setSelectValue('seriesAudio', data.audioLanguages);
+                        setSelectValue('seriesSubtitle', data.subtitleLanguages);
                         document.getElementById('seriesWarning').value = data.contentWarnings || '';
                         document.getElementById('seriesBanner').value = data.bannerUrl || '';
                         document.getElementById('seriesDesc').value = data.description || '';
@@ -333,10 +435,10 @@
                
                const seriesData = {
                     title: document.getElementById('seriesTitle').value.trim(), 
-                    genres: document.getElementById('seriesGenre').value.trim(),
-                    ageRating: document.getElementById('seriesAge').value.trim(),
-                    audioLanguages: document.getElementById('seriesAudio').value.trim(),
-                    subtitleLanguages: document.getElementById('seriesSubtitle').value.trim(),
+                    genres: document.getElementById('seriesGenre').value || '',
+                    ageRating: document.getElementById('seriesAge').value || '',
+                    audioLanguages: document.getElementById('seriesAudio').value || '',
+                    subtitleLanguages: document.getElementById('seriesSubtitle').value || '',
                     contentWarnings: document.getElementById('seriesWarning').value.trim(),
                     bannerUrl: document.getElementById('seriesBanner').value.trim(), 
                     description: document.getElementById('seriesDesc').value.trim()
@@ -346,12 +448,19 @@
                    if (isEditSeriesMode) {
                        await updateDoc(doc(db, "series", editSeriesId), seriesData);
                        alert('Perubahan Judul Seri Berhasil Disimpan!');
-                       window.location.href = 'admin.html'; // Kembali ke dashboard setelah diupdate
+                       window.location.href = 'admin.html'; // Kembali ke dashboard
                    } else {
                        seriesData.createdAt = serverTimestamp();
                        await addDoc(collection(db, "series"), seriesData);
                        alert('Judul Seri Baru Berhasil Tersimpan!'); 
                        e.target.reset(); 
+                       
+                       // Reset ulang dropdown ke posisi awal
+                       document.getElementById('seriesGenre').selectedIndex = 0;
+                       document.getElementById('seriesAge').selectedIndex = 0;
+                       document.getElementById('seriesAudio').selectedIndex = 0;
+                       document.getElementById('seriesSubtitle').selectedIndex = 0;
+
                        loadSeriesData(); 
                        switchTab('episode');
                    }
