@@ -20,43 +20,7 @@
         <div class="nav-right">
             <div class="nav-right-icons">
                 <button aria-label="Pencarian"><i class="fas fa-search"></i></button>
-                
-                <!-- CONTAINER PROFILE AVATAR & DROPDOWN -->
-                <div class="profile-dropdown-wrapper">
-                    <button class="user-avatar" id="user-avatar-btn" aria-label="Profil">
-                        <i class="fas fa-user" id="user-avatar-icon"></i>
-                        <img src="" alt="User Avatar" id="user-avatar-img" class="user-avatar-img hidden">
-                    </button>
-
-                    <!-- DROPDOWN CARD USER -->
-                    <div class="profile-popover hidden" id="profile-popover">
-                        <!-- Konten saat Sudah Login -->
-                        <div id="popover-logged-in" class="popover-content hidden">
-                            <div class="popover-user-info">
-                                <p class="user-name" id="popover-user-name">Pengguna</p>
-                                <p class="user-email" id="popover-user-email">email@domain.com</p>
-                            </div>
-                            <hr class="popover-divider">
-                            <button class="popover-btn logout-btn" id="btn-logout">
-                                <i class="fas fa-sign-out-alt"></i> Keluar (Logout)
-                            </button>
-                        </div>
-
-                        <!-- Konten saat Belum Login -->
-                        <div id="popover-logged-out" class="popover-content">
-                            <div class="popover-user-info">
-                                <p class="user-name">Guest</p>
-                                <p class="user-email">Belum masuk ke akun</p>
-                            </div>
-                            <hr class="popover-divider">
-                            <a href="auth.html" class="popover-btn login-btn">
-                                <i class="fas fa-sign-in-alt"></i> Masuk / Daftar
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <!-- END PROFILE DROPDOWN -->
-
+                <button class="user-avatar" aria-label="Profil"><i class="fas fa-user"></i></button>
             </div>
         </div>
     </div>
@@ -127,4 +91,5 @@
         </div>
     </div>
 </footer>
+
 
