@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mushoku Tensei - Vadd Studio</title>
+    <title id="page-title">Memuat... - Vadd Studio</title>
     <!-- Font Awesome & Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Montserrat:wght@500;700;800;900&display=swap" rel="stylesheet">
@@ -16,53 +16,42 @@
 </head>
 <body>
 
-    <!-- Container Utama Layout (Diisi otomatis oleh js/main.js dari layout.html) -->
     <div id="layout-wrapper"></div>
 
-    <!-- Template Konten Halaman Detail -->
     <template id="page-content">
         <div class="detail-page-wrapper">
             
-            <!-- Detail Hero Section (Poster Backdrop & Header Info) -->
+            <!-- Hero Section -->
             <header class="detail-hero">
                 <div class="detail-hero-bg">
-                    <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&q=80&w=1600" alt="Mushoku Tensei Cover">
+                    <img id="detail-banner" src="https://via.placeholder.com/1600x600?text=Memuat..." alt="Cover">
                     <div class="detail-hero-gradient"></div>
                 </div>
 
                 <div class="detail-hero-content">
-                    <!-- Judul Utama Seri -->
-                    <h1 class="series-logo-title">
-                        Mushoku Tensei
-                        <span>SEASON 3 • JOBLESS REINCARNATION</span>
+                    <!-- Judul Dinamis -->
+                    <h1 class="series-logo-title" id="detail-title">
+                        Memuat...
+                        <span id="detail-category">...</span>
                     </h1>
 
-                    <!-- Bar Informasi Metadata -->
                     <div class="meta-info-bar">
                         <span class="age-badge">16+</span>
                         <i class="fas fa-circle meta-dot"></i>
                         <span>Sub | Dub</span>
-                        <i class="fas fa-circle meta-dot"></i>
-                        <a href="#" class="meta-genre-link">Drama</a>,
-                        <a href="#" class="meta-genre-link">Fantasi</a>,
-                        <a href="#" class="meta-genre-link">Seinen</a>
                     </div>
 
-                    <!-- Rating Bintang -->
                     <div class="rating-box">
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star-half-alt"></i>
-                        <span class="rating-val">4.7</span>
-                        <span class="rating-count">(359.7K)</span>
-                        <i class="fas fa-chevron-down rating-arrow"></i>
+                        <span class="rating-val">4.8</span>
                     </div>
 
-                    <!-- Tombol Aksi Utama -->
                     <div class="action-buttons-group">
-                        <a href="#" class="btn-watch-main">
+                        <a href="#" class="btn-watch-main" id="btn-watch-hero" style="display:none;">
                             <i class="fas fa-play"></i> MULAI MENONTON E1
                         </a>
                         <button class="btn-square-icon toggle-bookmark" aria-label="Simpan Bookmark">
@@ -70,7 +59,6 @@
                         </button>
                     </div>
 
-                    <!-- Tombol Aksi Tambahan -->
                     <div class="secondary-actions">
                         <div class="action-item toggle-bookmark">
                             <i class="fas fa-plus"></i>
@@ -84,20 +72,16 @@
                 </div>
             </header>
 
-            <!-- Main Detail Content -->
             <div class="content-container">
-
-                <!-- Deskripsi & Ringkasan Sinopsis -->
                 <div class="synopsis-box">
                     <p class="synopsis-text" id="synopsis-text">
-                        Ketika seorang pria pengangguran berusia 34 tahun tewas dalam kecelakaan lalu lintas, kisahnya tidak berhenti di sana. Terlahir kembali di dunia sihir dan pedang sebagai seorang bayi bernama Rudeus Greyrat, ia bertekad memanfaatkan setiap kesempatan untuk menjalani kehidupan kedua yang jujur tanpa penyesalan. Berbekal ingatan masa lalu serta bakat sihir alami, Rudeus memulai petualangan besarnya!
+                        Sedang memuat data sinopsis...
                     </p>
                     <button class="btn-more-detail" id="btn-toggle-synopsis">
                         LEBIH BANYAK DETAIL <i class="fas fa-chevron-right icon-arrow"></i>
                     </button>
                 </div>
 
-                <!-- Banner Promosi Premium VIP -->
                 <div class="premium-banner">
                     <h3 class="premium-title">Tonton seri ini tanpa iklan!</h3>
                     <p class="premium-subtitle">Coba Vadd Studio Premium gratis selama 7 hari sekarang.</p>
@@ -106,96 +90,23 @@
                     </button>
                 </div>
 
-                <!-- Header Filter Season & Episode -->
                 <div class="episodes-header">
                     <div class="season-select-wrapper">
                         <button class="season-dropdown">
-                            Season 1 <i class="fas fa-chevron-down season-arrow"></i>
+                            Daftar Episode <i class="fas fa-chevron-down season-arrow"></i>
                         </button>
-                    </div>
-                    <div class="episode-controls">
-                        <i class="fas fa-sliders-h" title="Filter Episode"></i>
-                        <i class="fas fa-ellipsis-v" title="Opsi Tampilan"></i>
                     </div>
                 </div>
 
-                <!-- Daftar Episode -->
-                <div class="episode-list">
-
-                    <!-- Episode 1 -->
-                    <a href="#" class="episode-card">
-                        <div class="episode-thumb-box">
-                            <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&q=80&w=350" alt="E1 Thumbnail">
-                            <div class="episode-play-overlay">
-                                <i class="fas fa-play-circle"></i>
-                            </div>
-                            <span class="episode-time-badge">23m</span>
-                        </div>
-                        <div class="episode-details">
-                            <span class="episode-series-name">MUSHOKU TENSEI: JOBLESS REINCARNATION</span>
-                            <h4 class="episode-title">E1 - Jobless Reincarnation</h4>
-                            <p class="episode-sub-info">Sulih Suara Indonesia | Takarir</p>
-                        </div>
-                        <button class="episode-more-btn" aria-label="Opsi"><i class="fas fa-ellipsis-v"></i></button>
-                    </a>
-
-                    <!-- Episode 2 -->
-                    <a href="#" class="episode-card">
-                        <div class="episode-thumb-box">
-                            <img src="https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&q=80&w=350" alt="E2 Thumbnail">
-                            <div class="episode-play-overlay">
-                                <i class="fas fa-play-circle"></i>
-                            </div>
-                            <span class="episode-time-badge">23m</span>
-                        </div>
-                        <div class="episode-details">
-                            <span class="episode-series-name">MUSHOKU TENSEI: JOBLESS REINCARNATION</span>
-                            <h4 class="episode-title">E2 - Master</h4>
-                            <p class="episode-sub-info">Sulih Suara Indonesia | Takarir</p>
-                        </div>
-                        <button class="episode-more-btn" aria-label="Opsi"><i class="fas fa-ellipsis-v"></i></button>
-                    </a>
-
-                    <!-- Episode 3 -->
-                    <a href="#" class="episode-card">
-                        <div class="episode-thumb-box">
-                            <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&q=80&w=350" alt="E3 Thumbnail">
-                            <div class="episode-play-overlay">
-                                <i class="fas fa-play-circle"></i>
-                            </div>
-                            <span class="episode-time-badge">23m</span>
-                        </div>
-                        <div class="episode-details">
-                            <span class="episode-series-name">MUSHOKU TENSEI: JOBLESS REINCARNATION</span>
-                            <h4 class="episode-title">E3 - A Friend</h4>
-                            <p class="episode-sub-info">Sulih Suara Indonesia | Takarir</p>
-                        </div>
-                        <button class="episode-more-btn" aria-label="Opsi"><i class="fas fa-ellipsis-v"></i></button>
-                    </a>
-
-                    <!-- Episode 4 -->
-                    <a href="#" class="episode-card">
-                        <div class="episode-thumb-box">
-                            <img src="https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&q=80&w=350" alt="E4 Thumbnail">
-                            <div class="episode-play-overlay">
-                                <i class="fas fa-play-circle"></i>
-                            </div>
-                            <span class="episode-time-badge">23m</span>
-                        </div>
-                        <div class="episode-details">
-                            <span class="episode-series-name">MUSHOKU TENSEI: JOBLESS REINCARNATION</span>
-                            <h4 class="episode-title">E4 - Emergency Family Meeting</h4>
-                            <p class="episode-sub-info">Sulih Suara Indonesia | Takarir</p>
-                        </div>
-                        <button class="episode-more-btn" aria-label="Opsi"><i class="fas fa-ellipsis-v"></i></button>
-                    </a>
-
+                <!-- Daftar Episode Kosong (Diisi oleh JS) -->
+                <div class="episode-list" id="episode-container">
+                    <div style="color:#9ca3af; padding: 20px;">Memuat episode...</div>
                 </div>
             </div>
 
-            <!-- Sticky Floating Mobile Bar (Khusus Perangkat HP) -->
+            <!-- Sticky Mobile Bar -->
             <div class="sticky-mobile-bar">
-                <a href="#" class="btn-watch-main">
+                <a href="#" class="btn-watch-main" id="btn-watch-mobile" style="display:none;">
                     <i class="fas fa-play"></i> MULAI MENONTON
                 </a>
                 <button class="btn-square-icon toggle-bookmark" aria-label="Bookmark">
@@ -203,16 +114,11 @@
                 </button>
             </div>
 
-            <!-- Toast Pop-up Notifikasi -->
             <div id="vadd-toast">Berhasil ditambahkan ke Daftarku!</div>
-
         </div>
     </template>
 
-    <!-- Script Utama (Mengatur Injeksi Layout) -->
     <script src="js/main.js"></script>
-    <!-- Script Spesifik Halaman Detail -->
     <script type="module" src="js/detail.js"></script>    
 </body>
 </html>
-

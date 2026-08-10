@@ -2,17 +2,112 @@
 // SCRIPT LOGIKA DETAIL FILM (js/detail.js)
 // ==========================================
 
-window.addEventListener('layoutReady', () => {
+import { db } from './firebase-init.js';
+import { doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+window.addEventListener('layoutReady', async () => {
     console.log("Halaman Detail berhasil dimuat beserta layout!");
 
-    // 1. Toggle Sinopsis (Expand / Collapse)
-    const btnToggleSynopsis = document.getElementById('btn-toggle-synopsis');
-    const synopsisText = document.getElementById('synopsis-text');
+    // 1. Ambil Parameter ID Series dari URL (Misal: detail.html?id=xxx)
+    const urlParams = new URLSearchParams(window.location.search);
+    const seriesId = urlParams.get('id');
 
-    if (btnToggleSynopsis && synopsisText) {
+    if (!seriesId) {
+        alert("ID Series tidak ditemukan!");
+        window.location.href = 'index.html'; // Kembalikan ke beranda
+        return;
+    }
+
+    // Elemen DOM
+    const elPageTitle = document.getElementById('page-title');
+    const elBanner = document.getElementById('detail-banner');
+    const elTitle = document.getElementById('detail-title');
+    const elCat = document.getElementById('detail-category');
+    const elDesc = document.getElementById('synopsis-text');
+    const elEpContainer = document.getElementById('episode-container');
+    const btnWatchHero = document.getElementById('btn-watch-hero');
+    const btnWatchMobile = document.getElementById('btn-watch-mobile');
+
+    try {
+        // 2. MENGAMBIL DATA SERIES DARI FIREBASE
+        const docRef = doc(db, "series", seriesId);
+        const docSnap = await getDoc(docRef);
+
+        if (!docSnap.exists()) {
+            elTitle.innerHTML = "Judul Tidak Ditemukan";
+            elDesc.innerHTML = "Maaf, data film atau seri ini tidak ada di database.";
+            return;
+        }
+
+        const seriesData = docSnap.data();
+
+        // 3. SET DATA SERIES KE HTML
+        elPageTitle.innerText = `${seriesData.title} - Vadd Studio`;
+        elBanner.src = seriesData.bannerUrl || seriesData.banner_url || "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&q=80&w=1600";
+        elTitle.innerHTML = `${seriesData.title} <span>${seriesData.category || 'Animasi'}</span>`;
+        elDesc.innerText = seriesData.description || "Tidak ada sinopsis tersedia untuk judul ini.";
+
+        // 4. MENGAMBIL DATA EPISODE DARI FIREBASE
+        const q = query(collection(db, "episodes"), where("seriesId", "==", seriesId));
+        const epSnapshot = await getDocs(q);
+
+        let epArray = [];
+        epSnapshot.forEach(doc => epArray.push({ id: doc.id, ...doc.data() }));
+
+        // Urutkan episode dari yang terkecil
+        epArray.sort((a, b) => (a.episodeNumber || 0) - (b.episodeNumber || 0));
+
+        elEpContainer.innerHTML = ''; // Bersihkan loading
+
+        if (epArray.length === 0) {
+            elEpContainer.innerHTML = '<div style="color:#9ca3af; padding: 20px;">Belum ada episode yang dirilis.</div>';
+        } else {
+            // Jika episode ada, tampilkan tombol "Mulai Menonton E1"
+            const firstEpId = epArray[0].id;
+            const watchUrl = `player.html?ep=${firstEpId}`;
+            
+            btnWatchHero.style.display = "inline-flex";
+            btnWatchHero.href = watchUrl;
+            btnWatchMobile.style.display = "inline-flex";
+            btnWatchMobile.href = watchUrl;
+
+            // Render Daftar Episode
+            epArray.forEach(ep => {
+                const thumb = ep.thumbnailUrl || "https://via.placeholder.com/350x200?text=No+Thumb";
+                
+                const epCardHTML = `
+                    <a href="player.html?ep=${ep.id}" class="episode-card">
+                        <div class="episode-thumb-box">
+                            <img src="${thumb}" alt="E${ep.episodeNumber}">
+                            <div class="episode-play-overlay">
+                                <i class="fas fa-play-circle"></i>
+                            </div>
+                        </div>
+                        <div class="episode-details">
+                            <span class="episode-series-name">${seriesData.title}</span>
+                            <h4 class="episode-title">E${ep.episodeNumber} - ${ep.episodeTitle || 'Tanpa Judul'}</h4>
+                            <p class="episode-sub-info">Episode Animasi</p>
+                        </div>
+                        <button class="episode-more-btn" aria-label="Opsi" onclick="event.preventDefault();"><i class="fas fa-ellipsis-v"></i></button>
+                    </a>
+                `;
+                elEpContainer.innerHTML += epCardHTML;
+            });
+        }
+    } catch (error) {
+        console.error("Error Detail Firebase:", error);
+        elEpContainer.innerHTML = '<div style="color:#ef4444; padding: 20px;">Gagal memuat episode.</div>';
+    }
+
+
+    // --- LOGIKA UI (Dari detail.js asli) ---
+
+    // Toggle Sinopsis
+    const btnToggleSynopsis = document.getElementById('btn-toggle-synopsis');
+    if (btnToggleSynopsis && elDesc) {
         btnToggleSynopsis.addEventListener('click', () => {
-            synopsisText.classList.toggle('expanded');
-            if (synopsisText.classList.contains('expanded')) {
+            elDesc.classList.toggle('expanded');
+            if (elDesc.classList.contains('expanded')) {
                 btnToggleSynopsis.innerHTML = 'PERSINGKAT <i class="fas fa-chevron-up icon-arrow"></i>';
             } else {
                 btnToggleSynopsis.innerHTML = 'LEBIH BANYAK DETAIL <i class="fas fa-chevron-right icon-arrow"></i>';
@@ -20,76 +115,45 @@ window.addEventListener('layoutReady', () => {
         });
     }
 
-    // 2. Fungsi Toast Notification Sederhana
+    // Fungsi Toast
     const toast = document.getElementById('vadd-toast');
-
     function showToast(message) {
         if (!toast) return;
         toast.textContent = message;
         toast.classList.add('show');
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 2500);
+        setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
-    // 3. Toggle Bookmark / Tambahkan ke Daftarku
+    // Toggle Bookmark
     const bookmarkBtns = document.querySelectorAll('.toggle-bookmark');
-
     bookmarkBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
             btn.classList.toggle('active');
-            
             const icon = btn.querySelector('i');
             if (icon) {
                 if (icon.classList.contains('far')) {
-                    icon.classList.remove('far');
-                    icon.classList.add('fas');
+                    icon.classList.replace('far', 'fas');
                     showToast('Berhasil ditambahkan ke Daftarku!');
                 } else if (icon.classList.contains('fas') && !icon.classList.contains('fa-plus')) {
-                    icon.classList.remove('fas');
-                    icon.classList.add('far');
+                    icon.classList.replace('fas', 'far');
                     showToast('Dihapus dari Daftarku');
                 } else {
                     showToast('Berhasil ditambahkan ke Daftarku!');
                 }
-            } else {
-                showToast('Berhasil ditambahkan ke Daftarku!');
             }
         });
     });
 
-    // 4. Tombol Bagikan
+    // Bagikan
     const btnShare = document.getElementById('btn-share');
     if (btnShare) {
         btnShare.addEventListener('click', () => {
             if (navigator.share) {
-                navigator.share({
-                    title: 'Mushoku Tensei - Vadd Studio',
-                    url: window.location.href
-                }).catch(() => {});
+                navigator.share({ title: elPageTitle.innerText, url: window.location.href }).catch(() => {});
             } else {
                 showToast('Tautan berhasil disalin!');
             }
         });
     }
-
-    // 5. Mengarahkan tombol "Mulai Menonton" ke halaman pemutar video (player.html)
-    const watchButtons = document.querySelectorAll('.btn-watch-main');
-    watchButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.location.href = 'player.html';
-        });
-    });
-
-    // 6. Mengarahkan kartu-kartu episode ke halaman pemutar video (player.html)
-    const episodeCards = document.querySelectorAll('.episode-card');
-    episodeCards.forEach(card => {
-        card.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.location.href = 'player.html';
-        });
-    });
-
 });
