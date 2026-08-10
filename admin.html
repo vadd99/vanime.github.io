@@ -37,18 +37,17 @@
         .nav-item:hover { background-color: var(--bg-hover); color: var(--color-text-main); }
         .nav-item.active { background-color: var(--bg-hover); color: var(--color-green); border-left-color: var(--color-green); }
         .nav-item i { font-size: 20px; }
-        .system-divider { border-top: 1px solid var(--border-color); margin-top: 20px; padding-top: 20px; }
+        
+        /* Tombol Close Sidebar (Hanya tampil di HP) */
+        .close-sidebar-btn { display: none; background: none; border: none; color: var(--color-text-muted); font-size: 24px; cursor: pointer; }
 
         /* --- TOP HEADER --- */
         .top-header { height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; background-color: var(--bg-main); border-bottom: 1px solid var(--border-color); }
         .header-left { display: flex; align-items: center; gap: 15px; }
         .page-title { font-size: 18px; font-weight: 600; }
-        .header-right { display: flex; align-items: center; gap: 20px; }
-        .search-box { position: relative; display: flex; align-items: center; }
-        .search-box i { position: absolute; left: 12px; color: var(--color-text-muted); }
-        .search-box input { background-color: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 20px; padding: 8px 16px 8px 36px; color: var(--color-text-main); outline: none; width: 200px; transition: border 0.3s; }
-        .search-box input:focus { border-color: var(--color-green); }
-        .user-profile { width: 32px; height: 32px; border-radius: 50%; background-color: var(--bg-hover); border: 1px solid var(--color-green); display: flex; align-items: center; justify-content: center; color: var(--color-green); }
+        
+        /* Tombol Hamburger Menu (Hanya tampil di HP) */
+        .menu-btn { display: none; background: none; border: none; color: var(--color-text-main); font-size: 24px; cursor: pointer; }
 
         /* --- CONTENT AREA --- */
         .content-area { flex: 1; padding: 24px; overflow-y: auto; }
@@ -66,9 +65,6 @@
         .posts-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 15px; }
         .btn-primary { background-color: var(--color-orange); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: background 0.2s; font-size: 14px; }
         .btn-primary:hover { background-color: var(--color-orange-hover); }
-        .posts-filter { display: flex; gap: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; }
-        .filter-btn { background: none; border: none; color: var(--color-text-muted); padding-bottom: 10px; font-weight: 600; cursor: pointer; margin-bottom: -1px; border-bottom: 2px solid transparent; }
-        .filter-btn.active { color: var(--color-green); border-bottom-color: var(--color-green); }
 
         .posts-list { background-color: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
         .post-item { display: flex; padding: 16px; border-bottom: 1px solid var(--border-color); gap: 16px; align-items: center; transition: background 0.2s; }
@@ -97,15 +93,32 @@
         .modal-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background-color: var(--bg-main); }
         .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
         
-        .ep-list-item { display: flex; align-items: center; gap: 15px; padding: 12px; border-bottom: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 8px; }
+        .ep-list-item { display: flex; align-items: center; gap: 15px; padding: 12px; border-bottom: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 8px; flex-wrap: wrap; }
         .ep-list-item:hover { background-color: var(--bg-hover); }
         .ep-thumb-sm { width: 100px; height: 56px; border-radius: 6px; object-fit: cover; background: #000; border: 1px solid var(--border-color); }
-        .ep-info { flex: 1; }
+        .ep-info { flex: 1; min-width: 150px; }
         .ep-title-text { font-size: 15px; font-weight: bold; color: #fff; }
         .ep-sub-text { font-size: 12px; color: var(--color-text-muted); margin-top: 4px; }
+
+        /* --- RESPONSIVE MOBILE (YANG SEMPAT HILANG) --- */
+        .overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 40; }
+        .overlay.active { display: block; }
+
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; top: 0; bottom: 0; left: -100%; z-index: 50; }
+            .sidebar.open { left: 0; }
+            .close-sidebar-btn, .menu-btn { display: block; }
+            
+            .post-item { flex-direction: column; align-items: flex-start; }
+            .post-thumb { width: 100%; height: auto; aspect-ratio: 16/9; }
+            .post-actions { width: 100%; justify-content: flex-end; border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: 5px; }
+        }
     </style>
 </head>
 <body>
+
+    <!-- OVERLAY UNTUK HP -->
+    <div class="overlay" id="mobileOverlay"></div>
 
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
@@ -114,6 +127,8 @@
                 <div class="logo-icon">VS</div>
                 <div class="logo-text"><span>vadd</span> <span>studio</span></div>
             </div>
+            <!-- TOMBOL CLOSE SIDEBAR DI HP -->
+            <button class="close-sidebar-btn" id="closeSidebar"><i class="ph ph-x"></i></button>
         </div>
         <nav class="nav-menu">
             <div class="nav-label">Menu Utama</div>
@@ -130,6 +145,8 @@
     <div class="main-wrapper">
         <header class="top-header">
             <div class="header-left">
+                <!-- TOMBOL BUKA SIDEBAR DI HP -->
+                <button class="menu-btn" id="openSidebar"><i class="ph ph-list"></i></button>
                 <h1 class="page-title" id="headerTitle">Ringkasan Dashboard</h1>
             </div>
         </header>
@@ -157,7 +174,7 @@
                 <div class="posts-header">
                     <div>
                         <h2 style="font-size: 20px; margin-bottom: 4px;">Daftar Judul Series / Film</h2>
-                        <p style="font-size: 14px; color: var(--color-text-muted);">Klik tombol list untuk melihat dan mengelola episode.</p>
+                        <p style="font-size: 14px; color: var(--color-text-muted);">Klik ikon list untuk melihat dan mengelola episode.</p>
                     </div>
                     <button class="btn-primary" onclick="window.location.href='post.html'">
                         <i class="ph ph-plus"></i> Buat Judul Baru
@@ -195,23 +212,42 @@
         import { db } from './js/firebase-init.js';
         import { collection, getDocs, deleteDoc, doc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        let allEpisodesCache = []; // Menyimpan semua data episode agar loading cepat
+        // --- LOGIKA UI MOBILE SIDEBAR ---
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('mobileOverlay');
+        
+        window.openMobileSidebar = () => {
+            sidebar.classList.add('open');
+            overlay.classList.add('active');
+        };
+
+        window.closeMobileSidebar = () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        };
+
+        document.getElementById('openSidebar').addEventListener('click', openMobileSidebar);
+        document.getElementById('closeSidebar').addEventListener('click', closeMobileSidebar);
+        overlay.addEventListener('click', closeMobileSidebar);
+
+
+        // --- LOGIKA FIREBASE ---
+        let allEpisodesCache = [];
 
         async function fetchSeriesData() {
             const container = document.getElementById('postsContainer');
             try {
-                // 1. Ambil data Episode (Untuk menghitung jumlah per series)
+                // Ambil Episode
                 const epSnapshot = await getDocs(collection(db, "episodes"));
                 allEpisodesCache = [];
                 epSnapshot.forEach(doc => allEpisodesCache.push({ id: doc.id, ...doc.data() }));
 
-                // 2. Ambil data Series
+                // Ambil Series
                 const querySnapshot = await getDocs(collection(db, "series"));
                 const seriesData = [];
-                
                 querySnapshot.forEach(doc => seriesData.push({ id: doc.id, ...doc.data() }));
 
-                // Update Dashboard
+                // Update Dashboard stats
                 document.getElementById('dashTotalSeries').innerText = seriesData.length;
                 document.getElementById('dashTotalEps').innerText = allEpisodesCache.length;
 
@@ -232,8 +268,6 @@
 
             data.forEach(item => {
                 const banner = item.bannerUrl || item.banner_url || 'https://via.placeholder.com/400x225?text=No+Banner';
-                
-                // Hitung jumlah episode untuk series ini dari Cache
                 const totalEp = allEpisodesCache.filter(ep => ep.seriesId === item.id).length;
 
                 const postHTML = `
@@ -257,7 +291,7 @@
             });
         }
 
-        // --- FUNGSI MODAL EPISODE ---
+        // --- MODAL EPISODE ---
         const epModal = document.getElementById('episodeModal');
         const modalTitle = document.getElementById('modalSeriesTitle');
         const modalList = document.getElementById('modalEpList');
@@ -268,7 +302,6 @@
             epModal.classList.add('active');
 
             try {
-                // Ambil ulang data episode khusus series ini agar datanya selalu paling baru
                 const q = query(collection(db, "episodes"), where("seriesId", "==", seriesId), orderBy("episodeNumber", "asc"));
                 const snapshot = await getDocs(q);
                 
@@ -304,14 +337,12 @@
 
         window.closeEpModal = () => { epModal.classList.remove('active'); }
         
-        // Klik di luar modal untuk menutup
         epModal.addEventListener('click', (e) => {
             if(e.target === epModal) closeEpModal();
         });
 
-        // --- FUNGSI EDIT & HAPUS ---
+        // --- EDIT & HAPUS ---
         window.editEpisode = (epId) => {
-            // Arahkan ke post.html dengan membawa ID episode di URL
             window.location.href = `post.html?editEp=${epId}`;
         }
 
@@ -320,8 +351,8 @@
                 try {
                     await deleteDoc(doc(db, "episodes", epId));
                     alert("Episode berhasil dihapus!");
-                    openEpModal(seriesId, seriesTitle); // Refresh isi modal
-                    fetchSeriesData(); // Refresh badge episode di luar
+                    openEpModal(seriesId, seriesTitle);
+                    fetchSeriesData(); 
                 } catch(e) { alert("Gagal menghapus."); console.error(e); }
             }
         }
@@ -333,10 +364,10 @@
             }
         }
 
-        // Panggil saat load
+        // INIT LOAD
         fetchSeriesData();
 
-        // Navigasi Tab
+        // NAVIGASI TAB
         const navItems = document.querySelectorAll('.nav-item');
         const tabContents = document.querySelectorAll('.tab-content');
         const headerTitle = document.getElementById('headerTitle');
@@ -351,6 +382,7 @@
                 document.getElementById('tab-' + targetTab).classList.add('active');
                 if(targetTab === 'dashboard') headerTitle.textContent = "Ringkasan Dashboard";
                 if(targetTab === 'posts') headerTitle.textContent = "Kelola Series";
+                closeMobileSidebar(); // Otomatis tutup sidebar jika di HP
             });
         });
     </script>
