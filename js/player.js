@@ -2,163 +2,170 @@
 // SCRIPT LOGIKA PLAYER VIDEO (js/player.js)
 // ==========================================
 
-// Ganti DOMContentLoaded dengan layoutReady (Sesuai arsitektur Injeksi Vadd Studio)
-window.addEventListener('layoutReady', () => {
+import { db } from './firebase-init.js';
+import { doc, getDoc, collection, query, where, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+// ==========================================
+// FUNGSI PENDETEKSI & PENCONVERSI LINK EMBED (Smart Player)
+// ==========================================
+function getResponsiveEmbedHTML(rawUrl) {
+    if (!rawUrl) return '<div style="color:white; display:flex; align-items:center; justify-content:center; height:100%;">Video belum tersedia</div>';
+
+    let embedHTML = '';
+
+    // 1. JIKA LINK YOUTUBE
+    if (rawUrl.includes('youtube.com') || rawUrl.includes('youtu.be')) {
+        let videoId = '';
+        if (rawUrl.includes('youtu.be/')) {
+            videoId = rawUrl.split('youtu.be/')[1].split('?')[0];
+        } else if (rawUrl.includes('embed/')) {
+            videoId = rawUrl.split('embed/')[1].split('?')[0];
+        } else if (rawUrl.includes('watch?v=')) {
+            videoId = rawUrl.split('watch?v=')[1].split('&')[0];
+        }
+        
+        const cleanYoutubeUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+        embedHTML = `<iframe width="100%" height="100%" src="${cleanYoutubeUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+    
+    // 2. JIKA LINK GOOGLE DRIVE
+    } else if (rawUrl.includes('drive.google.com')) {
+        let fileId = '';
+        if (rawUrl.includes('/file/d/')) {
+            fileId = rawUrl.split('/file/d/')[1].split('/')[0];
+        } else if (rawUrl.includes('id=')) {
+            fileId = rawUrl.split('id=')[1].split('&')[0];
+        }
+        
+        const gdriveUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+        embedHTML = `<iframe width="100%" height="100%" src="${gdriveUrl}" frameborder="0" allow="autoplay" allowfullscreen></iframe>`;
+    
+    // 3. JIKA LINK FILE MP4 / MKV LANGSUNG
+    } else if (rawUrl.endsWith('.mp4') || rawUrl.endsWith('.mkv')) {
+        embedHTML = `
+            <video width="100%" height="100%" controls autoplay style="background:#000;">
+                <source src="${rawUrl}" type="video/mp4">
+                Browser Anda tidak mendukung pemutar video ini.
+            </video>
+        `;
+    } else {
+        // 4. JIKA BERUPA KODE IFRAME UTUH ATAU PENYEDIA LAIN (Mega, DoodStream, dll)
+        if (rawUrl.includes('<iframe')) {
+            embedHTML = rawUrl;
+        } else {
+            embedHTML = `<iframe width="100%" height="100%" src="${rawUrl}" frameborder="0" allowfullscreen></iframe>`;
+        }
+    }
+
+    return embedHTML;
+}
+
+window.addEventListener('layoutReady', async () => {
     console.log("Halaman Pemutar Video berhasil dimuat beserta layout!");
 
-    const video = document.getElementById('main-video');
-    const videoContainer = document.getElementById('video-container');
+    // 1. Ambil ID Episode dari URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const epId = urlParams.get('ep');
+
+    if (!epId) {
+        alert("Video tidak ditemukan!");
+        window.location.href = 'index.html';
+        return;
+    }
+
+    // Elemen DOM
+    const pageTitle = document.getElementById('page-title');
+    const epSeriesTitle = document.getElementById('ep-series-title');
+    const epMainTitle = document.getElementById('ep-main-title');
+    const epDesc = document.getElementById('ep-desc');
+    const btnAllEps = document.getElementById('btn-all-episodes');
+    
+    // Elemen Pemutar Video
+    const embedContainer = document.getElementById('embed-container');
+    const mainVideo = document.getElementById('main-video');
+    const videoControls = document.getElementById('video-controls');
     const bigPlayBtn = document.getElementById('big-play-btn');
-    const btnPlayPause = document.getElementById('btn-play-pause');
-    const btnSkipBackward = document.getElementById('btn-skip-backward');
-    const btnSkipForward = document.getElementById('btn-skip-forward');
-    const btnVolume = document.getElementById('btn-volume');
-    const volumeSlider = document.getElementById('volume-slider');
-    const progressBar = document.getElementById('progress-bar');
-    const bufferBar = document.getElementById('buffer-bar');
-    const progressContainer = document.getElementById('progress-container');
-    const videoTime = document.getElementById('video-time');
-    const btnFullscreen = document.getElementById('btn-fullscreen');
+    const videoWatermark = document.getElementById('video-watermark');
 
-    // 1. Format Waktu (Detik -> MM:SS)
-    function formatTime(seconds) {
-        if (isNaN(seconds)) return "00:00";
-        const mins = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
-    }
-
-    // 2. Play / Pause Toggle
-    function togglePlay() {
-        if (!video) return;
-        if (video.paused) {
-            video.play();
-        } else {
-            video.pause();
+    try {
+        // 2. MENGAMBIL DATA EPISODE INI DARI FIREBASE
+        const epDoc = await getDoc(doc(db, "episodes", epId));
+        
+        if (!epDoc.exists()) {
+            if(epMainTitle) epMainTitle.innerText = "Episode tidak ditemukan";
+            if(epDesc) epDesc.innerText = "Video mungkin telah dihapus dari database.";
+            return;
         }
-    }
 
-    function updatePlayState() {
-        if (!video) return;
-        if (video.paused) {
-            if(btnPlayPause) btnPlayPause.innerHTML = '<i class="fas fa-play"></i>';
-            if(bigPlayBtn) bigPlayBtn.classList.remove('hidden');
-        } else {
-            if(btnPlayPause) btnPlayPause.innerHTML = '<i class="fas fa-pause"></i>';
-            if(bigPlayBtn) bigPlayBtn.classList.add('hidden');
+        const epData = epDoc.data();
+        const currentSeriesId = epData.seriesId;
+        const currentEpNumber = Number(epData.episodeNumber);
+
+        // 3. SET DATA METADATA KE HTML
+        if(pageTitle) pageTitle.innerText = `E${currentEpNumber} - ${epData.episodeTitle || 'Episode'} | Vadd Studio`;
+        if (epSeriesTitle) {
+            epSeriesTitle.innerText = epData.seriesTitle || "Judul Seri";
+            epSeriesTitle.href = `detail.html?id=${currentSeriesId}`;
         }
-    }
-
-    if (video) {
-        video.addEventListener('click', togglePlay);
-        video.addEventListener('play', updatePlayState);
-        video.addEventListener('pause', updatePlayState);
-    }
-
-    if (bigPlayBtn) bigPlayBtn.addEventListener('click', togglePlay);
-    if (btnPlayPause) btnPlayPause.addEventListener('click', togglePlay);
-
-    // 3. Skip +/- 10 Detik
-    if (btnSkipBackward && video) {
-        btnSkipBackward.addEventListener('click', () => {
-            video.currentTime = Math.max(0, video.currentTime - 10);
-        });
-    }
-
-    if (btnSkipForward && video) {
-        btnSkipForward.addEventListener('click', () => {
-            video.currentTime = Math.min(video.duration, video.currentTime + 10);
-        });
-    }
-
-    // 4. Progress Bar & Time Update
-    if (video) {
-        video.addEventListener('timeupdate', () => {
-            if (video.duration && progressBar && videoTime) {
-                const pct = (video.currentTime / video.duration) * 100;
-                progressBar.style.width = `${pct}%`;
-                videoTime.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
-            }
-        });
-
-        video.addEventListener('progress', () => {
-            if (video.buffered.length > 0 && video.duration && bufferBar) {
-                const bufferedEnd = video.buffered.end(video.buffered.length - 1);
-                const pct = (bufferedEnd / video.duration) * 100;
-                bufferBar.style.width = `${pct}%`;
-            }
-        });
-    }
-
-    // Scrub / Click pada Progress Bar
-    if (progressContainer && video) {
-        progressContainer.addEventListener('click', (e) => {
-            const rect = progressContainer.getBoundingClientRect();
-            const clickPos = (e.clientX - rect.left) / rect.width;
-            if (video.duration) {
-                video.currentTime = clickPos * video.duration;
-            }
-        });
-    }
-
-    // 5. Pengaturan Volume
-    if (volumeSlider && video) {
-        volumeSlider.addEventListener('input', (e) => {
-            video.volume = e.target.value;
-            video.muted = (e.target.value === '0');
-            updateVolumeIcon();
-        });
-    }
-
-    if (btnVolume && video) {
-        btnVolume.addEventListener('click', () => {
-            video.muted = !video.muted;
-            if (video.muted) {
-                if(volumeSlider) volumeSlider.value = 0;
-            } else {
-                if(volumeSlider) volumeSlider.value = video.volume || 1;
-            }
-            updateVolumeIcon();
-        });
-    }
-
-    function updateVolumeIcon() {
-        if(!video || !btnVolume) return;
-        if (video.muted || video.volume === 0) {
-            btnVolume.innerHTML = '<i class="fas fa-volume-mute"></i>';
-        } else if (video.volume < 0.5) {
-            btnVolume.innerHTML = '<i class="fas fa-volume-down"></i>';
-        } else {
-            btnVolume.innerHTML = '<i class="fas fa-volume-up"></i>';
+        if (epMainTitle) {
+            epMainTitle.innerText = `E${currentEpNumber} - ${epData.episodeTitle || 'Tanpa Judul'}`;
         }
-    }
+        if (btnAllEps) {
+            btnAllEps.href = `detail.html?id=${currentSeriesId}`;
+        }
+        
+        // Ambil sinopsis seri untuk deskripsi episode
+        const seriesDoc = await getDoc(doc(db, "series", currentSeriesId));
+        if (seriesDoc.exists() && epDesc) {
+            epDesc.innerText = seriesDoc.data().description || "Selamat menonton episode ini di Vadd Studio!";
+        }
 
-    // 6. Fullscreen Toggle
-    if (btnFullscreen && videoContainer) {
-        btnFullscreen.addEventListener('click', () => {
-            if (!document.fullscreenElement) {
-                videoContainer.requestFullscreen().catch(err => console.error(err));
-            } else {
-                document.exitFullscreen().catch(err => console.error(err));
+        // 4. RENDER VIDEO DINAMIS (Otomatis mendeteksi YouTube, GDrive, MP4, dll)
+        if (epData.embedUrl) {
+            if (mainVideo) mainVideo.style.display = 'none';
+            if (videoControls) videoControls.style.display = 'none';
+            if (bigPlayBtn) bigPlayBtn.style.display = 'none';
+            if (videoWatermark) videoWatermark.style.display = 'none';
+
+            if (embedContainer) {
+                embedContainer.style.display = 'block';
+                embedContainer.innerHTML = getResponsiveEmbedHTML(epData.embedUrl);
             }
-        });
+        }
+
+        // 5. CARI EPISODE BERIKUTNYA SECARA OTOMATIS
+        const nextEpNum = currentEpNumber + 1;
+        const nextQ = query(collection(db, "episodes"), 
+            where("seriesId", "==", currentSeriesId),
+            where("episodeNumber", "==", nextEpNum),
+            limit(1)
+        );
+        
+        const nextSnapshot = await getDocs(nextQ);
+        const nextEpSection = document.getElementById('next-ep-section');
+        
+        if (!nextSnapshot.empty && nextEpSection) {
+            const nextData = nextSnapshot.docs[0].data();
+            const nextId = nextSnapshot.docs[0].id;
+
+            const nextEpLink = document.getElementById('next-ep-link');
+            const nextEpThumb = document.getElementById('next-ep-thumb');
+            const nextEpTitle = document.getElementById('next-ep-title');
+
+            if (nextEpLink) nextEpLink.href = `player.html?ep=${nextId}`;
+            if (nextEpThumb) nextEpThumb.src = nextData.thumbnailUrl || "https://via.placeholder.com/350x200?text=Next";
+            if (nextEpTitle) nextEpTitle.innerText = `E${nextData.episodeNumber} - ${nextData.episodeTitle || 'Tanpa Judul'}`;
+            
+            nextEpSection.style.display = 'block';
+        } else if (nextEpSection) {
+            nextEpSection.style.display = 'none';
+        }
+
+    } catch (error) {
+        console.error("Gagal memuat player:", error);
+        if (epMainTitle) epMainTitle.innerText = "Terjadi Kesalahan Server";
     }
 
-    // 7. Auto Hide Controls saat idle
-    let idleTimer;
-    if (videoContainer && video) {
-        videoContainer.addEventListener('mousemove', () => {
-            videoContainer.classList.remove('user-idle');
-            clearTimeout(idleTimer);
-            idleTimer = setTimeout(() => {
-                if (!video.paused) {
-                    videoContainer.classList.add('user-idle');
-                }
-            }, 3000);
-        });
-    }
-
-    // 8. Toast Notification & Toolbar Interaksi
+    // --- FUNGSI INTERAKSI SEDERHANA (TOAST, LIKE, DISLIKE) ---
     const toast = document.getElementById('vadd-toast');
     function showToast(msg) {
         if (!toast) return;
@@ -170,7 +177,6 @@ window.addEventListener('layoutReady', () => {
     const btnLike = document.getElementById('btn-like');
     const btnDislike = document.getElementById('btn-dislike');
     const btnDownload = document.getElementById('btn-download');
-    const btnMiniDownload = document.querySelector('.btn-download-mini');
 
     if (btnLike) {
         btnLike.addEventListener('click', () => {
@@ -187,15 +193,6 @@ window.addEventListener('layoutReady', () => {
     }
 
     if (btnDownload) {
-        btnDownload.addEventListener('click', () => {
-            showToast('Memulai pengunduhan video...');
-        });
-    }
-    
-    if (btnMiniDownload) {
-        btnMiniDownload.addEventListener('click', (e) => {
-            e.preventDefault(); // Mencegah pindah halaman saat klik ikon download
-            showToast('Memulai pengunduhan episode...');
-        });
+        btnDownload.addEventListener('click', () => showToast('Memulai pengunduhan video...'));
     }
 });
