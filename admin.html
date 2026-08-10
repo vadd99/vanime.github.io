@@ -302,28 +302,42 @@
             epModal.classList.add('active');
 
             try {
-                const q = query(collection(db, "episodes"), where("seriesId", "==", seriesId), orderBy("episodeNumber", "asc"));
+                // PERBAIKAN: Hapus "orderBy" di query Firebase untuk mencegah Error Index
+                const q = query(collection(db, "episodes"), where("seriesId", "==", seriesId));
                 const snapshot = await getDocs(q);
                 
-                modalList.innerHTML = '';
                 if(snapshot.empty) {
                     modalList.innerHTML = '<div class="empty-state" style="padding:20px;">Belum ada episode untuk judul ini.</div>';
                     return;
                 }
 
-                snapshot.forEach(doc => {
-                    const ep = doc.data();
+                // PERBAIKAN: Masukkan data ke array, lalu urutkan angkanya menggunakan JavaScript
+                let epArray = [];
+                snapshot.forEach(doc => epArray.push({ id: doc.id, ...doc.data() }));
+                
+                // Urutkan berdasarkan episodeNumber (Dari terkecil ke terbesar)
+                epArray.sort((a, b) => (a.episodeNumber || 0) - (b.episodeNumber || 0));
+
+                modalList.innerHTML = '';
+                epArray.forEach(ep => {
                     const thumb = ep.thumbnailUrl || 'https://via.placeholder.com/100x56?text=No+Thumb';
+                    
+                    // PERBAIKAN: Mengamankan format tanggal agar tidak error jika data baru disubmit
+                    let dateStr = 'Baru saja';
+                    if (ep.createdAt && typeof ep.createdAt.toDate === 'function') {
+                        dateStr = new Date(ep.createdAt.toDate()).toLocaleDateString('id-ID');
+                    }
+                    
                     const epItem = `
                         <div class="ep-list-item">
                             <img src="${thumb}" class="ep-thumb-sm">
                             <div class="ep-info">
                                 <div class="ep-title-text">Eps ${ep.episodeNumber} - ${ep.episodeTitle || 'Tanpa Judul'}</div>
-                                <div class="ep-sub-text">Ditambahkan pada: ${ep.createdAt ? new Date(ep.createdAt.toDate()).toLocaleDateString('id-ID') : 'Baru saja'}</div>
+                                <div class="ep-sub-text">Ditambahkan pada: ${dateStr}</div>
                             </div>
                             <div class="post-actions">
-                                <button class="action-btn" title="Edit Episode" onclick="editEpisode('${doc.id}')"><i class="ph ph-pencil-simple"></i></button>
-                                <button class="action-btn delete" title="Hapus Episode" onclick="deleteEpisode('${doc.id}', '${seriesId}', '${seriesTitle}')"><i class="ph ph-trash"></i></button>
+                                <button class="action-btn" title="Edit Episode" onclick="editEpisode('${ep.id}')"><i class="ph ph-pencil-simple"></i></button>
+                                <button class="action-btn delete" title="Hapus Episode" onclick="deleteEpisode('${ep.id}', '${seriesId}', '${seriesTitle}')"><i class="ph ph-trash"></i></button>
                             </div>
                         </div>
                     `;
@@ -331,9 +345,11 @@
                 });
             } catch(e) {
                 console.error(e);
-                modalList.innerHTML = '<div class="empty-state">Gagal memuat daftar episode.</div>';
+                // Menampilkan detail error di layar agar lebih mudah dilacak jika terjadi lagi
+                modalList.innerHTML = `<div class="empty-state">Gagal memuat daftar episode.<br><span style="font-size:10px; color:red;">${e.message}</span></div>`;
             }
         }
+
 
         window.closeEpModal = () => { epModal.classList.remove('active'); }
         
