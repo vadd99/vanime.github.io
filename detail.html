@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="page-title">Memuat... - Vadd Studio</title>
-    <!-- Font Awesome & Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Montserrat:wght@500;700;800;900&display=swap" rel="stylesheet">
     
@@ -29,19 +28,17 @@
                 </div>
 
                 <div class="detail-hero-content">
-                    <!-- Judul Dinamis -->
                     <h1 class="series-logo-title" id="detail-title">
                         Memuat...
                         <span id="detail-category">...</span>
                     </h1>
 
                     <div class="meta-info-bar">
-                        <span class="age-badge">16+</span>
+                        <span class="age-badge" id="hero-age-badge">13+</span>
                         <i class="fas fa-circle meta-dot"></i>
-                        <span>Sub | Dub</span>
+                        <span id="hero-sub-dub">Sub | Dub</span>
                     </div>
 
-                    <!-- Tempat Javascript Menyuntikkan Rating Bintang -->
                     <div class="rating-box" id="rating-container">
                         <div style="color:var(--color-text-muted); font-size:12px;">Menghitung rating...</div>
                     </div>
@@ -70,15 +67,25 @@
 
             <div class="content-container">
                 <div class="synopsis-box">
-                    <p class="synopsis-text" id="synopsis-text">
-                        Sedang memuat data sinopsis...
-                    </p>
+                    <div class="synopsis-content-wrapper" id="synopsis-wrapper">
+                        <!-- Teks Sinopsis Utama -->
+                        <p class="synopsis-text" id="synopsis-text">
+                            Sedang memuat data sinopsis...
+                        </p>
+                        
+                        <!-- Metadata Tambahan (Audio, Subtitle, dll) -->
+                        <div class="extra-details" id="extra-details-container">
+                            <p id="detail-audio" style="display:none;"><strong>Audio:</strong> <span></span></p>
+                            <p id="detail-subtitle" style="display:none;"><strong>Takarir:</strong> <span></span></p>
+                            <p id="detail-warnings" style="display:none;"><strong>Peringatan Konten:</strong> <span></span></p>
+                            <p id="detail-genre" style="display:none;"><strong>Genre:</strong> <span></span></p>
+                        </div>
+                    </div>
+
                     <button class="btn-more-detail" id="btn-toggle-synopsis">
-                        LEBIH BANYAK DETAIL <i class="fas fa-chevron-right icon-arrow"></i>
+                        LEBIH BANYAK DETAIL <i class="fas fa-chevron-down icon-arrow"></i>
                     </button>
                 </div>
-
-                <!-- BANNER PREMIUM VIP TELAH DIHAPUS DARI SINI -->
 
                 <div class="episodes-header">
                     <div class="season-select-wrapper">
@@ -88,7 +95,6 @@
                     </div>
                 </div>
 
-                <!-- Daftar Episode Kosong (Diisi oleh JS) -->
                 <div class="episode-list" id="episode-container">
                     <div style="color:#9ca3af; padding: 20px;">Memuat episode...</div>
                 </div>

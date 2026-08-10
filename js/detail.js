@@ -8,28 +8,24 @@ import { doc, getDoc, collection, query, where, getDocs, updateDoc, increment } 
 window.addEventListener('layoutReady', async () => {
     console.log("Halaman Detail berhasil dimuat beserta layout!");
 
-    // 1. Ambil Parameter ID Series dari URL (Misal: detail.html?id=xxx)
     const urlParams = new URLSearchParams(window.location.search);
     const seriesId = urlParams.get('id');
 
     if (!seriesId) {
         alert("ID Series tidak ditemukan!");
-        window.location.href = 'index.html'; // Kembalikan ke beranda
+        window.location.href = 'index.html'; 
         return;
     }
 
-    // --- FITUR VIEW COUNTER (Penghitung Jumlah Klik) ---
     try {
         const seriesRef = doc(db, "series", seriesId);
         await updateDoc(seriesRef, {
-            total_views: increment(1) // Menambah +1 view setiap halaman dibuka
+            total_views: increment(1) 
         });
-        console.log("View berhasil ditambahkan!");
     } catch (error) {
         console.error("Gagal menambah view:", error);
     }
 
-    // Elemen DOM
     const elPageTitle = document.getElementById('page-title');
     const elBanner = document.getElementById('detail-banner');
     const elTitle = document.getElementById('detail-title');
@@ -38,10 +34,16 @@ window.addEventListener('layoutReady', async () => {
     const elEpContainer = document.getElementById('episode-container');
     const btnWatchHero = document.getElementById('btn-watch-hero');
     const btnWatchMobile = document.getElementById('btn-watch-mobile');
-    const ratingContainer = document.getElementById('rating-container'); // Tambahan DOM Rating
+    const ratingContainer = document.getElementById('rating-container'); 
+    
+    // Elemen Extra Metadata
+    const elHeroAge = document.getElementById('hero-age-badge');
+    const elAudio = document.getElementById('detail-audio');
+    const elSubtitle = document.getElementById('detail-subtitle');
+    const elWarnings = document.getElementById('detail-warnings');
+    const elGenre = document.getElementById('detail-genre');
 
     try {
-        // 2. MENGAMBIL DATA SERIES DARI FIREBASE
         const docRef = doc(db, "series", seriesId);
         const docSnap = await getDoc(docRef);
 
@@ -51,31 +53,45 @@ window.addEventListener('layoutReady', async () => {
             return;
         }
 
-        const seriesData = docSnap.data();
+        const sd = docSnap.data(); // sd = seriesData
 
-        // 3. SET DATA SERIES KE HTML
-        if(elPageTitle) elPageTitle.innerText = `${seriesData.title} - Vadd Studio`;
-        if(elBanner) elBanner.src = seriesData.bannerUrl || seriesData.banner_url || "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&q=80&w=1600";
-        if(elTitle) elTitle.innerHTML = `${seriesData.title} <span style="display:block; font-size:14px; margin-top:8px; color:var(--color-green); letter-spacing:2px; font-weight:700;">${seriesData.category ? seriesData.category.toUpperCase() : 'ANIMASI'}</span>`;
-        if(elDesc) elDesc.innerText = seriesData.description || "Tidak ada sinopsis tersedia untuk judul ini.";
+        if(elPageTitle) elPageTitle.innerText = `${sd.title} - Vadd Studio`;
+        if(elBanner) elBanner.src = sd.bannerUrl || sd.banner_url || "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&q=80&w=1600";
+        if(elTitle) elTitle.innerHTML = `${sd.title} <span style="display:block; font-size:14px; margin-top:8px; color:var(--color-green); letter-spacing:2px; font-weight:700;">${sd.category ? sd.category.toUpperCase() : 'ANIMASI'}</span>`;
+        if(elDesc) elDesc.innerText = sd.description || "Tidak ada sinopsis tersedia untuk judul ini.";
 
-        // ========================================================
-        // LOGIKA RATING OTOMATIS (Mencegah Bintang Kosong)
-        // ========================================================
+        // --- SET METADATA EXTRA (JIKA ADA) ---
+        // Usia di Banner Atas
+        if (elHeroAge) elHeroAge.innerText = sd.ageRating || '13+';
+
+        // Set Audio
+        if (sd.audioLanguages && elAudio) {
+            elAudio.querySelector('span').innerText = sd.audioLanguages;
+            elAudio.style.display = 'block';
+        }
+        // Set Subtitle / Takarir
+        if (sd.subtitleLanguages && elSubtitle) {
+            elSubtitle.querySelector('span').innerText = sd.subtitleLanguages;
+            elSubtitle.style.display = 'block';
+        }
+        // Set Peringatan Konten
+        if (sd.contentWarnings && elWarnings) {
+            elWarnings.querySelector('span').innerHTML = `<span style="background-color:rgba(255,255,255,0.1); padding:1px 4px; border-radius:3px; color:#fff; font-size:10px; font-weight:bold; margin-right:4px;">${sd.ageRating || '13+'}</span> ${sd.contentWarnings}`;
+            elWarnings.style.display = 'block';
+        }
+        // Set Genre Lengkap
+        if (sd.genres && elGenre) {
+            elGenre.querySelector('span').innerText = sd.genres;
+            elGenre.style.display = 'block';
+        }
+
+
+        // --- LOGIKA RATING OTOMATIS ---
         let charSum = 0;
-        for(let i = 0; i < seriesId.length; i++) {
-            charSum += seriesId.charCodeAt(i);
-        }
-        
-        // Menghasilkan angka antara 4.2 hingga 4.9 secara konsisten
+        for(let i = 0; i < seriesId.length; i++) charSum += seriesId.charCodeAt(i);
         let ratingValue = (4.2 + (charSum % 8) / 10).toFixed(1); 
-        
-        // Jika di database sudah ada rating manual, utamakan data dari database
-        if (seriesData.rating) {
-            ratingValue = Number(seriesData.rating).toFixed(1);
-        }
+        if (sd.rating) ratingValue = Number(sd.rating).toFixed(1);
 
-        // Generate Icon Bintang
         let starsHTML = '';
         const fullStars = Math.floor(ratingValue);
         const hasHalfStar = (ratingValue % 1) >= 0.4;
@@ -85,57 +101,39 @@ window.addEventListener('layoutReady', async () => {
         if(hasHalfStar) starsHTML += '<i class="fas fa-star-half-alt" style="color:#facc15;"></i> ';
         for(let i=0; i<emptyStars; i++) starsHTML += '<i class="far fa-star" style="color:#facc15;"></i> ';
 
-        // Suntikkan ke HTML
         if(ratingContainer) {
-            ratingContainer.innerHTML = `
-                ${starsHTML}
-                <span class="rating-val" style="margin-left:8px; font-weight:bold; color:#fff;">${ratingValue}</span>
-            `;
+            ratingContainer.innerHTML = `${starsHTML} <span class="rating-val" style="margin-left:8px; font-weight:bold; color:#fff;">${ratingValue}</span>`;
         }
-        // ========================================================
 
-        // 4. MENGAMBIL DATA EPISODE DARI FIREBASE
+        // --- MENGAMBIL DATA EPISODE ---
         const q = query(collection(db, "episodes"), where("seriesId", "==", seriesId));
         const epSnapshot = await getDocs(q);
 
         let epArray = [];
         epSnapshot.forEach(doc => epArray.push({ id: doc.id, ...doc.data() }));
-
-        // Urutkan episode dari yang terkecil
         epArray.sort((a, b) => (a.episodeNumber || 0) - (b.episodeNumber || 0));
 
-        if(elEpContainer) elEpContainer.innerHTML = ''; // Bersihkan loading
+        if(elEpContainer) elEpContainer.innerHTML = ''; 
 
         if (epArray.length === 0) {
             if(elEpContainer) elEpContainer.innerHTML = '<div style="color:#9ca3af; padding: 20px;">Belum ada episode yang dirilis.</div>';
         } else {
-            // Jika episode ada, tampilkan tombol "Mulai Menonton E1"
             const firstEpId = epArray[0].id;
             const watchUrl = `player.html?ep=${firstEpId}`;
             
-            if(btnWatchHero) {
-                btnWatchHero.style.display = "inline-flex";
-                btnWatchHero.href = watchUrl;
-            }
-            if(btnWatchMobile) {
-                btnWatchMobile.style.display = "inline-flex";
-                btnWatchMobile.href = watchUrl;
-            }
+            if(btnWatchHero) { btnWatchHero.style.display = "inline-flex"; btnWatchHero.href = watchUrl; }
+            if(btnWatchMobile) { btnWatchMobile.style.display = "inline-flex"; btnWatchMobile.href = watchUrl; }
 
-            // Render Daftar Episode
             epArray.forEach(ep => {
                 const thumb = ep.thumbnailUrl || "https://via.placeholder.com/350x200?text=No+Thumb";
-                
                 const epCardHTML = `
                     <a href="player.html?ep=${ep.id}" class="episode-card">
                         <div class="episode-thumb-box">
                             <img src="${thumb}" alt="E${ep.episodeNumber}">
-                            <div class="episode-play-overlay">
-                                <i class="fas fa-play-circle"></i>
-                            </div>
+                            <div class="episode-play-overlay"><i class="fas fa-play-circle"></i></div>
                         </div>
                         <div class="episode-details">
-                            <span class="episode-series-name">${seriesData.title}</span>
+                            <span class="episode-series-name">${sd.title}</span>
                             <h4 class="episode-title">E${ep.episodeNumber} - ${ep.episodeTitle || 'Tanpa Judul'}</h4>
                             <p class="episode-sub-info">Episode Animasi</p>
                         </div>
@@ -150,22 +148,22 @@ window.addEventListener('layoutReady', async () => {
         if(elEpContainer) elEpContainer.innerHTML = '<div style="color:#ef4444; padding: 20px;">Gagal memuat episode.</div>';
     }
 
-    // --- LOGIKA UI (Dari detail.js asli) ---
 
-    // Toggle Sinopsis
+    // --- LOGIKA UI BUKA/TUTUP SINOPSIS & METADATA ---
     const btnToggleSynopsis = document.getElementById('btn-toggle-synopsis');
-    if (btnToggleSynopsis && elDesc) {
+    const synopsisWrapper = document.getElementById('synopsis-wrapper');
+    
+    if (btnToggleSynopsis && synopsisWrapper) {
         btnToggleSynopsis.addEventListener('click', () => {
-            elDesc.classList.toggle('expanded');
-            if (elDesc.classList.contains('expanded')) {
-                btnToggleSynopsis.innerHTML = 'PERSINGKAT <i class="fas fa-chevron-up icon-arrow"></i>';
+            synopsisWrapper.classList.toggle('expanded');
+            if (synopsisWrapper.classList.contains('expanded')) {
+                btnToggleSynopsis.innerHTML = 'LEBIH SEDIKIT DETAIL <i class="fas fa-chevron-up icon-arrow"></i>';
             } else {
-                btnToggleSynopsis.innerHTML = 'LEBIH BANYAK DETAIL <i class="fas fa-chevron-right icon-arrow"></i>';
+                btnToggleSynopsis.innerHTML = 'LEBIH BANYAK DETAIL <i class="fas fa-chevron-down icon-arrow"></i>';
             }
         });
     }
 
-    // Fungsi Toast
     const toast = document.getElementById('vadd-toast');
     function showToast(message) {
         if (!toast) return;
@@ -174,7 +172,6 @@ window.addEventListener('layoutReady', async () => {
         setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
-    // Toggle Bookmark
     const bookmarkBtns = document.querySelectorAll('.toggle-bookmark');
     bookmarkBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -195,7 +192,6 @@ window.addEventListener('layoutReady', async () => {
         });
     });
 
-    // Bagikan
     const btnShare = document.getElementById('btn-share');
     if (btnShare) {
         btnShare.addEventListener('click', () => {

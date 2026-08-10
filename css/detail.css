@@ -271,6 +271,81 @@ body {
 .btn-more-detail:hover { color: #ffffff; }
 .icon-arrow { font-size: 0.7rem; }
 
+/* --- Penyesuaian Sinopsis & Detail Tambahan --- */
+.synopsis-content-wrapper {
+    position: relative;
+    max-height: 4.5em; /* Sekitar 3 baris teks */
+    overflow: hidden;
+    transition: max-height 0.4s ease-out;
+    margin-bottom: 1rem;
+}
+
+/* Saat di-expand (tombol "Lebih Banyak Detail" diklik) */
+.synopsis-content-wrapper.expanded {
+    max-height: 1000px; /* Nilai besar agar semua konten muat */
+}
+
+.synopsis-text {
+    color: #d1d5db;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+/* Metadata Ekstra (Mirip Crunchyroll) */
+.extra-details {
+    color: #9ca3af;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    margin-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 1rem;
+    opacity: 0;
+    transition: opacity 0.3s ease-in;
+}
+
+.synopsis-content-wrapper.expanded .extra-details {
+    opacity: 1;
+}
+
+.extra-details p {
+    margin-bottom: 0.5rem;
+}
+
+.extra-details strong {
+    color: #ffffff;
+    font-weight: 700;
+    margin-right: 0.4rem;
+}
+
+.btn-more-detail {
+    color: var(--vadd-accent);
+    font-weight: bold;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+.btn-more-detail:hover { 
+    color: #ffffff; 
+}
+.icon-arrow { 
+    font-size: 0.7rem; 
+    transition: transform 0.3s;
+}
+.synopsis-content-wrapper.expanded + .btn-more-detail .icon-arrow {
+    transform: rotate(180deg); /* Panah berputar ke atas saat dibuka */
+}
+
+
 
 /* Section Episode */
 .episodes-header {
