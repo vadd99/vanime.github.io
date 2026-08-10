@@ -1,8 +1,10 @@
 // ==========================================
-// SCRIPT LOGIKA DETAIL FILM (JS/DETAIL.JS)
+// SCRIPT LOGIKA DETAIL FILM (js/detail.js)
 // ==========================================
 
-document.addEventListener('DOMContentLoaded', () => {
+// Menunggu event 'layoutReady' dari js/main.js
+window.addEventListener('layoutReady', () => {
+    console.log("Halaman Detail berhasil dimuat beserta layout!");
 
     // 1. Toggle Sinopsis (Expand / Collapse)
     const btnToggleSynopsis = document.getElementById('btn-toggle-synopsis');
