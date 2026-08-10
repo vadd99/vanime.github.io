@@ -27,7 +27,7 @@
             <header class="hero">
                 <div class="hero-bg">
                     <!-- Image default sementara sebelum data Firebase masuk -->
-                    <img id="hero-banner-img" src="https://via.placeholder.com/2000x800?text=Memuat+Banner..." alt="Latar Belakang Hero">
+                    <img id="hero-banner-img" src="https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?auto=format&fit=crop&q=80&w=2000" alt="Latar Belakang Hero">
                     <div class="hero-gradient"></div>
                     <div class="hero-gradient-side"></div>
                 </div>
@@ -50,26 +50,27 @@
             <!-- Main Content Area -->
             <main class="main-container">
                 
-                <!-- Section: Rilis Terbaru (Ini bisa untuk episode nanti, kita skip dulu/biarkan statis sementara) -->
+                <!-- Section: Paling Populer (Horizontal Scroll) -->
                 <section>
                     <div class="section-header">
-                        <h2 class="section-title border-primary">Episode Terbaru (Coming Soon)</h2>
+                        <h2 class="section-title border-primary">Paling Populer</h2>
+                        <a href="#" class="section-link">Lihat Semua</a>
                     </div>
                     <div class="carousel-wrapper">
-                        <div class="carousel-container hide-scroll" style="color:#666; font-size:14px; padding:20px 0;">
-                            Fitur daftar episode terbaru sedang dalam pengembangan...
+                        <!-- ID Baru: popular-series-container -->
+                        <div class="carousel-container hide-scroll" id="popular-series-container">
+                            <div style="color:#9ca3af; padding: 20px 0;">Memuat judul populer...</div>
                         </div>
                     </div>
                 </section>
 
-                <!-- Section: Daftar Semua Series (Dinamis dari Firebase) -->
+                <!-- Section: Daftar Semua Series (Grid Vertical) -->
                 <section>
                     <div class="section-header">
                         <h2 class="section-title border-accent">Jelajahi Judul Animasi</h2>
                     </div>
                     <!-- Tempat render data series -->
                     <div class="poster-grid" id="series-grid-container">
-                        <!-- Loading State -->
                         <div style="color:#9ca3af; padding: 20px 0;">Memuat daftar judul animasi...</div>
                     </div>
                 </section>

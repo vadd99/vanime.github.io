@@ -3,7 +3,7 @@
 // ==========================================
 
 import { db } from './firebase-init.js';
-import { doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc, collection, query, where, getDocs, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 window.addEventListener('layoutReady', async () => {
     console.log("Halaman Detail berhasil dimuat beserta layout!");
@@ -16,6 +16,17 @@ window.addEventListener('layoutReady', async () => {
         alert("ID Series tidak ditemukan!");
         window.location.href = 'index.html'; // Kembalikan ke beranda
         return;
+    }
+
+    // --- FITUR VIEW COUNTER ---
+    try {
+        const seriesRef = doc(db, "series", seriesId);
+        await updateDoc(seriesRef, {
+            views: increment(1)
+        });
+        console.log("View berhasil ditambahkan!");
+    } catch (error) {
+        console.error("Gagal menambah view:", error);
     }
 
     // Elemen DOM
@@ -42,10 +53,11 @@ window.addEventListener('layoutReady', async () => {
         const seriesData = docSnap.data();
 
         // 3. SET DATA SERIES KE HTML
-        elPageTitle.innerText = `${seriesData.title} - Vadd Studio`;
-        elBanner.src = seriesData.bannerUrl || seriesData.banner_url || "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&q=80&w=1600";
-        elTitle.innerHTML = `${seriesData.title} <span>${seriesData.category || 'Animasi'}</span>`;
-        elDesc.innerText = seriesData.description || "Tidak ada sinopsis tersedia untuk judul ini.";
+        if(elPageTitle) elPageTitle.innerText = `${seriesData.title} - Vadd Studio`;
+        if(elBanner) elBanner.src = seriesData.bannerUrl || seriesData.banner_url || "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&q=80&w=1600";
+        if(elTitle) elTitle.innerHTML = `${seriesData.title} <span>${seriesData.category || 'Animasi'}</span>`;
+        if(elDesc) elDesc.innerText = seriesData.description || "Tidak ada sinopsis tersedia untuk judul ini.";
+        if(elCat) elCat.innerText = seriesData.category || 'Animasi';
 
         // 4. MENGAMBIL DATA EPISODE DARI FIREBASE
         const q = query(collection(db, "episodes"), where("seriesId", "==", seriesId));
@@ -57,19 +69,23 @@ window.addEventListener('layoutReady', async () => {
         // Urutkan episode dari yang terkecil
         epArray.sort((a, b) => (a.episodeNumber || 0) - (b.episodeNumber || 0));
 
-        elEpContainer.innerHTML = ''; // Bersihkan loading
+        if(elEpContainer) elEpContainer.innerHTML = ''; // Bersihkan loading
 
         if (epArray.length === 0) {
-            elEpContainer.innerHTML = '<div style="color:#9ca3af; padding: 20px;">Belum ada episode yang dirilis.</div>';
+            if(elEpContainer) elEpContainer.innerHTML = '<div style="color:#9ca3af; padding: 20px;">Belum ada episode yang dirilis.</div>';
         } else {
             // Jika episode ada, tampilkan tombol "Mulai Menonton E1"
             const firstEpId = epArray[0].id;
             const watchUrl = `player.html?ep=${firstEpId}`;
             
-            btnWatchHero.style.display = "inline-flex";
-            btnWatchHero.href = watchUrl;
-            btnWatchMobile.style.display = "inline-flex";
-            btnWatchMobile.href = watchUrl;
+            if(btnWatchHero) {
+                btnWatchHero.style.display = "inline-flex";
+                btnWatchHero.href = watchUrl;
+            }
+            if(btnWatchMobile) {
+                btnWatchMobile.style.display = "inline-flex";
+                btnWatchMobile.href = watchUrl;
+            }
 
             // Render Daftar Episode
             epArray.forEach(ep => {
@@ -91,12 +107,12 @@ window.addEventListener('layoutReady', async () => {
                         <button class="episode-more-btn" aria-label="Opsi" onclick="event.preventDefault();"><i class="fas fa-ellipsis-v"></i></button>
                     </a>
                 `;
-                elEpContainer.innerHTML += epCardHTML;
+                if(elEpContainer) elEpContainer.innerHTML += epCardHTML;
             });
         }
     } catch (error) {
         console.error("Error Detail Firebase:", error);
-        elEpContainer.innerHTML = '<div style="color:#ef4444; padding: 20px;">Gagal memuat episode.</div>';
+        if(elEpContainer) elEpContainer.innerHTML = '<div style="color:#ef4444; padding: 20px;">Gagal memuat episode.</div>';
     }
 
 
@@ -150,7 +166,7 @@ window.addEventListener('layoutReady', async () => {
     if (btnShare) {
         btnShare.addEventListener('click', () => {
             if (navigator.share) {
-                navigator.share({ title: elPageTitle.innerText, url: window.location.href }).catch(() => {});
+                navigator.share({ title: elPageTitle ? elPageTitle.innerText : 'Tonton di Vadd Studio', url: window.location.href }).catch(() => {});
             } else {
                 showToast('Tautan berhasil disalin!');
             }
