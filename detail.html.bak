@@ -87,7 +87,6 @@
                     </button>
                 </div>
 
-                <!-- Bagian Daftar Episode -->
                 <div class="episodes-header">
                     <div class="season-select-wrapper">
                         <button class="season-dropdown">

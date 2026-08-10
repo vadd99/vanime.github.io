@@ -85,6 +85,7 @@ window.addEventListener('layoutReady', async () => {
             elGenre.style.display = 'block';
         }
 
+
         // --- LOGIKA RATING OTOMATIS ---
         let charSum = 0;
         for(let i = 0; i < seriesId.length; i++) charSum += seriesId.charCodeAt(i);
@@ -147,12 +148,15 @@ window.addEventListener('layoutReady', async () => {
         if(elEpContainer) elEpContainer.innerHTML = '<div style="color:#ef4444; padding: 20px;">Gagal memuat episode.</div>';
     }
 
+
     // --- LOGIKA UI BUKA/TUTUP SINOPSIS & METADATA ---
     const btnToggleSynopsis = document.getElementById('btn-toggle-synopsis');
     const synopsisWrapper = document.getElementById('synopsis-wrapper');
     
     if (btnToggleSynopsis && synopsisWrapper) {
         btnToggleSynopsis.addEventListener('click', () => {
+            // Cukup matikan/nyalakan kelas .expanded di div bungkusnya (wrapper)
+            // CSS max-height dan transisinya akan mengurus sisa animasinya.
             synopsisWrapper.classList.toggle('expanded');
             
             if (synopsisWrapper.classList.contains('expanded')) {
