@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
     
-    <!-- CSS Modular (Disusun seperti situs lama Anda) -->
+    <!-- CSS Modular -->
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
@@ -23,25 +23,24 @@
     <template id="page-content">
         <div class="home-page-wrapper">
             
-            <!-- Hero Section -->
+            <!-- Hero Section (Banner Atas Dinamis) -->
             <header class="hero">
                 <div class="hero-bg">
-                    <img src="https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?auto=format&fit=crop&q=80&w=2000" alt="Latar Belakang Hero">
+                    <!-- Image default sementara sebelum data Firebase masuk -->
+                    <img id="hero-banner-img" src="https://via.placeholder.com/2000x800?text=Memuat+Banner..." alt="Latar Belakang Hero">
                     <div class="hero-gradient"></div>
                     <div class="hero-gradient-side"></div>
                 </div>
 
                 <div class="hero-content-wrapper">
                     <div class="hero-box">
-                        <h1 class="hero-title">
-                            Petualangan Sang <br>
-                            <span>Sutradara Rubah</span>
-                        </h1>
-                        <p class="hero-desc">
-                            Di dunia di mana imajinasi menjadi nyata, seekor rubah dengan headphone ajaib dan kamera legendarisnya berjuang untuk menciptakan karya sinematik terhebat.
+                        <h1 class="hero-title" id="hero-title-text">Memuat...</h1>
+                        <p class="hero-desc" id="hero-desc-text">
+                            Silakan tunggu, sedang memuat data dari database Vadd Studio...
                         </p>
                         <div class="hero-buttons">
-                            <a href="#" class="btn-primary"><i class="fas fa-play"></i> Mulai Menonton</a>
+                            <!-- Link href akan diset otomatis oleh Javascript -->
+                            <a href="#" id="hero-play-btn" class="btn-primary"><i class="fas fa-play"></i> Mulai Menonton</a>
                             <a href="#" class="btn-secondary"><i class="fas fa-bookmark"></i> Tambahkan</a>
                         </div>
                     </div>
@@ -51,75 +50,27 @@
             <!-- Main Content Area -->
             <main class="main-container">
                 
-                <!-- Section: Rilis Terbaru -->
+                <!-- Section: Rilis Terbaru (Ini bisa untuk episode nanti, kita skip dulu/biarkan statis sementara) -->
                 <section>
                     <div class="section-header">
-                        <h2 class="section-title border-primary">Baru Saja Dirilis</h2>
-                        <a href="#" class="section-link">Lihat Semua</a>
+                        <h2 class="section-title border-primary">Episode Terbaru (Coming Soon)</h2>
                     </div>
                     <div class="carousel-wrapper">
-                        <div class="carousel-container hide-scroll">
-                            <div class="video-card">
-                                <div class="video-thumbnail">
-                                    <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&q=80&w=400" alt="Thumbnail">
-                                    <div class="video-overlay"><div class="play-circle"><i class="fas fa-play"></i></div></div>
-                                    <div class="video-duration">24:00</div>
-                                </div>
-                                <div class="video-info">
-                                    <h3 class="video-title">Kisah Hutan Hijau Eps 1</h3>
-                                    <p class="video-meta">Sub | Dub</p>
-                                </div>
-                            </div>
-                            <!-- Video Card 2 -->
-                            <div class="video-card">
-                                <div class="video-thumbnail">
-                                    <img src="https://images.unsplash.com/photo-1618336753174-89b25208b8b0?auto=format&fit=crop&q=80&w=400" alt="Thumbnail">
-                                    <div class="video-overlay"><div class="play-circle"><i class="fas fa-play"></i></div></div>
-                                    <div class="badge-tag tag-primary">Baru</div>
-                                </div>
-                                <div class="video-info">
-                                    <h3 class="video-title">Cyber Fox: Neon City Eps 4</h3>
-                                    <p class="video-meta">Sub</p>
-                                </div>
-                            </div>
+                        <div class="carousel-container hide-scroll" style="color:#666; font-size:14px; padding:20px 0;">
+                            Fitur daftar episode terbaru sedang dalam pengembangan...
                         </div>
                     </div>
                 </section>
 
-                <!-- Section: Sedang Populer -->
+                <!-- Section: Daftar Semua Series (Dinamis dari Firebase) -->
                 <section>
                     <div class="section-header">
-                        <h2 class="section-title border-accent">Sedang Populer</h2>
+                        <h2 class="section-title border-accent">Jelajahi Judul Animasi</h2>
                     </div>
-                    <div class="poster-grid">
-                        <!-- Poster 1 -->
-                        <div class="poster-card">
-                            <div class="poster-box">
-                                <img src="https://images.unsplash.com/photo-1560930950-5ce206df77ab?auto=format&fit=crop&q=80&w=300" alt="Poster">
-                                <div class="poster-gradient"></div>
-                                <div class="poster-content">
-                                    <h3 class="poster-title">Dunia Paralel</h3>
-                                    <div class="poster-footer">
-                                        <span class="badge-outline">Animasi</span>
-                                        <span class="poster-rating"><i class="fas fa-star"></i> 4.8</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Poster 2 -->
-                        <div class="poster-card">
-                            <div class="poster-box">
-                                <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&q=80&w=300" alt="Poster">
-                                <div class="poster-gradient"></div>
-                                <div class="badge-tag tag-accent" style="top:0.5rem; right:0.5rem; left:auto;">HOT</div>
-                                <div class="poster-content">
-                                    <h3 class="poster-title">Clapperboard Merah</h3>
-                                    <div class="poster-footer">
-                                        <span class="badge-outline">Drama</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- Tempat render data series -->
+                    <div class="poster-grid" id="series-grid-container">
+                        <!-- Loading State -->
+                        <div style="color:#9ca3af; padding: 20px 0;">Memuat daftar judul animasi...</div>
                     </div>
                 </section>
 
@@ -127,10 +78,8 @@
         </div>
     </template>
 
-    <!-- Script Utama (Mengatur Layout & Injeksi Konten) -->
+    <!-- Script Utama -->
     <script src="js/main.js"></script>
     <script type="module" src="js/index.js"></script>    
 </body>
 </html>
-
-
