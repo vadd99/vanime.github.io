@@ -8,10 +8,13 @@
     padding: 0;
 }
 
-/* Video Player Wrapper */
+/* Video Player Wrapper (Diperbarui agar terlihat seperti frame premium) */
 .video-player-wrapper {
     width: 100%;
     background-color: #000;
+    position: relative;
+    /* Memberikan efek bingkai tipis di versi mobile */
+    border-bottom: 1px solid var(--vadd-border, #1a3a26); 
 }
 
 .video-container {
@@ -24,6 +27,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* Memastikan iFrame GDrive/YT memenuhi frame dengan rapi */
+#embed-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
 }
 
 #main-video {
@@ -67,7 +78,7 @@
     cursor: pointer;
     z-index: 10;
     transition: transform 0.2s, background-color 0.2s;
-    padding-left: 4px; /* Imbang posisi icon play */
+    padding-left: 4px;
 }
 
 .big-play-btn:hover {
@@ -344,7 +355,7 @@
 
 /* Next Episode Section */
 .next-episode-section {
-    margin-top: 2rem;
+    margin-bottom: 2rem;
 }
 
 .section-label {
@@ -461,9 +472,12 @@
         padding: 0 1rem;
     }
 
+    /* Penyesuaian frame video di Desktop (Membuatnya melengkung & Berbayang) */
     .video-player-wrapper {
-        border-radius: 0.5rem;
+        border-radius: 12px;
         overflow: hidden;
+        border: 1px solid var(--vadd-border, #1a3a26);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.6);
     }
 
     .player-info-container {

@@ -25,7 +25,7 @@ function getResponsiveEmbedHTML(rawUrl) {
         }
         
         const cleanYoutubeUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
-        embedHTML = `<iframe width="100%" height="100%" src="${cleanYoutubeUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+        embedHTML = `<iframe src="${cleanYoutubeUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>`;
     
     // 2. JIKA LINK GOOGLE DRIVE
     } else if (rawUrl.includes('drive.google.com')) {
@@ -36,8 +36,9 @@ function getResponsiveEmbedHTML(rawUrl) {
             fileId = rawUrl.split('id=')[1].split('&')[0];
         }
         
-        const gdriveUrl = `https://drive.google.com/file/d/${fileId}/preview`;
-        embedHTML = `<iframe width="100%" height="100%" src="${gdriveUrl}" frameborder="0" allow="autoplay" allowfullscreen></iframe>`;
+        // Memaksa parameter preview dan autoplay
+        const gdriveUrl = `https://drive.google.com/file/d/${fileId}/preview?autoplay=1`;
+        embedHTML = `<iframe src="${gdriveUrl}" frameborder="0" allow="autoplay" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>`;
     
     // 3. JIKA LINK FILE MP4 / MKV LANGSUNG
     } else if (rawUrl.endsWith('.mp4') || rawUrl.endsWith('.mkv')) {
@@ -52,7 +53,7 @@ function getResponsiveEmbedHTML(rawUrl) {
         if (rawUrl.includes('<iframe')) {
             embedHTML = rawUrl;
         } else {
-            embedHTML = `<iframe width="100%" height="100%" src="${rawUrl}" frameborder="0" allowfullscreen></iframe>`;
+            embedHTML = `<iframe src="${rawUrl}" frameborder="0" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>`;
         }
     }
 
@@ -119,12 +120,15 @@ window.addEventListener('layoutReady', async () => {
             epDesc.innerText = seriesDoc.data().description || "Selamat menonton episode ini di Vadd Studio!";
         }
 
-        // 4. RENDER VIDEO DINAMIS (Otomatis mendeteksi YouTube, GDrive, MP4, dll)
+        // 4. RENDER VIDEO DINAMIS
         if (epData.embedUrl) {
             if (mainVideo) mainVideo.style.display = 'none';
             if (videoControls) videoControls.style.display = 'none';
             if (bigPlayBtn) bigPlayBtn.style.display = 'none';
-            if (videoWatermark) videoWatermark.style.display = 'none';
+            
+            // Opsional: Tetap tampilkan watermark Vadd Studio meski pakai GDrive agar terasa milik sendiri
+            // Jika mau disembunyikan, hapus komentar pada baris di bawah ini:
+            // if (videoWatermark) videoWatermark.style.display = 'none';
 
             if (embedContainer) {
                 embedContainer.style.display = 'block';

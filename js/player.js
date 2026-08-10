@@ -3,44 +3,31 @@
 // ==========================================
 
 import { db } from './firebase-init.js';
-import { doc, getDoc, collection, query, where, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// ==========================================
-// FUNGSI PENDETEKSI & PENCONVERSI LINK EMBED (Smart Player)
-// ==========================================
+// FUNGSI PENDETEKSI & PENCONVERSI LINK EMBED
 function getResponsiveEmbedHTML(rawUrl) {
     if (!rawUrl) return '<div style="color:white; display:flex; align-items:center; justify-content:center; height:100%;">Video belum tersedia</div>';
 
     let embedHTML = '';
 
-    // 1. JIKA LINK YOUTUBE
     if (rawUrl.includes('youtube.com') || rawUrl.includes('youtu.be')) {
         let videoId = '';
-        if (rawUrl.includes('youtu.be/')) {
-            videoId = rawUrl.split('youtu.be/')[1].split('?')[0];
-        } else if (rawUrl.includes('embed/')) {
-            videoId = rawUrl.split('embed/')[1].split('?')[0];
-        } else if (rawUrl.includes('watch?v=')) {
-            videoId = rawUrl.split('watch?v=')[1].split('&')[0];
-        }
+        if (rawUrl.includes('youtu.be/')) videoId = rawUrl.split('youtu.be/')[1].split('?')[0];
+        else if (rawUrl.includes('embed/')) videoId = rawUrl.split('embed/')[1].split('?')[0];
+        else if (rawUrl.includes('watch?v=')) videoId = rawUrl.split('watch?v=')[1].split('&')[0];
         
         const cleanYoutubeUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
         embedHTML = `<iframe src="${cleanYoutubeUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>`;
     
-    // 2. JIKA LINK GOOGLE DRIVE
     } else if (rawUrl.includes('drive.google.com')) {
         let fileId = '';
-        if (rawUrl.includes('/file/d/')) {
-            fileId = rawUrl.split('/file/d/')[1].split('/')[0];
-        } else if (rawUrl.includes('id=')) {
-            fileId = rawUrl.split('id=')[1].split('&')[0];
-        }
+        if (rawUrl.includes('/file/d/')) fileId = rawUrl.split('/file/d/')[1].split('/')[0];
+        else if (rawUrl.includes('id=')) fileId = rawUrl.split('id=')[1].split('&')[0];
         
-        // Memaksa parameter preview dan autoplay
         const gdriveUrl = `https://drive.google.com/file/d/${fileId}/preview?autoplay=1`;
         embedHTML = `<iframe src="${gdriveUrl}" frameborder="0" allow="autoplay" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>`;
     
-    // 3. JIKA LINK FILE MP4 / MKV LANGSUNG
     } else if (rawUrl.endsWith('.mp4') || rawUrl.endsWith('.mkv')) {
         embedHTML = `
             <video width="100%" height="100%" controls autoplay style="background:#000;">
@@ -49,21 +36,16 @@ function getResponsiveEmbedHTML(rawUrl) {
             </video>
         `;
     } else {
-        // 4. JIKA BERUPA KODE IFRAME UTUH ATAU PENYEDIA LAIN (Mega, DoodStream, dll)
-        if (rawUrl.includes('<iframe')) {
-            embedHTML = rawUrl;
-        } else {
-            embedHTML = `<iframe src="${rawUrl}" frameborder="0" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>`;
-        }
+        if (rawUrl.includes('<iframe')) embedHTML = rawUrl;
+        else embedHTML = `<iframe src="${rawUrl}" frameborder="0" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>`;
     }
 
     return embedHTML;
 }
 
 window.addEventListener('layoutReady', async () => {
-    console.log("Halaman Pemutar Video berhasil dimuat beserta layout!");
+    console.log("Halaman Pemutar Video dimuat!");
 
-    // 1. Ambil ID Episode dari URL
     const urlParams = new URLSearchParams(window.location.search);
     const epId = urlParams.get('ep');
 
@@ -73,27 +55,21 @@ window.addEventListener('layoutReady', async () => {
         return;
     }
 
-    // Elemen DOM
     const pageTitle = document.getElementById('page-title');
     const epSeriesTitle = document.getElementById('ep-series-title');
     const epMainTitle = document.getElementById('ep-main-title');
     const epDesc = document.getElementById('ep-desc');
-    const btnAllEps = document.getElementById('btn-all-episodes');
     
-    // Elemen Pemutar Video
     const embedContainer = document.getElementById('embed-container');
     const mainVideo = document.getElementById('main-video');
     const videoControls = document.getElementById('video-controls');
     const bigPlayBtn = document.getElementById('big-play-btn');
-    const videoWatermark = document.getElementById('video-watermark');
 
     try {
-        // 2. MENGAMBIL DATA EPISODE INI DARI FIREBASE
         const epDoc = await getDoc(doc(db, "episodes", epId));
         
         if (!epDoc.exists()) {
             if(epMainTitle) epMainTitle.innerText = "Episode tidak ditemukan";
-            if(epDesc) epDesc.innerText = "Video mungkin telah dihapus dari database.";
             return;
         }
 
@@ -101,34 +77,22 @@ window.addEventListener('layoutReady', async () => {
         const currentSeriesId = epData.seriesId;
         const currentEpNumber = Number(epData.episodeNumber);
 
-        // 3. SET DATA METADATA KE HTML
         if(pageTitle) pageTitle.innerText = `E${currentEpNumber} - ${epData.episodeTitle || 'Episode'} | Vadd Studio`;
         if (epSeriesTitle) {
             epSeriesTitle.innerText = epData.seriesTitle || "Judul Seri";
             epSeriesTitle.href = `detail.html?id=${currentSeriesId}`;
         }
-        if (epMainTitle) {
-            epMainTitle.innerText = `E${currentEpNumber} - ${epData.episodeTitle || 'Tanpa Judul'}`;
-        }
-        if (btnAllEps) {
-            btnAllEps.href = `detail.html?id=${currentSeriesId}`;
-        }
+        if (epMainTitle) epMainTitle.innerText = `E${currentEpNumber} - ${epData.episodeTitle || 'Tanpa Judul'}`;
         
-        // Ambil sinopsis seri untuk deskripsi episode
         const seriesDoc = await getDoc(doc(db, "series", currentSeriesId));
         if (seriesDoc.exists() && epDesc) {
             epDesc.innerText = seriesDoc.data().description || "Selamat menonton episode ini di Vadd Studio!";
         }
 
-        // 4. RENDER VIDEO DINAMIS
         if (epData.embedUrl) {
             if (mainVideo) mainVideo.style.display = 'none';
             if (videoControls) videoControls.style.display = 'none';
             if (bigPlayBtn) bigPlayBtn.style.display = 'none';
-            
-            // Opsional: Tetap tampilkan watermark Vadd Studio meski pakai GDrive agar terasa milik sendiri
-            // Jika mau disembunyikan, hapus komentar pada baris di bawah ini:
-            // if (videoWatermark) videoWatermark.style.display = 'none';
 
             if (embedContainer) {
                 embedContainer.style.display = 'block';
@@ -136,40 +100,65 @@ window.addEventListener('layoutReady', async () => {
             }
         }
 
-        // 5. CARI EPISODE BERIKUTNYA SECARA OTOMATIS
-        const nextEpNum = currentEpNumber + 1;
-        const nextQ = query(collection(db, "episodes"), 
-            where("seriesId", "==", currentSeriesId),
-            where("episodeNumber", "==", nextEpNum),
-            limit(1)
-        );
+        // --- MENGAMBIL SEMUA DAFTAR EPISODE ---
+        const epsQuery = query(collection(db, "episodes"), where("seriesId", "==", currentSeriesId));
+        const epsSnapshot = await getDocs(epsQuery);
         
-        const nextSnapshot = await getDocs(nextQ);
-        const nextEpSection = document.getElementById('next-ep-section');
+        const epSection = document.getElementById('episodes-section');
+        const epScrollList = document.getElementById('ep-scroll-list');
         
-        if (!nextSnapshot.empty && nextEpSection) {
-            const nextData = nextSnapshot.docs[0].data();
-            const nextId = nextSnapshot.docs[0].id;
-
-            const nextEpLink = document.getElementById('next-ep-link');
-            const nextEpThumb = document.getElementById('next-ep-thumb');
-            const nextEpTitle = document.getElementById('next-ep-title');
-
-            if (nextEpLink) nextEpLink.href = `player.html?ep=${nextId}`;
-            if (nextEpThumb) nextEpThumb.src = nextData.thumbnailUrl || "https://via.placeholder.com/350x200?text=Next";
-            if (nextEpTitle) nextEpTitle.innerText = `E${nextData.episodeNumber} - ${nextData.episodeTitle || 'Tanpa Judul'}`;
+        if (!epsSnapshot.empty && epSection && epScrollList) {
+            let epArray = [];
+            epsSnapshot.forEach(doc => epArray.push({ id: doc.id, ...doc.data() }));
             
-            nextEpSection.style.display = 'block';
-        } else if (nextEpSection) {
-            nextEpSection.style.display = 'none';
+            // Mengurutkan episode berdasarkan nomor (1, 2, 3...)
+            epArray.sort((a, b) => (a.episodeNumber || 0) - (b.episodeNumber || 0));
+
+            epScrollList.innerHTML = '';
+            
+            epArray.forEach(ep => {
+                const isActive = ep.id === epId; // Cek apakah ini episode yang sedang ditonton
+                const thumb = ep.thumbnailUrl || "https://via.placeholder.com/350x200?text=Eps+" + ep.episodeNumber;
+                
+                // Jika aktif, ganti ikon play menjadi ikon volume/sedang diputar
+                const iconOverlay = isActive ? 
+                    `<i class="fas fa-volume-up" style="color:var(--vadd-primary);"></i>` : 
+                    `<i class="fas fa-play"></i>`;
+
+                const epHTML = `
+                    <a href="player.html?ep=${ep.id}" class="next-episode-card ${isActive ? 'active-ep' : ''}" ${isActive ? 'id="current-playing-ep"' : ''}>
+                        <div class="next-thumb-wrapper">
+                            <img src="${thumb}" alt="E${ep.episodeNumber}">
+                            <div class="play-overlay-mini">
+                                ${iconOverlay}
+                            </div>
+                        </div>
+                        <div class="next-episode-info">
+                            <h4 class="next-title">E${ep.episodeNumber} - ${ep.episodeTitle || 'Tanpa Judul'}</h4>
+                        </div>
+                    </a>
+                `;
+                epScrollList.innerHTML += epHTML;
+            });
+            
+            epSection.style.display = 'block';
+
+            // Auto-scroll list ke episode yang sedang ditonton
+            setTimeout(() => {
+                const activeEl = document.getElementById('current-playing-ep');
+                if (activeEl && epScrollList) {
+                    activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }, 800);
+
+        } else if (epSection) {
+            epSection.style.display = 'none';
         }
 
     } catch (error) {
         console.error("Gagal memuat player:", error);
-        if (epMainTitle) epMainTitle.innerText = "Terjadi Kesalahan Server";
     }
 
-    // --- FUNGSI INTERAKSI SEDERHANA (TOAST, LIKE, DISLIKE) ---
     const toast = document.getElementById('vadd-toast');
     function showToast(msg) {
         if (!toast) return;

@@ -4,16 +4,14 @@
 
 .player-page-container {
     max-width: 1280px;
-    margin: 64px auto 2rem auto; /* 64px mengkompensasi navbar fixed */
+    margin: 64px auto 2rem auto; 
     padding: 0;
 }
 
-/* Video Player Wrapper (Diperbarui agar terlihat seperti frame premium) */
 .video-player-wrapper {
     width: 100%;
     background-color: #000;
     position: relative;
-    /* Memberikan efek bingkai tipis di versi mobile */
     border-bottom: 1px solid var(--vadd-border, #1a3a26); 
 }
 
@@ -29,458 +27,146 @@
     justify-content: center;
 }
 
-/* Memastikan iFrame GDrive/YT memenuhi frame dengan rapi */
-#embed-container iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    display: block;
-}
-
-#main-video {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    cursor: pointer;
-}
+#embed-container iframe { width: 100%; height: 100%; border: none; display: block; }
+#main-video { width: 100%; height: 100%; object-fit: contain; cursor: pointer; }
 
 /* Watermark */
 .video-watermark {
-    position: absolute;
-    top: 1rem;
-    right: 1.25rem;
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 0.85rem;
-    font-weight: 800;
-    pointer-events: none;
-    z-index: 5;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
+    position: absolute; top: 1rem; right: 1.25rem; color: rgba(255, 255, 255, 0.4);
+    font-size: 0.85rem; font-weight: 800; pointer-events: none; z-index: 5;
+    letter-spacing: 0.05em; text-transform: uppercase;
 }
-
-.video-watermark span {
-    color: var(--vadd-accent, #f27329);
-}
+.video-watermark span { color: var(--vadd-accent, #f27329); }
 
 /* Big Play Overlay Button */
 .big-play-btn {
-    position: absolute;
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background-color: rgba(0, 0, 0, 0.6);
-    border: 2px solid var(--vadd-primary, #60d381);
-    color: #fff;
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 10;
-    transition: transform 0.2s, background-color 0.2s;
-    padding-left: 4px;
+    position: absolute; width: 64px; height: 64px; border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.6); border: 2px solid var(--vadd-primary, #60d381);
+    color: #fff; font-size: 1.5rem; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 10; transition: transform 0.2s, background-color 0.2s; padding-left: 4px;
 }
-
-.big-play-btn:hover {
-    transform: scale(1.1);
-    background-color: var(--vadd-primary, #60d381);
-    color: #000;
-}
-
-.big-play-btn.hidden {
-    display: none;
-}
+.big-play-btn:hover { transform: scale(1.1); background-color: var(--vadd-primary, #60d381); color: #000; }
+.big-play-btn.hidden { display: none; }
 
 /* Custom Controls Bar */
 .video-controls {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
+    position: absolute; bottom: 0; left: 0; width: 100%;
     background: linear-gradient(0deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.4) 70%, transparent 100%);
-    padding: 0.5rem 1rem;
-    z-index: 10;
-    opacity: 1;
-    transition: opacity 0.3s ease;
+    padding: 0.5rem 1rem; z-index: 10; opacity: 1; transition: opacity 0.3s ease;
 }
+.video-container.user-idle .video-controls { opacity: 0; pointer-events: none; }
 
-.video-container.user-idle .video-controls {
-    opacity: 0;
-    pointer-events: none;
-}
+.progress-bar-container { position: relative; width: 100%; height: 5px; background-color: rgba(255, 255, 255, 0.2); cursor: pointer; border-radius: 3px; margin-bottom: 0.5rem; transition: height 0.15s; }
+.progress-bar-container:hover { height: 8px; }
+.progress-bar { position: absolute; top: 0; left: 0; height: 100%; width: 0%; background-color: var(--vadd-accent, #f27329); border-radius: 3px; z-index: 2; }
+.buffer-bar { position: absolute; top: 0; left: 0; height: 100%; width: 0%; background-color: rgba(255, 255, 255, 0.4); border-radius: 3px; z-index: 1; }
 
-/* Progress Bar */
-.progress-bar-container {
-    position: relative;
-    width: 100%;
-    height: 5px;
-    background-color: rgba(255, 255, 255, 0.2);
-    cursor: pointer;
-    border-radius: 3px;
-    margin-bottom: 0.5rem;
-    transition: height 0.15s;
-}
-
-.progress-bar-container:hover {
-    height: 8px;
-}
-
-.progress-bar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 0%;
-    background-color: var(--vadd-accent, #f27329);
-    border-radius: 3px;
-    z-index: 2;
-}
-
-.buffer-bar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 0%;
-    background-color: rgba(255, 255, 255, 0.4);
-    border-radius: 3px;
-    z-index: 1;
-}
-
-/* Control Row */
-.controls-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.controls-left, .controls-right {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.control-btn {
-    background: none;
-    border: none;
-    color: #ffffff;
-    font-size: 1.1rem;
-    cursor: pointer;
-    padding: 0.2rem;
-    transition: color 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.control-btn:hover {
-    color: var(--vadd-primary, #60d381);
-}
-
-.badge-btn {
-    font-size: 0.75rem;
-    font-weight: 800;
-    border: 1px solid #ffffff;
-    border-radius: 3px;
-    padding: 0.1rem 0.3rem;
-}
-
-/* Volume Bar */
-.volume-container {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-}
-
-.volume-slider {
-    width: 60px;
-    height: 4px;
-    accent-color: var(--vadd-primary, #60d381);
-    cursor: pointer;
-}
-
-.video-time {
-    color: #d1d5db;
-    font-size: 0.75rem;
-    font-weight: 600;
-    margin-left: 0.25rem;
-}
+.controls-row { display: flex; align-items: center; justify-content: space-between; }
+.controls-left, .controls-right { display: flex; align-items: center; gap: 0.75rem; }
+.control-btn { background: none; border: none; color: #ffffff; font-size: 1.1rem; cursor: pointer; padding: 0.2rem; transition: color 0.2s; display: flex; align-items: center; justify-content: center; }
+.control-btn:hover { color: var(--vadd-primary, #60d381); }
+.badge-btn { font-size: 0.75rem; font-weight: 800; border: 1px solid #ffffff; border-radius: 3px; padding: 0.1rem 0.3rem; }
+.volume-container { display: flex; align-items: center; gap: 0.4rem; }
+.volume-slider { width: 60px; height: 4px; accent-color: var(--vadd-primary, #60d381); cursor: pointer; }
+.video-time { color: #d1d5db; font-size: 0.75rem; font-weight: 600; margin-left: 0.25rem; }
 
 /* Player Info Container */
-.player-info-container {
-    padding: 1.25rem 1rem;
-}
+.player-info-container { padding: 1.25rem 1rem; }
+.series-subtitle { color: var(--vadd-primary, #60d381); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; margin-bottom: 0.25rem; text-decoration: none; transition: color 0.2s; }
+.series-subtitle:hover { color: #ffffff; }
+.episode-main-title { color: #ffffff; font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem; }
+.episode-tags { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; font-size: 0.8rem; }
+.age-tag { background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); color: #ffffff; padding: 0.1rem 0.4rem; border-radius: 3px; font-weight: bold; }
+.sub-status { color: #9ca3af; display: flex; align-items: center; gap: 0.3rem; }
 
-.series-subtitle {
-    color: var(--vadd-primary, #60d381);
-    font-size: 0.85rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    display: inline-block;
-    margin-bottom: 0.25rem;
-    text-decoration: none;
-    transition: color 0.2s;
-}
+.interaction-toolbar { display: flex; align-items: center; justify-content: space-between; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 1.25rem; }
+.like-dislike-group { display: flex; align-items: center; background-color: rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 0.2rem 0.6rem; }
+.toolbar-btn { background: none; border: none; color: #ffffff; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.4rem; cursor: pointer; padding: 0.4rem 0.6rem; transition: color 0.2s; }
+.toolbar-btn:hover, .toolbar-btn.active { color: var(--vadd-primary, #60d381); }
+.like-dislike-group .divider { width: 1px; height: 16px; background-color: rgba(255, 255, 255, 0.2); }
+.action-tools { display: flex; gap: 0.5rem; }
+.circle-btn { background-color: rgba(255, 255, 255, 0.08); width: 36px; height: 36px; border-radius: 50%; justify-content: center; padding: 0; }
 
-.series-subtitle:hover {
-    color: #ffffff;
-}
+.episode-description { color: #d1d5db; font-size: 0.9rem; line-height: 1.5; margin-bottom: 1.25rem; }
+.content-warning-box { background-color: rgba(255, 255, 255, 0.03); border-left: 3px solid var(--vadd-accent, #f27329); padding: 0.75rem 1rem; border-radius: 0 0.375rem 0.375rem 0; margin-bottom: 2rem; }
+.warning-title { font-size: 0.8rem; font-weight: 800; color: #ffffff; text-transform: uppercase; margin-bottom: 0.2rem; }
+.warning-tags { font-size: 0.75rem; color: var(--vadd-accent, #f27329); font-weight: 700; }
+.warning-details { font-size: 0.8rem; color: #9ca3af; }
 
-.episode-main-title {
-    color: #ffffff;
-    font-size: 1.4rem;
-    font-weight: 800;
-    margin-bottom: 0.5rem;
-}
+/* =========================================
+   DAFTAR EPISODE SCROLLABLE
+   ========================================= */
+.next-episode-section { margin-bottom: 2rem; }
+.section-label { font-size: 1rem; font-weight: 800; color: #ffffff; margin-bottom: 1rem; }
 
-.episode-tags {
+/* Container Scroll List */
+.episode-scroll-list {
     display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1.25rem;
-    font-size: 0.8rem;
+    flex-direction: column;
+    gap: 0.6rem;
+    max-height: 380px; /* Cukup untuk menampilkan sekitar ~5 episode */
+    overflow-y: auto;
+    padding-right: 0.5rem;
 }
 
-.age-tag {
-    background-color: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: #ffffff;
-    padding: 0.1rem 0.4rem;
-    border-radius: 3px;
-    font-weight: bold;
-}
+/* Custom Scrollbar agar keren */
+.episode-scroll-list::-webkit-scrollbar { width: 5px; }
+.episode-scroll-list::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 4px; }
+.episode-scroll-list::-webkit-scrollbar-thumb { background: var(--vadd-border, #1a3a26); border-radius: 4px; }
+.episode-scroll-list::-webkit-scrollbar-thumb:hover { background: var(--vadd-primary, #60d381); }
 
-.sub-status {
-    color: #9ca3af;
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-}
-
-/* Interaction Toolbar */
-.interaction-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-bottom: 1.25rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 1.25rem;
-}
-
-.like-dislike-group {
-    display: flex;
-    align-items: center;
-    background-color: rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
-    padding: 0.2rem 0.6rem;
-}
-
-.toolbar-btn {
-    background: none;
-    border: none;
-    color: #ffffff;
-    font-size: 0.85rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    cursor: pointer;
-    padding: 0.4rem 0.6rem;
-    transition: color 0.2s;
-}
-
-.toolbar-btn:hover {
-    color: var(--vadd-primary, #60d381);
-}
-
-.toolbar-btn.active {
-    color: var(--vadd-primary, #60d381);
-}
-
-.like-dislike-group .divider {
-    width: 1px;
-    height: 16px;
-    background-color: rgba(255, 255, 255, 0.2);
-}
-
-.action-tools {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.circle-btn {
-    background-color: rgba(255, 255, 255, 0.08);
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    justify-content: center;
-    padding: 0;
-}
-
-/* Deskripsi & Warning */
-.episode-description {
-    color: #d1d5db;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    margin-bottom: 1.25rem;
-}
-
-.content-warning-box {
-    background-color: rgba(255, 255, 255, 0.03);
-    border-left: 3px solid var(--vadd-accent, #f27329);
-    padding: 0.75rem 1rem;
-    border-radius: 0 0.375rem 0.375rem 0;
-    margin-bottom: 2rem;
-}
-
-.warning-title {
-    font-size: 0.8rem;
-    font-weight: 800;
-    color: #ffffff;
-    text-transform: uppercase;
-    margin-bottom: 0.2rem;
-}
-
-.warning-tags {
-    font-size: 0.75rem;
-    color: var(--vadd-accent, #f27329);
-    font-weight: 700;
-}
-
-.warning-details {
-    font-size: 0.8rem;
-    color: #9ca3af;
-}
-
-/* Next Episode Section */
-.next-episode-section {
-    margin-bottom: 2rem;
-}
-
-.section-label {
-    font-size: 1rem;
-    font-weight: 800;
-    color: #ffffff;
-    margin-bottom: 1rem;
-}
-
+/* Item List Episode */
 .next-episode-card {
     display: flex;
     align-items: center;
     gap: 1rem;
     background-color: rgba(255, 255, 255, 0.04);
-    padding: 0.6rem;
+    padding: 0.5rem;
     border-radius: 0.5rem;
     text-decoration: none;
     color: inherit;
-    transition: background-color 0.2s;
-    margin-bottom: 1.25rem;
+    transition: all 0.2s;
+    border: 1px solid transparent;
 }
 
 .next-episode-card:hover {
     background-color: rgba(255, 255, 255, 0.08);
 }
 
+/* State Aktif (Episode yang sedang diputar) */
+.next-episode-card.active-ep {
+    background-color: rgba(96, 211, 129, 0.1); /* Background hijau transparan */
+    border: 1px solid var(--vadd-primary, #60d381);
+}
+.active-ep .next-title {
+    color: var(--vadd-primary, #60d381);
+}
+
 .next-thumb-wrapper {
     position: relative;
-    width: 120px;
+    width: 110px;
+    min-width: 110px; /* Mencegah thumbnail menyusut */
     aspect-ratio: 16 / 9;
     border-radius: 0.375rem;
     overflow: hidden;
 }
 
-.next-thumb-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
+.next-thumb-wrapper img { width: 100%; height: 100%; object-fit: cover; }
 .play-overlay-mini {
-    position: absolute;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 1rem;
+    position: absolute; inset: 0; background-color: rgba(0, 0, 0, 0.4);
+    display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1rem;
 }
-
-.time-tag {
-    position: absolute;
-    bottom: 0.25rem;
-    right: 0.25rem;
-    background-color: rgba(0, 0, 0, 0.8);
-    color: #fff;
-    font-size: 0.65rem;
-    padding: 0.1rem 0.3rem;
-    border-radius: 2px;
-    font-weight: bold;
-}
-
-.next-episode-info {
-    flex: 1;
-}
-
-.next-title {
-    color: #ffffff;
-    font-size: 0.9rem;
-    font-weight: 700;
-}
-
-.btn-download-mini {
-    background: none;
-    border: none;
-    color: #9ca3af;
-    font-size: 0.9rem;
-    cursor: pointer;
-    padding: 0.5rem;
-    transition: color 0.2s;
-}
-
-.btn-download-mini:hover {
-    color: var(--vadd-primary, #60d381);
-}
-
-/* All Episodes Button */
-.all-episodes-btn {
-    display: block;
-    width: 100%;
-    text-align: center;
-    background-color: rgba(255, 255, 255, 0.08);
-    color: #ffffff;
-    font-weight: 700;
-    padding: 0.75rem;
-    border-radius: 0.375rem;
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: background-color 0.2s;
-}
-
-.all-episodes-btn:hover {
-    background-color: rgba(255, 255, 255, 0.15);
-}
+.next-episode-info { flex: 1; }
+.next-title { color: #ffffff; font-size: 0.9rem; font-weight: 700; transition: color 0.2s; }
 
 /* Responsive Desktop */
 @media (min-width: 992px) {
-    .player-page-container {
-        display: grid;
-        grid-template-columns: 1fr 360px;
-        gap: 1.5rem;
-        align-items: start;
-        padding: 0 1rem;
-    }
-
-    /* Penyesuaian frame video di Desktop (Membuatnya melengkung & Berbayang) */
-    .video-player-wrapper {
-        border-radius: 12px;
-        overflow: hidden;
-        border: 1px solid var(--vadd-border, #1a3a26);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-    }
-
-    .player-info-container {
-        padding: 0;
+    .player-page-container { display: grid; grid-template-columns: 1fr 360px; gap: 1.5rem; align-items: start; padding: 0 1rem; }
+    .video-player-wrapper { border-radius: 12px; overflow: hidden; border: 1px solid var(--vadd-border, #1a3a26); box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
+    .player-info-container { padding: 0; }
+    
+    /* Perbesar tinggi list scroll jika layar lebar */
+    .episode-scroll-list {
+        max-height: 520px; 
     }
 }
