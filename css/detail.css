@@ -98,17 +98,6 @@ body {
     font-size: 0.4rem;
 }
 
-.meta-genre-link {
-    color: #ffffff;
-    text-decoration: underline;
-    text-decoration-color: var(--vadd-primary);
-    transition: color 0.2s;
-}
-
-.meta-genre-link:hover {
-    color: var(--vadd-primary);
-}
-
 .rating-box {
     display: flex;
     align-items: center;
@@ -123,18 +112,6 @@ body {
     color: #ffffff;
     font-weight: bold;
     margin-left: 0.3rem;
-}
-
-.rating-count {
-    color: #9ca3af;
-    font-size: 0.85rem;
-    margin-left: 0.25rem;
-}
-
-.rating-arrow {
-    font-size: 0.7rem;
-    color: #9ca3af;
-    margin-left: 0.2rem;
 }
 
 /* Tombol Aksi */
@@ -234,55 +211,45 @@ body {
     padding: 1.5rem 1rem;
 }
 
-/* Sinopsis */
+
+/* =========================================
+   SINOPSIS & METADATA EKSTRA (REVISI FINAL)
+   ========================================= */
 .synopsis-box {
     position: relative;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
 }
 
-.synopsis-text {
-    color: #d1d5db;
-    font-size: 0.9rem;
-    line-height: 1.6;
-    margin-bottom: 0.75rem;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    transition: all 0.3s;
-}
-
-.synopsis-text.expanded {
-    -webkit-line-clamp: unset;
-}
-
-.btn-more-detail {
-    color: var(--vadd-accent);
-    font-weight: bold;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    transition: color 0.2s;
-}
-
-.btn-more-detail:hover { color: #ffffff; }
-.icon-arrow { font-size: 0.7rem; }
-
-/* --- Penyesuaian Sinopsis & Detail Tambahan --- */
 .synopsis-content-wrapper {
     position: relative;
-    max-height: 4.5em; /* Sekitar 3 baris teks */
+    /* Membatasi tinggi kira-kira 3 baris teks */
+    max-height: 4.5em; 
     overflow: hidden;
     transition: max-height 0.4s ease-out;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
 }
 
-/* Saat di-expand (tombol "Lebih Banyak Detail" diklik) */
+/* Efek gradien bayangan saat tertutup agar terlihat keren */
+.synopsis-content-wrapper::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2.5em;
+    background: linear-gradient(to bottom, rgba(5,18,10,0), rgba(5,18,10,1));
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+/* Saat tombol diklik dan kelas expanded aktif */
 .synopsis-content-wrapper.expanded {
-    max-height: 1000px; /* Nilai besar agar semua konten muat */
+    max-height: 1500px; /* Nilai besar agar semua detail muat */
+}
+
+/* Hilangkan bayangan gradien saat terbuka penuh */
+.synopsis-content-wrapper.expanded::after {
+    opacity: 0;
 }
 
 .synopsis-text {
@@ -290,14 +257,15 @@ body {
     font-size: 0.95rem;
     line-height: 1.6;
     margin-bottom: 1rem;
+    display: block; /* Mencegah bentrok dengan line-clamp */
 }
 
-/* Metadata Ekstra (Mirip Crunchyroll) */
+/* Kotak Detail Tambahan (Audio, Sub, dll) */
 .extra-details {
     color: #9ca3af;
     font-size: 0.85rem;
     line-height: 1.7;
-    margin-top: 1rem;
+    margin-top: 1.5rem;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     padding-top: 1rem;
     opacity: 0;
@@ -309,7 +277,7 @@ body {
 }
 
 .extra-details p {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.6rem;
 }
 
 .extra-details strong {
@@ -318,6 +286,7 @@ body {
     margin-right: 0.4rem;
 }
 
+/* Tombol Lihat Lebih */
 .btn-more-detail {
     color: var(--vadd-accent);
     font-weight: bold;
@@ -327,24 +296,26 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    cursor: pointer;
     background: none;
     border: none;
+    cursor: pointer;
     padding: 0;
+    margin-top: 0.5rem;
     transition: color 0.2s;
 }
 
-.btn-more-detail:hover { 
-    color: #ffffff; 
-}
+.btn-more-detail:hover { color: #ffffff; }
+
 .icon-arrow { 
     font-size: 0.7rem; 
-    transition: transform 0.3s;
-}
-.synopsis-content-wrapper.expanded + .btn-more-detail .icon-arrow {
-    transform: rotate(180deg); /* Panah berputar ke atas saat dibuka */
+    transition: transform 0.3s ease;
 }
 
+/* Memutar ikon panah saat div expanded */
+.synopsis-content-wrapper.expanded + .btn-more-detail .icon-arrow {
+    transform: rotate(180deg);
+}
+/* ========================================= */
 
 
 /* Section Episode */

@@ -155,7 +155,10 @@ window.addEventListener('layoutReady', async () => {
     
     if (btnToggleSynopsis && synopsisWrapper) {
         btnToggleSynopsis.addEventListener('click', () => {
+            // Cukup matikan/nyalakan kelas .expanded di div bungkusnya (wrapper)
+            // CSS max-height dan transisinya akan mengurus sisa animasinya.
             synopsisWrapper.classList.toggle('expanded');
+            
             if (synopsisWrapper.classList.contains('expanded')) {
                 btnToggleSynopsis.innerHTML = 'LEBIH SEDIKIT DETAIL <i class="fas fa-chevron-up icon-arrow"></i>';
             } else {
