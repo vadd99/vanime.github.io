@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Console Admin - Vadd Studio</title>
     
-    <!-- Phosphor Icons (Untuk Icon, tidak perlu install apa-apa) -->
+    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
@@ -24,447 +24,91 @@
         }
 
         /* --- RESET & BASIC --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: var(--font-family);
-        }
-
-        body {
-            background-color: var(--bg-main);
-            color: var(--color-text-main);
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-family); }
+        body { background-color: var(--bg-main); color: var(--color-text-main); height: 100vh; overflow: hidden; display: flex; }
 
         /* --- LAYOUT --- */
-        .sidebar {
-            width: 260px;
-            background-color: var(--bg-panel);
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s ease;
-            z-index: 50;
-        }
-
-        .main-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+        .sidebar { width: 260px; background-color: var(--bg-panel); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; transition: transform 0.3s ease; z-index: 50; }
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
         /* --- SIDEBAR COMPONENTS --- */
-        .sidebar-header {
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            border-bottom: 1px solid var(--border-color);
-            background-color: var(--bg-main);
-        }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: var(--bg-panel);
-            border: 2px solid var(--color-green);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--color-green);
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .logo-text {
-            font-size: 20px;
-            font-weight: bold;
-        }
+        .sidebar-header { height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid var(--border-color); background-color: var(--bg-main); }
+        .logo-container { display: flex; align-items: center; gap: 10px; }
+        .logo-icon { width: 32px; height: 32px; border-radius: 50%; background-color: var(--bg-panel); border: 2px solid var(--color-green); display: flex; align-items: center; justify-content: center; color: var(--color-green); font-size: 12px; font-weight: bold; }
+        .logo-text { font-size: 20px; font-weight: bold; }
         .logo-text span:first-child { color: var(--color-green); }
-
-        .close-sidebar-btn {
-            display: none;
-            background: none;
-            border: none;
-            color: var(--color-text-muted);
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        .nav-menu {
-            padding: 20px 12px;
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        .nav-label {
-            font-size: 12px;
-            text-transform: uppercase;
-            color: var(--color-text-muted);
-            margin-bottom: 10px;
-            padding-left: 12px;
-            font-weight: 600;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            background: none;
-            border: none;
-            width: 100%;
-            color: var(--color-text-muted);
-            font-size: 15px;
-            cursor: pointer;
-            border-radius: 8px;
-            margin-bottom: 5px;
-            border-left: 4px solid transparent;
-            transition: all 0.2s;
-            text-align: left;
-        }
-
-        .nav-item:hover {
-            background-color: var(--bg-hover);
-            color: var(--color-text-main);
-        }
-
-        .nav-item.active {
-            background-color: var(--bg-hover);
-            color: var(--color-green);
-            border-left-color: var(--color-green);
-        }
-
+        .close-sidebar-btn { display: none; background: none; border: none; color: var(--color-text-muted); font-size: 24px; cursor: pointer; }
+        .nav-menu { padding: 20px 12px; flex: 1; overflow-y: auto; }
+        .nav-label { font-size: 12px; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 10px; padding-left: 12px; font-weight: 600; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: none; border: none; width: 100%; color: var(--color-text-muted); font-size: 15px; cursor: pointer; border-radius: 8px; margin-bottom: 5px; border-left: 4px solid transparent; transition: all 0.2s; text-align: left; }
+        .nav-item:hover { background-color: var(--bg-hover); color: var(--color-text-main); }
+        .nav-item.active { background-color: var(--bg-hover); color: var(--color-green); border-left-color: var(--color-green); }
         .nav-item i { font-size: 20px; }
-
-        .system-divider {
-            border-top: 1px solid var(--border-color);
-            margin-top: 20px;
-            padding-top: 20px;
-        }
+        .system-divider { border-top: 1px solid var(--border-color); margin-top: 20px; padding-top: 20px; }
 
         /* --- TOP HEADER --- */
-        .top-header {
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-            background-color: var(--bg-main);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            color: var(--color-text-muted);
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        .page-title {
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .search-box {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .search-box i {
-            position: absolute;
-            left: 12px;
-            color: var(--color-text-muted);
-        }
-
-        .search-box input {
-            background-color: var(--bg-panel);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 8px 16px 8px 36px;
-            color: var(--color-text-main);
-            outline: none;
-            width: 200px;
-            transition: border 0.3s;
-        }
-
-        .search-box input:focus {
-            border-color: var(--color-green);
-        }
-
-        .user-profile {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: var(--bg-hover);
-            border: 1px solid var(--color-green);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--color-green);
-        }
+        .top-header { height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; background-color: var(--bg-main); border-bottom: 1px solid var(--border-color); }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .menu-btn { display: none; background: none; border: none; color: var(--color-text-muted); font-size: 24px; cursor: pointer; }
+        .page-title { font-size: 18px; font-weight: 600; }
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        .search-box { position: relative; display: flex; align-items: center; }
+        .search-box i { position: absolute; left: 12px; color: var(--color-text-muted); }
+        .search-box input { background-color: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 20px; padding: 8px 16px 8px 36px; color: var(--color-text-main); outline: none; width: 200px; transition: border 0.3s; }
+        .search-box input:focus { border-color: var(--color-green); }
+        .user-profile { width: 32px; height: 32px; border-radius: 50%; background-color: var(--bg-hover); border: 1px solid var(--color-green); display: flex; align-items: center; justify-content: center; color: var(--color-green); }
 
         /* --- MAIN CONTENT AREA --- */
-        .content-area {
-            flex: 1;
-            padding: 24px;
-            overflow-y: auto;
-        }
-
-        /* Tab Content Control */
+        .content-area { flex: 1; padding: 24px; overflow-y: auto; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
         /* --- DASHBOARD STYLES --- */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background-color: var(--bg-panel);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-        }
-
-        .stat-title {
-            color: var(--color-text-muted);
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: bold;
-            display: flex;
-            align-items: baseline;
-            gap: 10px;
-        }
-
-        .stat-indicator {
-            font-size: 12px;
-            color: var(--color-green);
-        }
-
-        .stat-desc {
-            font-size: 12px;
-            color: var(--color-text-muted);
-            margin-top: 5px;
-        }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background-color: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .stat-title { color: var(--color-text-muted); font-size: 14px; margin-bottom: 10px; }
+        .stat-value { font-size: 28px; font-weight: bold; display: flex; align-items: baseline; gap: 10px; }
+        .stat-indicator { font-size: 12px; color: var(--color-green); }
+        .stat-desc { font-size: 12px; color: var(--color-text-muted); margin-top: 5px; }
 
         /* --- POSTS STYLES --- */
-        .posts-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .btn-primary {
-            background-color: var(--color-orange);
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-size: 14px;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--color-orange-hover);
-        }
-
-        .posts-filter {
-            display: flex;
-            gap: 20px;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 20px;
-        }
-
-        .filter-btn {
-            background: none;
-            border: none;
-            color: var(--color-text-muted);
-            padding-bottom: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: -1px;
-            border-bottom: 2px solid transparent;
-        }
-
-        .filter-btn.active {
-            color: var(--color-green);
-            border-bottom-color: var(--color-green);
-        }
+        .posts-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 15px; }
+        .btn-primary { background-color: var(--color-orange); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: background 0.2s; font-size: 14px; }
+        .btn-primary:hover { background-color: var(--color-orange-hover); }
+        .posts-filter { display: flex; gap: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; }
+        .filter-btn { background: none; border: none; color: var(--color-text-muted); padding-bottom: 10px; font-weight: 600; cursor: pointer; margin-bottom: -1px; border-bottom: 2px solid transparent; }
+        .filter-btn.active { color: var(--color-green); border-bottom-color: var(--color-green); }
 
         /* Posts List */
-        .posts-list {
-            background-color: var(--bg-panel);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            overflow: hidden;
-        }
+        .posts-list { background-color: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .post-item { display: flex; padding: 16px; border-bottom: 1px solid var(--border-color); gap: 16px; align-items: center; transition: background 0.2s; }
+        .post-item:last-child { border-bottom: none; }
+        .post-item:hover { background-color: #0c2619; }
+        .post-thumb { width: 150px; height: 85px; border-radius: 8px; background-color: var(--bg-hover); object-fit: cover; border: 1px solid var(--border-color); }
+        .post-info { flex: 1; min-width: 0; }
+        .post-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .post-meta { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--color-text-muted); flex-wrap: wrap; }
+        .post-category { background-color: rgba(17, 51, 32, 0.5); color: var(--color-green); border: 1px solid #2a5a3a; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+        .post-status { color: var(--color-orange); font-weight: 600; }
+        
+        /* Loading & Error State */
+        .loading-state, .empty-state { padding: 40px; text-align: center; color: var(--color-text-muted); }
 
-        .post-item {
-            display: flex;
-            padding: 16px;
-            border-bottom: 1px solid var(--border-color);
-            gap: 16px;
-            align-items: center;
-            transition: background 0.2s;
-        }
-
-        .post-item:last-child {
-            border-bottom: none;
-        }
-
-        .post-item:hover {
-            background-color: #0c2619;
-        }
-
-        .post-thumb {
-            width: 150px;
-            height: 85px;
-            border-radius: 8px;
-            background-color: var(--bg-hover);
-            object-fit: cover;
-        }
-
-        .post-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .post-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .post-meta {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 13px;
-            color: var(--color-text-muted);
-            flex-wrap: wrap;
-        }
-
-        .post-category {
-            background-color: rgba(17, 51, 32, 0.5);
-            color: var(--color-green);
-            border: 1px solid #2a5a3a;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-
-        .post-status {
-            color: var(--color-orange);
-            font-weight: 600;
-        }
-
-        .post-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .action-btn {
-            background: none;
-            border: none;
-            color: var(--color-text-muted);
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 18px;
-            transition: all 0.2s;
-        }
-
+        .post-actions { display: flex; gap: 8px; }
+        .action-btn { background: none; border: none; color: var(--color-text-muted); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; transition: all 0.2s; }
         .action-btn:hover { background-color: var(--bg-hover); color: var(--color-text-main); }
         .action-btn.delete:hover { background-color: rgba(248, 113, 113, 0.1); color: #f87171; }
 
         /* --- RESPONSIVE MOBILE --- */
         @media (max-width: 768px) {
-            .sidebar {
-                position: fixed;
-                top: 0;
-                bottom: 0;
-                left: -100%;
-            }
-            .sidebar.open {
-                left: 0;
-            }
-            .close-sidebar-btn, .menu-btn {
-                display: block;
-            }
-            .search-box {
-                display: none; /* Sembunyikan pencarian di HP */
-            }
-            .post-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .post-thumb {
-                width: 100%;
-                height: 180px;
-            }
-            .post-actions {
-                width: 100%;
-                justify-content: flex-end;
-                margin-top: 10px;
-            }
-            /* Overlay */
-            .overlay {
-                display: none;
-                position: fixed;
-                top: 0; left: 0; right: 0; bottom: 0;
-                background: rgba(0,0,0,0.6);
-                z-index: 40;
-            }
+            .sidebar { position: fixed; top: 0; bottom: 0; left: -100%; }
+            .sidebar.open { left: 0; }
+            .close-sidebar-btn, .menu-btn { display: block; }
+            .search-box { display: none; }
+            .post-item { flex-direction: column; align-items: flex-start; }
+            .post-thumb { width: 100%; height: 180px; }
+            .post-actions { width: 100%; justify-content: flex-end; margin-top: 10px; }
+            .overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 40; }
             .overlay.active { display: block; }
         }
     </style>
@@ -490,7 +134,7 @@
                 <i class="ph ph-squares-four"></i> Dashboard
             </button>
             <button class="nav-item" data-tab="posts">
-                <i class="ph ph-video-camera"></i> Postingan Video
+                <i class="ph ph-film-strip"></i> Kelola Judul Series
             </button>
             <button class="nav-item">
                 <i class="ph ph-chart-bar"></i> Statistik Detail
@@ -517,7 +161,7 @@
             <div class="header-right">
                 <div class="search-box">
                     <i class="ph ph-magnifying-glass"></i>
-                    <input type="text" placeholder="Cari...">
+                    <input type="text" placeholder="Cari Judul...">
                 </div>
                 <div class="user-profile">
                     <i class="ph ph-user"></i>
@@ -530,100 +174,139 @@
             
             <!-- TAB: DASHBOARD -->
             <div id="tab-dashboard" class="tab-content active">
+                <!-- Statistik Dashboard -->
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-title">Total Kunjungan</div>
-                        <div class="stat-value">124.5K <span class="stat-indicator">+12%</span></div>
-                        <div class="stat-desc">Bulan ini</div>
+                        <div class="stat-value" id="dashTotalViews">...</div>
+                        <div class="stat-desc">Semua Series</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-title">Total Video</div>
-                        <div class="stat-value">48</div>
-                        <div class="stat-desc">Status Publik</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-title">Komentar Baru</div>
-                        <div class="stat-value" style="gap: 5px;">892 <span class="stat-indicator" style="color: var(--color-orange);">Review</span></div>
-                        <div class="stat-desc">7 hari terakhir</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-title">Waktu Tonton</div>
-                        <div class="stat-value">8.2K <span style="font-size:14px; color:var(--color-text-muted);">Jam</span></div>
-                        <div class="stat-desc">Bulan ini</div>
+                     <div class="stat-card">
+                        <div class="stat-title">Total Series</div>
+                        <div class="stat-value" id="dashTotalSeries">...</div>
+                        <div class="stat-desc">Database Aktif</div>
                     </div>
                 </div>
-                <!-- Placeholder area -->
                 <div style="border: 1px dashed var(--border-color); padding: 40px; text-align: center; border-radius: 12px; color: var(--color-text-muted);">
                     <i class="ph ph-chart-line-up" style="font-size: 48px; margin-bottom: 10px; opacity: 0.5;"></i>
                     <p>Area Grafik Chart Akan Tampil Disini</p>
                 </div>
             </div>
 
-            <!-- TAB: POSTS -->
+            <!-- TAB: POSTS / SERIES -->
             <div id="tab-posts" class="tab-content">
                 <div class="posts-header">
                     <div>
-                        <h2 style="font-size: 20px; margin-bottom: 4px;">Daftar Video</h2>
-                        <p style="font-size: 14px; color: var(--color-text-muted);">Kelola semua konten video yang ada di Vadd Studio.</p>
+                        <h2 style="font-size: 20px; margin-bottom: 4px;">Daftar Judul Series / Film</h2>
+                        <p style="font-size: 14px; color: var(--color-text-muted);">Kelola judul, klik ikon <i class="ph ph-list-numbers"></i> untuk melihat atau menambah episode di dalamnya.</p>
                     </div>
-                    <button class="btn-primary" onclick="window.location.href='post.html'">
-                        <i class="ph ph-plus"></i> Buat Postingan Baru
+                    <button class="btn-primary" id="btnAddNewSeries" onclick="window.location.href='post.html'">
+                        <i class="ph ph-plus"></i> Buat Judul Baru
                     </button>
                 </div>
 
                 <div class="posts-filter">
-                    <button class="filter-btn active">Semua (4)</button>
-                    <button class="filter-btn">Publik (3)</button>
-                    <button class="filter-btn">Draft (1)</button>
+                    <button class="filter-btn active">Semua</button>
+                    <button class="filter-btn">Publik</button>
+                    <button class="filter-btn">Draft</button>
                 </div>
 
                 <div class="posts-list" id="postsContainer">
-                    <!-- Postingan akan di-render oleh JavaScript di sini -->
+                    <div class="loading-state">
+                        <i class="ph ph-spinner ph-spin" style="font-size: 32px; margin-bottom: 10px;"></i>
+                        <p>Mengambil data dari database...</p>
+                    </div>
                 </div>
             </div>
 
         </main>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
-    <script>
-        // Data Mockup Postingan
-        let postsData = [
-            { id: 1, title: "Kisah Hutan Hijau Eps 1", category: "Animasi", views: "12.4K", date: "12 Okt 2026", status: "Publik", thumbnail: "https://images.unsplash.com/photo-1618336753974-aae8e04506aa?auto=format&fit=crop&q=80&w=400&h=225" },
-            { id: 2, title: "Dunia Paralel - Trailer Resmi", category: "Sci-Fi", views: "8.2K", date: "10 Okt 2026", status: "Publik", thumbnail: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&q=80&w=400&h=225" },
-            { id: 3, title: "Clapperboard Merah: Di Balik Layar", category: "Dokumenter", views: "3.1K", date: "05 Okt 2026", status: "Draft", thumbnail: "https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?auto=format&fit=crop&q=80&w=400&h=225" },
-            { id: 4, title: "Petualangan Sang Sutradara Rubah", category: "Animasi", views: "45.9K", date: "01 Okt 2026", status: "Publik", thumbnail: "https://images.unsplash.com/photo-1500829243541-74b676fecc20?auto=format&fit=crop&q=80&w=400&h=225" }
-        ];
+    <!-- PENTING: Gunakan type="module" karena kita mengimpor file module -->
+    <script type="module">
+        // 1. Import 'db' dari file firebase-init.js (Jalur sudah diubah ke folder js/)
+        import { db } from './js/firebase-init.js';
+        
+        // 2. Import fungsi Firestore yang dibutuhkan
+        import { collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Render Data ke HTML
-        function renderPosts() {
+        // Fungsi Format Angka (10000 -> 10K)
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num;
+        }
+
+        // Fungsi Mengambil Data Judul (Series) dari Firestore
+        async function fetchSeriesData() {
             const container = document.getElementById('postsContainer');
-            container.innerHTML = ''; // Bersihkan container
+            
+            try {
+                // Mengambil seluruh dokumen dari koleksi "series"
+                const querySnapshot = await getDocs(collection(db, "series"));
+                const seriesData = [];
+                let totalViewsAllSeries = 0;
+                
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    seriesData.push({ id: doc.id, ...data });
+                    
+                    // Menjumlahkan views untuk Dashboard
+                    totalViewsAllSeries += (data.total_views || 0);
+                });
 
-            if (postsData.length === 0) {
-                container.innerHTML = '<div style="padding: 30px; text-align: center; color: var(--color-text-muted);">Tidak ada postingan.</div>';
+                // Update Dashboard Stats
+                document.getElementById('dashTotalSeries').innerText = seriesData.length;
+                document.getElementById('dashTotalViews').innerText = formatNumber(totalViewsAllSeries);
+
+                // Render List
+                renderSeries(seriesData);
+
+            } catch (error) {
+                console.error("Error mengambil data:", error);
+                container.innerHTML = `
+                    <div class="empty-state" style="color: #f87171;">
+                        Gagal memuat data dari Firebase. <br>
+                        Detail error: ${error.message} <br>
+                        Pastikan Anda sudah mengonfigurasi 'firebase-init.js' dengan benar.
+                    </div>`;
+            }
+        }
+
+        // Fungsi Render HTML
+        function renderSeries(data) {
+            const container = document.getElementById('postsContainer');
+            container.innerHTML = ''; // Bersihkan loading
+
+            if (data.length === 0) {
+                container.innerHTML = '<div class="empty-state">Belum ada judul/series yang ditambahkan di Database.</div>';
                 return;
             }
 
-            postsData.forEach(post => {
-                const draftBadge = post.status === 'Draft' ? `<span class="post-status">• ${post.status}</span>` : '';
+            data.forEach(item => {
+                const draftBadge = item.status === 'Draft' ? `<span class="post-status">• Draft</span>` : '';
                 
+                // Set default data agar tidak error jika field kosong di Firebase
+                const views = item.total_views || 0;
+                const likes = item.total_likes || 0;
+                const banner = item.banner_url || 'https://images.unsplash.com/photo-1618336753974-aae8e04506aa?auto=format&fit=crop&q=80&w=400&h=225'; // Fallback dummy image
+
                 const postHTML = `
-                    <div class="post-item">
-                        <img src="${post.thumbnail}" alt="Thumbnail" class="post-thumb">
+                    <div class="post-item" id="series-${item.id}">
+                        <img src="${banner}" alt="Banner" class="post-thumb">
                         <div class="post-info">
-                            <div class="post-title">${post.title}</div>
+                            <div class="post-title">${item.title || 'Judul Tidak Diketahui'}</div>
                             <div class="post-meta">
-                                <span class="post-category">${post.category}</span>
-                                <span><i class="ph ph-eye"></i> ${post.views}</span>
-                                <span>• ${post.date}</span>
+                                <span class="post-category">${item.category || 'Uncategorized'}</span>
+                                <span title="Total Penonton Keseluruhan"><i class="ph ph-eye"></i> ${formatNumber(views)}</span>
+                                <span title="Total Likes"><i class="ph ph-thumbs-up"></i> ${formatNumber(likes)}</span>
                                 ${draftBadge}
                             </div>
                         </div>
                         <div class="post-actions">
-                            <button class="action-btn" title="Lihat"><i class="ph ph-eye"></i></button>
-                            <button class="action-btn" title="Edit"><i class="ph ph-pencil-simple"></i></button>
-                            <button class="action-btn delete" title="Hapus" onclick="deletePost(${post.id})"><i class="ph ph-trash"></i></button>
+                            <button class="action-btn" title="Kelola Episode" onclick="manageEpisodes('${item.id}')"><i class="ph ph-list-numbers"></i></button>
+                            <button class="action-btn" title="Edit Judul" onclick="editSeries('${item.id}')"><i class="ph ph-pencil-simple"></i></button>
+                            <button class="action-btn delete" title="Hapus Judul" onclick="deleteSeriesData('${item.id}')"><i class="ph ph-trash"></i></button>
                         </div>
                     </div>
                 `;
@@ -631,18 +314,35 @@
             });
         }
 
-        // Fungsi Hapus Post
-        function deletePost(id) {
-            if(confirm("Apakah Anda yakin ingin menghapus postingan ini?")) {
-                postsData = postsData.filter(post => post.id !== id);
-                renderPosts();
+        // Mendaftarkan fungsi ke 'window' agar bisa dipanggil oleh atribut 'onclick' HTML
+        window.deleteSeriesData = async (id) => {
+            if(confirm("Yakin ingin menghapus Series ini? Catatan: Anda harus menghapus episode terkait secara manual nanti.")) {
+                try {
+                    await deleteDoc(doc(db, "series", id));
+                    alert("Berhasil dihapus!");
+                    fetchSeriesData(); // Refresh list
+                } catch (error) {
+                    console.error("Gagal menghapus:", error);
+                    alert("Gagal menghapus data.");
+                }
             }
         }
 
-        // Inisialisasi render pertama
-        renderPosts();
+        window.manageEpisodes = (seriesId) => {
+            alert("Nantinya ini akan mengarahkan ke halaman pengelola episode untuk Series ID: " + seriesId);
+            // Implementasi nyata: window.location.href = `manage-episodes.html?seriesId=${seriesId}`;
+        }
 
-        // --- SISTEM TAB (Berpindah Menu) ---
+        window.editSeries = (seriesId) => {
+            alert("Membuka form edit untuk Judul ID: " + seriesId);
+            // Implementasi nyata: window.location.href = `post.html?editId=${seriesId}`;
+        }
+
+        // Panggil fetch pertama kali
+        fetchSeriesData();
+
+
+        // --- SISTEM UI (TAB & SIDEBAR) ---
         const navItems = document.querySelectorAll('.nav-item');
         const tabContents = document.querySelectorAll('.tab-content');
         const headerTitle = document.getElementById('headerTitle');
@@ -650,40 +350,28 @@
         navItems.forEach(item => {
             item.addEventListener('click', function() {
                 const targetTab = this.getAttribute('data-tab');
-                if(!targetTab) return; // Abaikan menu yang belum ada tujuannya
-
-                // Reset class aktif
+                if(!targetTab) return;
+                
                 navItems.forEach(nav => nav.classList.remove('active'));
                 tabContents.forEach(tab => tab.classList.remove('active'));
 
-                // Set menu yang diklik menjadi aktif
                 this.classList.add('active');
                 document.getElementById('tab-' + targetTab).classList.add('active');
 
-                // Ubah Judul Header
                 if(targetTab === 'dashboard') headerTitle.textContent = "Ringkasan Dashboard";
-                if(targetTab === 'posts') headerTitle.textContent = "Kelola Postingan";
+                if(targetTab === 'posts') headerTitle.textContent = "Kelola Judul Series";
 
-                // Tutup sidebar di versi mobile setelah klik menu
                 closeMobileSidebar();
             });
         });
 
-        // --- SISTEM SIDEBAR MOBILE ---
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('mobileOverlay');
         const btnOpen = document.getElementById('openSidebar');
         const btnClose = document.getElementById('closeSidebar');
 
-        function openMobileSidebar() {
-            sidebar.classList.add('open');
-            overlay.classList.add('active');
-        }
-
-        function closeMobileSidebar() {
-            sidebar.classList.remove('open');
-            overlay.classList.remove('active');
-        }
+        function openMobileSidebar() { sidebar.classList.add('open'); overlay.classList.add('active'); }
+        function closeMobileSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('active'); }
 
         btnOpen.addEventListener('click', openMobileSidebar);
         btnClose.addEventListener('click', closeMobileSidebar);
@@ -692,4 +380,3 @@
     </script>
 </body>
 </html>
-
