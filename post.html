@@ -47,7 +47,7 @@
             </a>
             <div class="flex items-center gap-2 border-l border-vs-border pl-3 ml-1">
                 <div class="w-8 h-8 rounded-full bg-vs-border border-2 border-vs-green flex items-center justify-center overflow-hidden">
-                   <!-- Menggunakan Logo yang Anda Punya -->
+                   <!-- Menggunakan Logo Anda -->
                    <img src="logo.png" alt="Logo" class="w-full h-full object-cover">
                 </div>
                 <span class="text-lg font-bold tracking-tight hidden sm:block">
@@ -58,7 +58,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 relative">
         <div class="max-w-5xl mx-auto space-y-6 animate-[fadeIn_0.5s_ease-out]">
             
             <!-- Page Title & Tabs -->
@@ -66,7 +66,7 @@
                 <h1 class="text-2xl font-bold text-white mb-4">Kelola Konten Video</h1>
                 <div class="flex gap-6">
                     <button id="tab-btn-series" class="pb-3 tab-active transition-colors flex items-center gap-2">
-                        <i data-lucide="folder-plus" class="w-5 h-5"></i> Tambah Judul Seri Baru
+                        <i data-lucide="folder-plus" class="w-5 h-5"></i> Tambah Judul Seri
                     </button>
                     <button id="tab-btn-episode" class="pb-3 tab-inactive transition-colors flex items-center gap-2">
                         <i data-lucide="video" class="w-5 h-5"></i> Tambah Episode
@@ -91,12 +91,14 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-1">Kategori</label>
-                            <select id="seriesCategory" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
-                                <option value="Animasi">Animasi</option>
-                                <option value="Drama">Drama</option>
-                                <option value="Aksi & Sci-Fi">Aksi & Sci-Fi</option>
-                                <option value="Film Pendek">Film Pendek</option>
+                            <label class="block text-sm font-medium text-gray-300 mb-1 flex justify-between">
+                                <span>Kategori <span class="text-red-500">*</span></span>
+                                <button type="button" id="btn-add-category" class="text-xs text-vs-green hover:underline flex items-center gap-1">
+                                    <i data-lucide="plus" class="w-3 h-3"></i> Kategori Baru
+                                </button>
+                            </label>
+                            <select id="seriesCategory" required class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                                <option value="" disabled selected>Memuat kategori...</option>
                             </select>
                         </div>
                         
@@ -180,7 +182,7 @@
                             <h1 id="prev-s-title" class="text-2xl sm:text-3xl font-black text-white leading-tight mb-2 uppercase">Nama Anime</h1>
                             <div class="flex justify-center gap-2 text-xs text-gray-300 mb-4">
                                 <span class="border border-vs-green text-vs-green px-1.5 py-0.5 rounded">16+</span>
-                                <span id="prev-s-cat" class="px-1.5 py-0.5">Animasi</span>
+                                <span id="prev-s-cat" class="px-1.5 py-0.5 border border-transparent">Animasi</span>
                             </div>
                             <p id="prev-s-desc" class="text-gray-300 text-xs line-clamp-2">Sinopsis akan muncul di sini saat Anda mengetik...</p>
                         </div>
@@ -203,9 +205,30 @@
 
                 </div>
             </div>
-
         </div>
     </main>
+
+    <!-- Modal Tambah Kategori -->
+    <div id="modal-category" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-vs-panel border border-vs-border rounded-xl p-6 w-full max-w-sm shadow-2xl transform scale-95 transition-transform duration-300" id="modal-category-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-white">Tambah Kategori Baru</h3>
+                <button type="button" id="btn-close-category" class="text-gray-400 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <label class="block text-sm font-medium text-gray-300 mb-1">Nama Kategori</label>
+            <input type="text" id="newCategoryName" placeholder="Contoh: Isekai, Romance..." class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none mb-6">
+            
+            <div class="flex justify-end gap-3">
+                <button type="button" id="btn-cancel-category" class="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Batal</button>
+                <button type="button" id="btn-save-category" class="bg-vs-green hover:bg-green-500 text-vs-bg px-5 py-2 rounded-lg font-bold text-sm flex items-center gap-2 transition-all shadow-lg shadow-green-900/20">
+                    <i data-lucide="save" class="w-4 h-4"></i> Simpan
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script type="module">
         // 1. IMPORT FIREBASE (Sesuaikan path file firebase-init.js)
@@ -241,7 +264,7 @@
                     formEpisode.classList.remove('hidden');
                     previewSeries.classList.add('hidden');
                     previewEpisode.classList.remove('hidden');
-                    loadSeriesData(); // Refresh dropdown saat masuk tab episode
+                    loadSeriesData(); 
                 }
             }
 
@@ -249,15 +272,111 @@
             tabEpisodeBtn.addEventListener('click', () => switchTab('episode'));
             shortcutSeriesBtn.addEventListener('click', () => switchTab('series'));
 
+
+            // --- LOGIKA KATEGORI (DATABASE & MODAL) ---
+            const sCat = document.getElementById('seriesCategory');
+            const btnAddCategory = document.getElementById('btn-add-category');
+            const modalCategory = document.getElementById('modal-category');
+            const modalCatContent = document.getElementById('modal-category-content');
+            const btnCloseCategory = document.getElementById('btn-close-category');
+            const btnCancelCategory = document.getElementById('btn-cancel-category');
+            const btnSaveCategory = document.getElementById('btn-save-category');
+            const newCategoryName = document.getElementById('newCategoryName');
+
+            // Load kategori dari Firebase
+            async function loadCategories(autoSelectValue = null) {
+                try {
+                    const q = query(collection(db, "categories"), orderBy("name", "asc"));
+                    const querySnapshot = await getDocs(q);
+                    
+                    sCat.innerHTML = '<option value="" disabled selected>Pilih Kategori...</option>';
+                    
+                    if (querySnapshot.empty) {
+                        sCat.innerHTML = '<option value="" disabled>Belum ada kategori, silakan tambah!</option>';
+                        return;
+                    }
+
+                    querySnapshot.forEach((doc) => {
+                        const catName = doc.data().name;
+                        const option = document.createElement('option');
+                        option.value = catName;
+                        option.textContent = catName;
+                        sCat.appendChild(option);
+                    });
+
+                    // Jika ada parameter autoSelect, pilih opsi tersebut
+                    if(autoSelectValue) {
+                        sCat.value = autoSelectValue;
+                        updatePreviewSeries();
+                    }
+
+                } catch (error) {
+                    console.error("Gagal memuat kategori: ", error);
+                    sCat.innerHTML = '<option value="" disabled>Gagal memuat kategori</option>';
+                }
+            }
+
+            // Fungsi Buka Tutup Modal Kategori
+            function openCategoryModal() {
+                modalCategory.classList.remove('opacity-0', 'pointer-events-none');
+                modalCatContent.classList.remove('scale-95');
+                modalCatContent.classList.add('scale-100');
+                newCategoryName.value = ''; // Kosongkan input
+                newCategoryName.focus();
+            }
+
+            function closeCategoryModal() {
+                modalCategory.classList.add('opacity-0', 'pointer-events-none');
+                modalCatContent.classList.remove('scale-100');
+                modalCatContent.classList.add('scale-95');
+            }
+
+            btnAddCategory.addEventListener('click', openCategoryModal);
+            btnCloseCategory.addEventListener('click', closeCategoryModal);
+            btnCancelCategory.addEventListener('click', closeCategoryModal);
+
+            // Simpan Kategori Baru ke Firebase
+            btnSaveCategory.addEventListener('click', async () => {
+                const catVal = newCategoryName.value.trim();
+                if (!catVal) {
+                    alert("Nama kategori tidak boleh kosong!");
+                    return;
+                }
+
+                const origText = btnSaveCategory.innerHTML;
+                btnSaveCategory.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Menyimpan...';
+                btnSaveCategory.disabled = true;
+                lucide.createIcons();
+
+                try {
+                    // Simpan ke koleksi 'categories'
+                    await addDoc(collection(db, "categories"), {
+                        name: catVal,
+                        createdAt: serverTimestamp()
+                    });
+                    
+                    closeCategoryModal();
+                    // Muat ulang daftar kategori dan otomatis pilih yang baru dibuat
+                    await loadCategories(catVal); 
+                    
+                } catch (error) {
+                    alert("Gagal menyimpan kategori: " + error.message);
+                } finally {
+                    btnSaveCategory.innerHTML = origText;
+                    btnSaveCategory.disabled = false;
+                    lucide.createIcons();
+                }
+            });
+
+
             // --- LOGIKA FORM SERI (JUDUL BARU) ---
             const sTitle = document.getElementById('seriesTitle');
-            const sCat = document.getElementById('seriesCategory');
             const sBanner = document.getElementById('seriesBanner');
             const sDesc = document.getElementById('seriesDesc');
 
             function updatePreviewSeries() {
                 document.getElementById('prev-s-title').textContent = sTitle.value || 'NAMA ANIME';
-                document.getElementById('prev-s-cat').textContent = sCat.value;
+                document.getElementById('prev-s-cat').textContent = sCat.value || 'Kategori';
                 document.getElementById('prev-s-desc').textContent = sDesc.value || 'Sinopsis akan muncul di sini...';
                 document.getElementById('prev-s-bg').style.backgroundImage = sBanner.value ? `url('${sBanner.value}')` : 'none';
             }
@@ -271,6 +390,7 @@
                 const origText = btn.innerHTML;
                 btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Menyimpan...';
                 btn.disabled = true;
+                lucide.createIcons();
 
                 try {
                     await addDoc(collection(db, "series"), {
@@ -317,9 +437,8 @@
                     querySnapshot.forEach((doc) => {
                         const data = doc.data();
                         const option = document.createElement('option');
-                        option.value = doc.id; // Simpan ID Document nya
+                        option.value = doc.id; 
                         option.textContent = data.title;
-                        // Simpan judul sebagai dataset untuk preview
                         option.dataset.title = data.title; 
                         eSeries.appendChild(option);
                     });
@@ -378,13 +497,14 @@
                 const origText = btn.innerHTML;
                 btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Memposting...';
                 btn.disabled = true;
+                lucide.createIcons();
 
                 const selectedOption = eSeries.options[eSeries.selectedIndex];
 
                 try {
                     await addDoc(collection(db, "episodes"), {
                         seriesId: eSeries.value,
-                        seriesTitle: selectedOption.dataset.title, // Simpan nama seri agar query gampang
+                        seriesTitle: selectedOption.dataset.title, 
                         episodeNumber: Number(eNum.value),
                         episodeTitle: eTitle.value.trim(),
                         thumbnailUrl: eThumb.value.trim(),
@@ -394,13 +514,13 @@
                     
                     alert(`Episode ${eNum.value} berhasil diposting!`);
                     
-                    // Reset input episode (kecuali pilihan series)
+                    // Reset input episode
                     eNum.value = '';
                     eTitle.value = '';
                     eThumb.value = '';
                     eEmbed.value = '';
                     
-                    // Trigger change manual untuk memuat ulang daftar episode yang sudah ada
+                    // Update daftar episode via event change
                     eSeries.dispatchEvent(new Event('change')); 
 
                 } catch (error) {
@@ -412,7 +532,8 @@
                 }
             });
 
-            // Jalankan initial load
+            // Jalankan saat load pertama kali
+            loadCategories(); 
             updatePreviewSeries();
             loadSeriesData();
         });
