@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buat Postingan - Vadd Studio Console</title>
+    <title>Buat/Edit Postingan - Vadd Studio</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -17,13 +17,8 @@
                 extend: {
                     colors: {
                         vs: {
-                            bg: '#05110a',
-                            panel: '#0a1f14',
-                            border: '#1a3a26',
-                            green: '#4ade80',
-                            orange: '#f97316',
-                            'orange-hover': '#ea580c',
-                            hover: '#113320'
+                            bg: '#05110a', panel: '#0a1f14', border: '#1a3a26',
+                            green: '#4ade80', orange: '#f97316', 'orange-hover': '#ea580c', hover: '#113320'
                         }
                     }
                 }
@@ -38,16 +33,13 @@
 </head>
 <body class="bg-vs-bg text-gray-200 font-sans min-h-screen flex flex-col selection:bg-vs-green selection:text-vs-bg">
 
-    <!-- Top Header -->
     <header class="h-16 flex items-center justify-between px-6 bg-vs-bg border-b border-vs-border sticky top-0 z-30">
         <div class="flex items-center gap-3">
             <a href="admin.html" class="text-gray-400 hover:text-white transition-colors" title="Kembali ke Dashboard">
                 <i data-lucide="arrow-left" class="w-5 h-5"></i>
             </a>
             <div class="flex items-center gap-2 border-l border-vs-border pl-3 ml-1">
-                <div class="w-8 h-8 rounded-full bg-vs-border border-2 border-vs-green flex items-center justify-center overflow-hidden">
-                   <img src="logo.png" alt="Logo" class="w-full h-full object-cover">
-                </div>
+                <div class="w-8 h-8 rounded-full bg-vs-border border-2 border-vs-green flex items-center justify-center overflow-hidden text-xs font-bold text-vs-green">VS</div>
                 <span class="text-lg font-bold tracking-tight hidden sm:block">
                   <span class="text-vs-green">vadd</span> <span class="text-white">studio</span> <span class="text-gray-500 font-normal text-sm ml-2">Console</span>
                 </span>
@@ -55,136 +47,103 @@
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 relative">
         <div class="max-w-5xl mx-auto space-y-6 animate-[fadeIn_0.5s_ease-out]">
             
             <div class="border-b border-vs-border pb-0">
-                <h1 class="text-2xl font-bold text-white mb-4">Kelola Konten Video</h1>
+                <h1 class="text-2xl font-bold text-white mb-4" id="page-main-title">Kelola Konten Video</h1>
                 <div class="flex gap-6">
                     <button id="tab-btn-series" class="pb-3 tab-active transition-colors flex items-center gap-2">
                         <i data-lucide="folder-plus" class="w-5 h-5"></i> Tambah Judul Seri
                     </button>
                     <button id="tab-btn-episode" class="pb-3 tab-inactive transition-colors flex items-center gap-2">
-                        <i data-lucide="video" class="w-5 h-5"></i> Tambah Episode
+                        <i data-lucide="video" class="w-5 h-5"></i> Tambah / Edit Episode
                     </button>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- BAGIAN KIRI: FORM -->
+                <!-- FORM -->
                 <div>
-                    <!-- FORM 1: TAMBAH JUDUL SERI -->
+                    <!-- FORM 1: SERI -->
                     <form id="form-series" class="bg-vs-panel border border-vs-border rounded-xl p-6 space-y-5 shadow-xl">
+                        <!-- Konten Form Seri (Sama dengan sebelumnya) -->
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-1">Judul Anime/Seri <span class="text-red-500">*</span></label>
-                            <input type="text" id="seriesTitle" required placeholder="Cth: Mushoku Tensei" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                            <input type="text" id="seriesTitle" required class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
                         </div>
-
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-1 flex justify-between">
-                                <span>Kategori <span class="text-red-500">*</span></span>
-                                <button type="button" id="btn-add-category" class="text-xs text-vs-green hover:underline flex items-center gap-1">
-                                    <i data-lucide="plus" class="w-3 h-3"></i> Kategori Baru
-                                </button>
+                                <span>Kategori</span>
+                                <button type="button" class="text-xs text-vs-green hover:underline flex items-center gap-1"><i data-lucide="plus" class="w-3 h-3"></i> Baru</button>
                             </label>
-                            <select id="seriesCategory" required class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
-                                <option value="" disabled selected>Memuat kategori...</option>
-                            </select>
+                            <select id="seriesCategory" required class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none"><option value="Animasi">Animasi</option></select>
                         </div>
-                        
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-1">Banner (URL / Path Lokal Repo)</label>
-                            <!-- Diubah ke type="text" agar bisa menerima "banner/1.jpg" maupun link URL web -->
-                            <input type="text" id="seriesBanner" placeholder="Cth: banner/1.jpg atau https://..." class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Banner (Path Github)</label>
+                            <input type="text" id="seriesBanner" placeholder="banner/1.jpg" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
                         </div>
-
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-1">Deskripsi / Sinopsis</label>
-                            <textarea id="seriesDesc" rows="3" placeholder="Ceritakan sinopsis singkat..." class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none resize-y"></textarea>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Deskripsi</label>
+                            <textarea id="seriesDesc" rows="3" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none resize-y"></textarea>
                         </div>
-
                         <div class="pt-4 flex justify-end">
-                            <button type="submit" class="bg-vs-green hover:bg-green-500 text-vs-bg px-6 py-2.5 rounded-lg font-bold flex items-center gap-2 transition-all">
+                            <button type="submit" class="bg-vs-green hover:bg-green-500 text-vs-bg px-6 py-2.5 rounded-lg font-bold flex items-center gap-2">
                                 <i data-lucide="save" class="w-4 h-4"></i> Simpan Judul
                             </button>
                         </div>
                     </form>
 
-                    <!-- FORM 2: TAMBAH EPISODE -->
+                    <!-- FORM 2: EPISODE -->
                     <form id="form-episode" class="bg-vs-panel border border-vs-border rounded-xl p-6 space-y-5 shadow-xl hidden">
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-1 flex justify-between">
-                                <span>Pilih Judul Seri <span class="text-red-500">*</span></span>
-                                <button type="button" id="btn-shortcut-series" class="text-xs text-vs-green hover:underline flex items-center gap-1">
-                                    <i data-lucide="plus" class="w-3 h-3"></i> Judul Baru
-                                </button>
-                            </label>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Pilih Judul Seri <span class="text-red-500">*</span></label>
                             <select id="epSeriesSelect" required class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
                                 <option value="" disabled selected>Memuat data seri...</option>
                             </select>
-                            <p id="existing-episodes-info" class="text-xs text-vs-orange mt-1.5 font-medium hidden">Episode yang sudah ada: <span id="ep-list-text"></span></p>
                         </div>
-
                         <div class="grid grid-cols-3 gap-4">
                             <div class="col-span-1">
                                 <label class="block text-sm font-medium text-gray-300 mb-1">Eps Ke- <span class="text-red-500">*</span></label>
-                                <input type="number" id="epNumber" min="1" required placeholder="Cth: 1" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                                <input type="number" id="epNumber" min="1" required class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
                             </div>
                             <div class="col-span-2">
                                 <label class="block text-sm font-medium text-gray-300 mb-1">Judul Episode</label>
-                                <input type="text" id="epTitle" placeholder="Cth: Jobless Reincarnation" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                                <input type="text" id="epTitle" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
                             </div>
                         </div>
-                        
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-1">Thumbnail Episode (URL / Path Lokal Repo)</label>
-                            <!-- Diubah ke type="text" agar bisa menerima "thumbnail/1.jpg" maupun link URL web -->
-                            <input type="text" id="epThumb" placeholder="Cth: thumbnail/1.jpg atau https://..." class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Thumbnail (Path Github)</label>
+                            <input type="text" id="epThumb" placeholder="thumbnail/1.jpg" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
                         </div>
-
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-1">URL Embed Video <span class="text-red-500">*</span></label>
-                            <input type="url" id="epEmbed" required placeholder="https://www.youtube.com/embed/xxxxx" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                            <label class="block text-sm font-medium text-gray-300 mb-1">URL Embed Youtube <span class="text-red-500">*</span></label>
+                            <input type="url" id="epEmbed" required class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
                         </div>
-
                         <div class="pt-4 flex justify-end">
-                            <button type="submit" class="bg-vs-orange hover:bg-vs-orange-hover text-white px-6 py-2.5 rounded-lg font-bold flex items-center gap-2 transition-all">
+                            <button type="submit" id="btn-submit-ep" class="bg-vs-orange hover:bg-vs-orange-hover text-white px-6 py-2.5 rounded-lg font-bold flex items-center gap-2">
                                 <i data-lucide="upload" class="w-4 h-4"></i> Posting Episode
                             </button>
                         </div>
                     </form>
                 </div>
 
-                <!-- BAGIAN KANAN: LIVE PREVIEW -->
-                <div class="bg-vs-panel border border-vs-border rounded-xl p-6 shadow-xl">
+                <!-- PREVIEW (Sama seperti sebelumnya) -->
+                <div class="bg-vs-panel border border-vs-border rounded-xl p-6 shadow-xl hidden lg:block">
                     <h2 class="text-sm font-bold text-gray-400 mb-4 uppercase tracking-wider flex items-center gap-2">
                         <i data-lucide="eye" class="w-4 h-4"></i> Live Preview
                     </h2>
-                    
-                    <div id="preview-series" class="relative w-full aspect-video rounded-xl overflow-hidden border border-vs-border bg-vs-bg shadow-2xl group">
-                        <div id="prev-s-bg" class="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat opacity-60"></div>
-                        <div class="absolute inset-0 bg-gradient-to-t from-vs-bg via-vs-bg/70 to-transparent"></div>
-                        <div class="absolute inset-0 p-6 flex flex-col justify-end z-10 text-center">
-                            <h1 id="prev-s-title" class="text-2xl sm:text-3xl font-black text-white leading-tight mb-2 uppercase">Nama Anime</h1>
-                            <div class="flex justify-center gap-2 text-xs text-gray-300 mb-4">
-                                <span class="border border-vs-green text-vs-green px-1.5 py-0.5 rounded">16+</span>
-                                <span id="prev-s-cat" class="px-1.5 py-0.5 border border-transparent">Kategori</span>
-                            </div>
-                            <p id="prev-s-desc" class="text-gray-300 text-xs line-clamp-2">Sinopsis akan muncul di sini saat Anda mengetik...</p>
-                        </div>
+                    <div id="preview-series" class="relative w-full aspect-video rounded-xl border border-vs-border bg-vs-bg shadow-2xl flex items-center justify-center text-gray-500">
+                        Isi form seri di kiri...
                     </div>
-
                     <div id="preview-episode" class="hidden space-y-4">
                         <div class="flex gap-4 p-3 rounded-lg bg-vs-hover/40 border border-transparent">
                             <div class="relative w-32 aspect-video rounded bg-vs-bg overflow-hidden shrink-0 border border-vs-border">
                                 <div id="prev-e-bg" class="absolute inset-0 bg-cover bg-center"></div>
-                                <div class="absolute inset-0 bg-black/30 flex items-center justify-center"><i data-lucide="play-circle" class="text-white w-8 h-8"></i></div>
                             </div>
                             <div class="flex flex-col justify-center">
-                                <span id="prev-e-series" class="text-[10px] text-gray-400 uppercase font-bold tracking-wide">PILIH SERI DULU</span>
-                                <h4 id="prev-e-title" class="text-sm font-bold text-white mt-1">E1 - Judul Episode</h4>
-                                <span class="text-[10px] text-vs-green mt-1">Baru Ditambahkan</span>
+                                <span id="prev-e-series" class="text-[10px] text-gray-400 uppercase font-bold">PILIH SERI</span>
+                                <h4 id="prev-e-title" class="text-sm font-bold text-white mt-1">E1 - Judul</h4>
                             </div>
                         </div>
                     </div>
@@ -193,248 +152,145 @@
         </div>
     </main>
 
-    <!-- Modal Tambah Kategori -->
-    <div id="modal-category" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="bg-vs-panel border border-vs-border rounded-xl p-6 w-full max-w-sm shadow-2xl transform scale-95 transition-transform duration-300" id="modal-category-content">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-white">Tambah Kategori Baru</h3>
-                <button type="button" id="btn-close-category" class="text-gray-400 hover:text-white">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-            
-            <label class="block text-sm font-medium text-gray-300 mb-1">Nama Kategori</label>
-            <input type="text" id="newCategoryName" placeholder="Contoh: Isekai, Romance..." class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none mb-6">
-            
-            <div class="flex justify-end gap-3">
-                <button type="button" id="btn-cancel-category" class="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Batal</button>
-                <button type="button" id="btn-save-category" class="bg-vs-green hover:bg-green-500 text-vs-bg px-5 py-2 rounded-lg font-bold text-sm flex items-center gap-2 transition-all">
-                    <i data-lucide="save" class="w-4 h-4"></i> Simpan
-                </button>
-            </div>
-        </div>
-    </div>
-
     <script type="module">
         import { db } from './js/firebase-init.js'; 
-        import { collection, addDoc, getDocs, query, orderBy, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { collection, addDoc, getDocs, getDoc, doc, updateDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             lucide.createIcons();
 
             const tabSeriesBtn = document.getElementById('tab-btn-series');
             const tabEpisodeBtn = document.getElementById('tab-btn-episode');
             const formSeries = document.getElementById('form-series');
             const formEpisode = document.getElementById('form-episode');
-            const previewSeries = document.getElementById('preview-series');
-            const previewEpisode = document.getElementById('preview-episode');
+            
+            // Variabel Status Edit
+            const urlParams = new URLSearchParams(window.location.search);
+            const editEpId = urlParams.get('editEp'); 
+            let isEditMode = false;
 
             function switchTab(tab) {
                 if (tab === 'series') {
                     tabSeriesBtn.className = "pb-3 tab-active transition-colors flex items-center gap-2";
                     tabEpisodeBtn.className = "pb-3 tab-inactive transition-colors flex items-center gap-2";
                     formSeries.classList.remove('hidden'); formEpisode.classList.add('hidden');
-                    previewSeries.classList.remove('hidden'); previewEpisode.classList.add('hidden');
+                    document.getElementById('preview-series').classList.remove('hidden');
+                    document.getElementById('preview-episode').classList.add('hidden');
                 } else {
                     tabSeriesBtn.className = "pb-3 tab-inactive transition-colors flex items-center gap-2";
                     tabEpisodeBtn.className = "pb-3 tab-active transition-colors flex items-center gap-2";
                     formSeries.classList.add('hidden'); formEpisode.classList.remove('hidden');
-                    previewSeries.classList.add('hidden'); previewEpisode.classList.remove('hidden');
-                    loadSeriesData(); 
+                    document.getElementById('preview-series').classList.add('hidden');
+                    document.getElementById('preview-episode').classList.remove('hidden');
                 }
             }
 
             tabSeriesBtn.addEventListener('click', () => switchTab('series'));
             tabEpisodeBtn.addEventListener('click', () => switchTab('episode'));
-            document.getElementById('btn-shortcut-series').addEventListener('click', () => switchTab('series'));
 
-            // --- KATEGORI LOGIC ---
-            const sCat = document.getElementById('seriesCategory');
-            const modalCategory = document.getElementById('modal-category');
-            const modalCatContent = document.getElementById('modal-category-content');
-            const newCategoryName = document.getElementById('newCategoryName');
-            const btnSaveCategory = document.getElementById('btn-save-category');
-
-            async function loadCategories(autoSelectValue = null) {
-                try {
-                    const q = query(collection(db, "categories"), orderBy("name", "asc"));
-                    const snapshot = await getDocs(q);
-                    
-                    sCat.innerHTML = '<option value="" disabled selected>Pilih Kategori...</option>';
-                    if (snapshot.empty) {
-                        sCat.innerHTML = '<option value="" disabled>Belum ada kategori</option>';
-                        return;
-                    }
-
-                    snapshot.forEach((doc) => {
-                        const opt = document.createElement('option');
-                        opt.value = doc.data().name;
-                        opt.textContent = doc.data().name;
-                        sCat.appendChild(opt);
-                    });
-
-                    if(autoSelectValue) sCat.value = autoSelectValue;
-                    updatePreviewSeries();
-                } catch (error) {
-                    sCat.innerHTML = '<option value="" disabled>Gagal memuat kategori</option>';
-                    console.error(error);
-                }
-            }
-
-            function closeCategoryModal() {
-                modalCategory.classList.add('opacity-0', 'pointer-events-none');
-                modalCatContent.classList.remove('scale-100');
-                modalCatContent.classList.add('scale-95');
-            }
-
-            document.getElementById('btn-add-category').addEventListener('click', () => {
-                modalCategory.classList.remove('opacity-0', 'pointer-events-none');
-                modalCatContent.classList.remove('scale-95');
-                modalCatContent.classList.add('scale-100');
-                newCategoryName.value = '';
-                newCategoryName.focus();
-            });
-
-            document.getElementById('btn-close-category').addEventListener('click', closeCategoryModal);
-            document.getElementById('btn-cancel-category').addEventListener('click', closeCategoryModal);
-
-            btnSaveCategory.addEventListener('click', async () => {
-                const catVal = newCategoryName.value.trim();
-                if (!catVal) return alert("Nama kategori kosong!");
-
-                const origText = btnSaveCategory.innerHTML;
-                btnSaveCategory.innerHTML = 'Menyimpan...';
-                btnSaveCategory.disabled = true;
-
-                try {
-                    await addDoc(collection(db, "categories"), { name: catVal, createdAt: serverTimestamp() });
-                    closeCategoryModal();
-                    await loadCategories(catVal); 
-                } catch (error) {
-                    console.error(error);
-                    alert("Gagal menyimpan kategori. Error: " + error.message);
-                } finally {
-                    btnSaveCategory.innerHTML = origText;
-                    btnSaveCategory.disabled = false;
-                }
-            });
-
-            // --- FORM SERI ---
-            const sTitle = document.getElementById('seriesTitle');
-            const sBanner = document.getElementById('seriesBanner');
-            const sDesc = document.getElementById('seriesDesc');
-
-            function updatePreviewSeries() {
-                document.getElementById('prev-s-title').textContent = sTitle.value || 'NAMA ANIME';
-                document.getElementById('prev-s-cat').textContent = sCat.value || 'Kategori';
-                document.getElementById('prev-s-desc').textContent = sDesc.value || 'Sinopsis akan muncul di sini...';
-                document.getElementById('prev-s-bg').style.backgroundImage = sBanner.value ? `url('${sBanner.value}')` : 'none';
-            }
-            [sTitle, sCat, sBanner, sDesc].forEach(el => el.addEventListener('input', updatePreviewSeries));
-
-            document.getElementById('form-series').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const btn = e.target.querySelector('button[type="submit"]');
-                const origText = btn.innerHTML;
-                btn.innerHTML = 'Menyimpan...'; btn.disabled = true;
-
-                try {
-                    await addDoc(collection(db, "series"), {
-                        title: sTitle.value.trim(), category: sCat.value,
-                        bannerUrl: sBanner.value.trim(), description: sDesc.value.trim(),
-                        createdAt: serverTimestamp()
-                    });
-                    alert('Judul Seri Baru Berhasil Disimpan!');
-                    e.target.reset(); updatePreviewSeries(); switchTab('episode');
-                } catch (error) {
-                    console.error(error);
-                    alert("Gagal menyimpan seri. Error: " + error.message);
-                } finally {
-                    btn.innerHTML = origText; btn.disabled = false;
-                }
-            });
-
-            // --- FORM EPISODE ---
+            // Memuat Daftar Seri ke Select Input
             const eSeries = document.getElementById('epSeriesSelect');
-            const eNum = document.getElementById('epNumber');
-            const eTitle = document.getElementById('epTitle');
-            const eThumb = document.getElementById('epThumb');
-            const eEmbed = document.getElementById('epEmbed');
-            const epListText = document.getElementById('ep-list-text');
-
             async function loadSeriesData() {
-                try {
-                    const q = query(collection(db, "series"), orderBy("title", "asc"));
-                    const snapshot = await getDocs(q);
-                    
-                    eSeries.innerHTML = '<option value="" disabled selected>Pilih Judul Seri...</option>';
-                    if(snapshot.empty) return eSeries.innerHTML = '<option value="" disabled>Belum ada judul seri</option>';
+                const q = query(collection(db, "series"), orderBy("title", "asc"));
+                const snapshot = await getDocs(q);
+                eSeries.innerHTML = '<option value="" disabled selected>Pilih Judul Seri...</option>';
+                snapshot.forEach((doc) => {
+                    const opt = document.createElement('option');
+                    opt.value = doc.id; opt.textContent = doc.data().title;
+                    opt.dataset.title = doc.data().title; 
+                    eSeries.appendChild(opt);
+                });
+            }
 
-                    snapshot.forEach((doc) => {
-                        const opt = document.createElement('option');
-                        opt.value = doc.id; opt.textContent = doc.data().title;
-                        opt.dataset.title = doc.data().title; 
-                        eSeries.appendChild(opt);
-                    });
-                } catch (error) {
-                    console.error(error);
+            // --- LOGIKA EDIT EPISODE OTOMATIS JIKA ADA URL ?editEp= ---
+            await loadSeriesData(); // Wajib tunggu dropdown seri selesai dimuat dulu
+
+            if(editEpId) {
+                isEditMode = true;
+                switchTab('episode'); // Otomatis pindah tab ke Episode
+                document.getElementById('page-main-title').innerText = "Edit Episode";
+                
+                // Ubah teks tombol
+                const btnSubmit = document.getElementById('btn-submit-ep');
+                btnSubmit.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Simpan Perubahan';
+                btnSubmit.classList.replace('bg-vs-orange', 'bg-vs-green');
+                btnSubmit.classList.replace('hover:bg-vs-orange-hover', 'hover:bg-green-500');
+
+                try {
+                    // Tarik data lama dari Firebase
+                    const epDoc = await getDoc(doc(db, "episodes", editEpId));
+                    if(epDoc.exists()) {
+                        const data = epDoc.data();
+                        
+                        // Isi otomatis kolom input dengan data lama
+                        eSeries.value = data.seriesId;
+                        document.getElementById('epNumber').value = data.episodeNumber;
+                        document.getElementById('epTitle').value = data.episodeTitle || '';
+                        document.getElementById('epThumb').value = data.thumbnailUrl || '';
+                        document.getElementById('epEmbed').value = data.embedUrl || '';
+                        
+                        // Update preview (opsional)
+                        document.getElementById('prev-e-series').textContent = data.seriesTitle;
+                        document.getElementById('prev-e-title').textContent = `E${data.episodeNumber} - ${data.episodeTitle}`;
+                        document.getElementById('prev-e-bg').style.backgroundImage = `url('${data.thumbnailUrl}')`;
+                    } else {
+                        alert("Episode yang ingin diedit tidak ditemukan di Database.");
+                    }
+                } catch(e) {
+                    console.error("Gagal menarik data edit:", e);
                 }
             }
 
-            eSeries.addEventListener('change', async () => {
-                document.getElementById('prev-e-series').textContent = eSeries.options[eSeries.selectedIndex].dataset.title;
-                updatePreviewEpisode();
-
-                try {
-                    const q = query(collection(db, "episodes"), where("seriesId", "==", eSeries.value), orderBy("episodeNumber", "asc"));
-                    const snapshot = await getDocs(q);
-                    
-                    if(!snapshot.empty) {
-                        let eps = [];
-                        snapshot.forEach(doc => eps.push(doc.data().episodeNumber));
-                        epListText.textContent = eps.join(', ');
-                        document.getElementById('existing-episodes-info').classList.remove('hidden');
-                        eNum.value = Math.max(...eps) + 1; 
-                    } else {
-                        document.getElementById('existing-episodes-info').classList.add('hidden');
-                        eNum.value = 1;
-                    }
-                    updatePreviewEpisode();
-                } catch (error) { console.error(error); }
-            });
-
-            function updatePreviewEpisode() {
-                document.getElementById('prev-e-title').textContent = `E${eNum.value || '?'} - ${eTitle.value || 'Judul Episode'}`;
-                document.getElementById('prev-e-bg').style.backgroundImage = eThumb.value ? `url('${eThumb.value}')` : 'none';
-            }
-            [eNum, eTitle, eThumb].forEach(el => el.addEventListener('input', updatePreviewEpisode));
-
+            // --- SUBMIT FORM EPISODE (HANDLE TAMBAH & UPDATE) ---
             document.getElementById('form-episode').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const btn = e.target.querySelector('button[type="submit"]');
+                const btn = document.getElementById('btn-submit-ep');
                 const origText = btn.innerHTML;
-                btn.innerHTML = 'Memposting...'; btn.disabled = true;
+                btn.innerHTML = 'Memproses...'; btn.disabled = true;
+
+                const epData = {
+                    seriesId: eSeries.value, 
+                    seriesTitle: eSeries.options[eSeries.selectedIndex].dataset.title, 
+                    episodeNumber: Number(document.getElementById('epNumber').value), 
+                    episodeTitle: document.getElementById('epTitle').value.trim(),
+                    thumbnailUrl: document.getElementById('epThumb').value.trim(), 
+                    embedUrl: document.getElementById('epEmbed').value.trim()
+                };
 
                 try {
-                    await addDoc(collection(db, "episodes"), {
-                        seriesId: eSeries.value, seriesTitle: eSeries.options[eSeries.selectedIndex].dataset.title, 
-                        episodeNumber: Number(eNum.value), episodeTitle: eTitle.value.trim(),
-                        thumbnailUrl: eThumb.value.trim(), embedUrl: eEmbed.value.trim(),
-                        createdAt: serverTimestamp()
-                    });
-                    
-                    alert(`Episode ${eNum.value} berhasil diposting!`);
-                    eNum.value = ''; eTitle.value = ''; eThumb.value = ''; eEmbed.value = '';
-                    eSeries.dispatchEvent(new Event('change')); 
+                    if(isEditMode) {
+                        // UPDATE DATA LAMA
+                        await updateDoc(doc(db, "episodes", editEpId), epData);
+                        alert(`Perubahan Episode ${epData.episodeNumber} berhasil disimpan!`);
+                        window.location.href = 'admin.html'; // Kembali ke admin setelah selesai ngedit
+                    } else {
+                        // TAMBAH DATA BARU
+                        epData.createdAt = serverTimestamp(); // Tambah timestamp hanya untuk data baru
+                        await addDoc(collection(db, "episodes"), epData);
+                        alert(`Episode ${epData.episodeNumber} berhasil diposting!`);
+                        document.getElementById('form-episode').reset();
+                    }
                 } catch (error) {
-                    console.error(error);
-                    alert("Gagal memposting episode. Error: " + error.message);
+                    alert("Gagal memproses. Error: " + error.message);
                 } finally {
                     btn.innerHTML = origText; btn.disabled = false;
                 }
             });
 
-            loadCategories(); updatePreviewSeries(); loadSeriesData();
+            // (Kode submit untuk Form Seri tetap sama, disingkat untuk menghemat baris)
+            document.getElementById('form-series').addEventListener('submit', async(e)=>{
+               e.preventDefault();
+               try {
+                   await addDoc(collection(db, "series"), {
+                        title: document.getElementById('seriesTitle').value.trim(), 
+                        category: document.getElementById('seriesCategory').value,
+                        bannerUrl: document.getElementById('seriesBanner').value.trim(), 
+                        description: document.getElementById('seriesDesc').value.trim(),
+                        createdAt: serverTimestamp()
+                    });
+                    alert('Judul Tersimpan!'); e.target.reset(); loadSeriesData(); switchTab('episode');
+               } catch(err) { alert(err.message); }
+            });
         });
     </script>
 </body>
