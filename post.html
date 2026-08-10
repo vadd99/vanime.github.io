@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buat Postingan Baru - Vadd Studio Console</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Konfigurasi Tema Tailwind Kustom -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        vs: {
+                            bg: '#05110a',
+                            panel: '#0a1f14',
+                            border: '#1a3a26',
+                            green: '#4ade80',
+                            orange: '#f97316',
+                            'orange-hover': '#ea580c',
+                            hover: '#113320'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-vs-bg text-gray-200 font-sans min-h-screen flex flex-col selection:bg-vs-green selection:text-vs-bg">
+
+    <!-- Top Header -->
+    <header class="h-16 flex items-center justify-between px-6 bg-vs-bg border-b border-vs-border sticky top-0 z-30">
+        <div class="flex items-center gap-3">
+            <a href="#" class="text-gray-400 hover:text-white transition-colors" title="Kembali ke Dashboard">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            </a>
+            <div class="flex items-center gap-2 border-l border-vs-border pl-3 ml-1">
+                <div class="w-8 h-8 rounded-full bg-vs-border border-2 border-vs-green flex items-center justify-center overflow-hidden">
+                   <span class="text-vs-green text-xs font-bold">VS</span>
+                </div>
+                <span class="text-lg font-bold tracking-tight hidden sm:block">
+                  <span class="text-vs-green">vadd</span> <span class="text-white">studio</span> <span class="text-gray-500 font-normal text-sm ml-2">Console</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div class="w-8 h-8 rounded-full bg-vs-hover border border-vs-green flex items-center justify-center text-vs-green cursor-pointer">
+                <i data-lucide="user" class="w-4 h-4"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        <div class="max-w-4xl mx-auto space-y-8 animate-[fadeIn_0.5s_ease-out]">
+            
+            <!-- Page Title -->
+            <div>
+                <h1 class="text-2xl font-bold text-white">Buat Postingan Video</h1>
+                <p class="text-sm text-gray-400 mt-1">Lengkapi form di bawah untuk mengunggah video ke situs.</p>
+            </div>
+
+            <!-- Form -->
+            <form id="postForm" class="bg-vs-panel border border-vs-border rounded-xl p-6 space-y-6 shadow-xl">
+                
+                <!-- Nama Video -->
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-300 mb-2">Nama Video <span class="text-red-500">*</span></label>
+                    <input 
+                        type="text" 
+                        id="title" 
+                        name="title"
+                        placeholder="Contoh: Petualangan Sang Sutradara Rubah" 
+                        class="w-full bg-vs-bg border border-vs-border rounded-lg py-3 px-4 text-white focus:outline-none focus:border-vs-green focus:ring-1 focus:ring-vs-green transition-all"
+                        required
+                    />
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Kategori -->
+                    <div>
+                        <label for="category" class="block text-sm font-medium text-gray-300 mb-2">Kategori</label>
+                        <select 
+                            id="category" 
+                            name="category"
+                            class="w-full bg-vs-bg border border-vs-border rounded-lg py-3 px-4 text-white focus:outline-none focus:border-vs-green focus:ring-1 focus:ring-vs-green transition-all appearance-none cursor-pointer"
+                        >
+                            <option value="Animasi">Animasi</option>
+                            <option value="Drama">Drama</option>
+                            <option value="Sci-Fi">Sci-Fi</option>
+                            <option value="Dokumenter">Dokumenter</option>
+                            <option value="Aksi">Aksi</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Thumbnail URL -->
+                    <div>
+                        <label for="thumbnailUrl" class="block text-sm font-medium text-gray-300 mb-2">URL Thumbnail Gambar</label>
+                        <input 
+                            type="url" 
+                            id="thumbnailUrl" 
+                            name="thumbnailUrl"
+                            placeholder="https://contoh.com/gambar.jpg" 
+                            class="w-full bg-vs-bg border border-vs-border rounded-lg py-3 px-4 text-white focus:outline-none focus:border-vs-green focus:ring-1 focus:ring-vs-green transition-all"
+                        />
+                    </div>
+                </div>
+
+                <!-- Deskripsi -->
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-300 mb-2">Deskripsi Video</label>
+                    <textarea 
+                        id="description" 
+                        name="description"
+                        rows="4"
+                        placeholder="Ceritakan tentang video ini..."
+                        class="w-full bg-vs-bg border border-vs-border rounded-lg py-3 px-4 text-white focus:outline-none focus:border-vs-green focus:ring-1 focus:ring-vs-green transition-all resize-y"
+                    ></textarea>
+                </div>
+
+                <!-- URL Embed -->
+                <div>
+                    <label for="embedUrl" class="block text-sm font-medium text-gray-300 mb-2">URL Embed Video (Opsional)</label>
+                    <input 
+                        type="url" 
+                        id="embedUrl" 
+                        name="embedUrl"
+                        placeholder="https://www.youtube.com/embed/xxxxx" 
+                        class="w-full bg-vs-bg border border-vs-border rounded-lg py-3 px-4 text-white focus:outline-none focus:border-vs-green focus:ring-1 focus:ring-vs-green transition-all"
+                    />
+                    <p class="text-xs text-gray-500 mt-2">Masukkan link iframe atau direct link pemutar video.</p>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-6 border-t border-vs-border flex justify-end">
+                    <button 
+                        type="submit"
+                        class="bg-vs-orange hover:bg-vs-orange-hover text-white px-8 py-3 rounded-lg font-bold transition-all shadow-lg shadow-orange-900/30 flex items-center gap-2 transform active:scale-95"
+                    >
+                        <i data-lucide="upload" class="w-5 h-5"></i>
+                        Posting Video Sekarang
+                    </button>
+                </div>
+            </form>
+
+            <!-- LIVE DEMO SECTION -->
+            <div class="pt-4 pb-12">
+                <div class="flex items-center gap-2 mb-6">
+                    <i data-lucide="eye" class="text-vs-green w-6 h-6"></i>
+                    <h2 class="text-xl font-bold text-white">Live Demo Tampilan Postingan</h2>
+                </div>
+                
+                <!-- Preview Container -->
+                <div class="relative w-full aspect-[4/5] sm:aspect-[21/9] lg:aspect-video rounded-2xl overflow-hidden border border-vs-border bg-vs-bg shadow-2xl group">
+                    
+                    <!-- Background Image (Dynamically Updated) -->
+                    <div id="preview-bg" class="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat opacity-50 transition-all duration-500 ease-in-out flex items-center justify-center">
+                        <div id="preview-empty-icon" class="flex flex-col items-center text-vs-border">
+                            <i data-lucide="image" class="w-16 h-16"></i>
+                            <p class="mt-2 text-sm">Belum ada thumbnail</p>
+                        </div>
+                    </div>
+
+                    <!-- Gradient Overlays for Readability -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-vs-bg via-vs-bg/70 to-transparent"></div>
+                    <div class="absolute inset-0 bg-gradient-to-r from-vs-bg/90 via-transparent to-transparent hidden sm:block"></div>
+                    
+                    <!-- Content Overlay -->
+                    <div class="absolute inset-0 p-6 sm:p-10 flex flex-col justify-end z-10">
+                        
+                        <h1 id="preview-title" class="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight mb-3 drop-shadow-lg max-w-3xl">
+                            Judul <span class="text-vs-green">Video</span> <span class="text-vs-orange">Baru</span>
+                        </h1>
+                        
+                        <p id="preview-description" class="text-gray-300 text-sm sm:text-base lg:text-lg mb-8 max-w-2xl line-clamp-2 sm:line-clamp-3 drop-shadow-md">
+                            Di dunia di mana imajinasi menjadi nyata, seekor rubah dengan headphone ajaib dan kamera legendarisnya siap mengarahkan film epik pertamanya...
+                        </p>
+                        
+                        <div class="flex flex-wrap items-center gap-4">
+                            <button class="bg-vs-orange hover:bg-vs-orange-hover text-white px-6 py-3 rounded-lg flex items-center gap-2 font-bold transition-colors">
+                                <i data-lucide="play" class="w-5 h-5 fill-current"></i>
+                                Mulai Menonton
+                            </button>
+                            
+                            <button class="bg-vs-panel/80 backdrop-blur-sm border border-vs-border hover:bg-vs-hover text-white px-6 py-3 rounded-lg flex items-center gap-2 font-bold transition-colors">
+                                <i data-lucide="bookmark-plus" class="w-5 h-5"></i>
+                                Tambahkan
+                            </button>
+                        </div>
+                        
+                        <!-- Category Tag -->
+                        <div class="absolute top-6 left-6 sm:top-10 sm:left-10">
+                            <span id="preview-category" class="px-3 py-1.5 rounded bg-vs-panel/80 backdrop-blur-sm border border-[#2a5a3a] text-xs font-bold text-vs-green uppercase tracking-wider shadow-lg">
+                                ANIMASI
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Script Logika Live Preview -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inisialisasi Ikon Lucide
+            lucide.createIcons();
+
+            // Referensi Elemen Input Form
+            const titleInput = document.getElementById('title');
+            const descInput = document.getElementById('description');
+            const thumbInput = document.getElementById('thumbnailUrl');
+            const catInput = document.getElementById('category');
+
+            // Referensi Elemen Preview
+            const previewTitle = document.getElementById('preview-title');
+            const previewDesc = document.getElementById('preview-description');
+            const previewBg = document.getElementById('preview-bg');
+            const previewCat = document.getElementById('preview-category');
+            const previewEmptyIcon = document.getElementById('preview-empty-icon');
+
+            // Fungsi Update Preview
+            function updatePreview() {
+                // 1. Update Judul (Dengan pewarnaan kata terakhir)
+                const titleText = titleInput.value.trim();
+                if (titleText) {
+                    const words = titleText.split(' ');
+                    if (words.length >= 3) {
+                        const lastWord = words.pop();
+                        const secondLastWord = words.pop();
+                        const restOfWords = words.join(' ');
+                        previewTitle.innerHTML = `${restOfWords} <span class="text-vs-green">${secondLastWord}</span> <span class="text-vs-orange">${lastWord}</span>`;
+                    } else if (words.length === 2) {
+                        previewTitle.innerHTML = `<span class="text-vs-green">${words[0]}</span> <span class="text-vs-orange">${words[1]}</span>`;
+                    } else {
+                        previewTitle.innerHTML = `<span class="text-white">${words[0]}</span>`;
+                    }
+                } else {
+                    previewTitle.innerHTML = `Judul <span class="text-vs-green">Video</span> <span class="text-vs-orange">Baru</span>`;
+                }
+
+                // 2. Update Deskripsi
+                const descText = descInput.value.trim();
+                previewDesc.textContent = descText ? descText : 'Di dunia di mana imajinasi menjadi nyata, seekor rubah dengan headphone ajaib dan kamera legendarisnya siap mengarahkan film epik pertamanya...';
+
+                // 3. Update Background Thumbnail
+                const thumbUrl = thumbInput.value.trim();
+                if (thumbUrl) {
+                    previewBg.style.backgroundImage = `url('${thumbUrl}')`;
+                    previewEmptyIcon.style.display = 'none';
+                } else {
+                    previewBg.style.backgroundImage = 'none';
+                    previewEmptyIcon.style.display = 'flex';
+                }
+
+                // 4. Update Kategori
+                previewCat.textContent = catInput.value;
+            }
+
+            // Event Listeners: Mengikat form dengan preview (Real-time)
+            ['input', 'change'].forEach(eventType => {
+                titleInput.addEventListener(eventType, updatePreview);
+                descInput.addEventListener(eventType, updatePreview);
+                thumbInput.addEventListener(eventType, updatePreview);
+                catInput.addEventListener(eventType, updatePreview);
+            });
+
+            // Handle Submit Form
+            document.getElementById('postForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                // Animasi pada tombol (Opsional)
+                const btn = e.target.querySelector('button[type="submit"]');
+                const originalText = btn.innerHTML;
+                
+                btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> Menyimpan...';
+                lucide.createIcons();
+
+                // Simulasi proses upload (1 detik)
+                setTimeout(() => {
+                    alert('Berhasil! Video telah di-posting ke database (Demonstrasi).');
+                    btn.innerHTML = originalText;
+                    lucide.createIcons();
+                    e.target.reset(); // Kosongkan form
+                    updatePreview(); // Kembalikan preview ke default
+                }, 1000);
+            });
+
+            // Jalankan sekali saat load agar kategori default langsung tersetting
+            updatePreview();
+        });
+    </script>
+</body>
+</html>
+
