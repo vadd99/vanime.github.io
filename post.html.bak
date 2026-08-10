@@ -78,7 +78,6 @@
                                 <div class="flex gap-2">
                                     <select id="seriesGenre" class="flex-1 w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
                                         <option value="" disabled selected>Pilih Genre...</option>
-                                        <!-- Opsi dari DB akan masuk ke sini -->
                                     </select>
                                     <button type="button" id="addGenreBtn" class="bg-vs-hover border border-vs-border p-2.5 rounded-lg text-vs-green hover:bg-vs-green hover:text-vs-bg transition-colors" title="Tambah Genre Baru"><i data-lucide="plus" class="w-5 h-5"></i></button>
                                 </div>
@@ -138,7 +137,7 @@
                         </div>
                     </form>
 
-                    <!-- FORM 2: EPISODE -->
+                    <!-- FORM 2: EPISODE & MULTI-SERVER EMBED -->
                     <form id="form-episode" class="bg-vs-panel border border-vs-border rounded-xl p-6 space-y-5 shadow-xl hidden">
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-1">Pilih Judul Seri <span class="text-red-500">*</span></label>
@@ -160,10 +159,30 @@
                             <label class="block text-sm font-medium text-gray-300 mb-1">Thumbnail (Path Github)</label>
                             <input type="text" id="epThumb" placeholder="thumbnail/1.jpg" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-1">URL Embed Youtube <span class="text-red-500">*</span></label>
-                            <input type="url" id="epEmbed" required class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+
+                        <!-- BAGIAN MULTI-SERVER EMBED -->
+                        <div class="border-t border-vs-border pt-4 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <label class="block text-sm font-medium text-vs-green">Daftar Server Video (Embed) <span class="text-red-500">*</span></label>
+                                <button type="button" id="addServerBtn" class="bg-vs-hover border border-vs-border text-xs px-3 py-1.5 rounded-lg text-vs-green hover:bg-vs-green hover:text-vs-bg transition-colors flex items-center gap-1 font-bold">
+                                    <i data-lucide="plus" class="w-4 h-4"></i> Tambah Server
+                                </button>
+                            </div>
+                            <p class="text-xs text-gray-400">Anda bisa menambahkan beberapa server seperti Google Drive, Mega, atau server alternatif lainnya.</p>
+                            
+                            <!-- Container tempat baris input server ditambahkan -->
+                            <div id="servers-container" class="space-y-3">
+                                <!-- Baris Server Pertama (Default) -->
+                                <div class="server-row flex gap-2 items-center bg-vs-bg/50 p-3 rounded-lg border border-vs-border">
+                                    <input type="text" placeholder="Nama Server (Cth: Google Drive)" class="server-name w-1/3 bg-vs-bg border border-vs-border rounded-lg py-2 px-3 text-white text-sm focus:border-vs-green focus:outline-none" value="Google Drive" required />
+                                    <input type="url" placeholder="URL Embed (https://...)" class="server-url flex-1 bg-vs-bg border border-vs-border rounded-lg py-2 px-3 text-white text-sm focus:border-vs-green focus:outline-none" required />
+                                    <button type="button" class="remove-server-btn text-red-400 hover:text-red-300 p-2" title="Hapus Server" style="display:none;">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
+
                         <div class="pt-4 flex justify-end">
                             <button type="submit" id="btn-submit-ep" class="bg-vs-orange hover:bg-vs-orange-hover text-white px-6 py-2.5 rounded-lg font-bold flex items-center gap-2">
                                 <i data-lucide="upload" class="w-4 h-4"></i> Posting Episode
@@ -234,10 +253,49 @@
             tabSeriesBtn.addEventListener('click', () => switchTab('series'));
             tabEpisodeBtn.addEventListener('click', () => switchTab('episode'));
 
+            // --- LOGIKA TAMBAH BARIS SERVER EMBED DINAMIS ---
+            const serversContainer = document.getElementById('servers-container');
+            const addServerBtn = document.getElementById('addServerBtn');
+
+            function updateRemoveButtons() {
+                const rows = serversContainer.querySelectorAll('.server-row');
+                rows.forEach(row => {
+                    const removeBtn = row.querySelector('.remove-server-btn');
+                    if (rows.length > 1) {
+                        removeBtn.style.display = 'block';
+                    } else {
+                        removeBtn.style.display = 'none';
+                    }
+                });
+            }
+
+            addServerBtn.addEventListener('click', () => {
+                const newRow = document.createElement('div');
+                newRow.className = "server-row flex gap-2 items-center bg-vs-bg/50 p-3 rounded-lg border border-vs-border";
+                newRow.innerHTML = `
+                    <input type="text" placeholder="Nama Server (Cth: Mega / Server 2)" class="server-name w-1/3 bg-vs-bg border border-vs-border rounded-lg py-2 px-3 text-white text-sm focus:border-vs-green focus:outline-none" required />
+                    <input type="url" placeholder="URL Embed (https://...)" class="server-url flex-1 bg-vs-bg border border-vs-border rounded-lg py-2 px-3 text-white text-sm focus:border-vs-green focus:outline-none" required />
+                    <button type="button" class="remove-server-btn text-red-400 hover:text-red-300 p-2" title="Hapus Server">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                `;
+                serversContainer.appendChild(newRow);
+                lucide.createIcons();
+                updateRemoveButtons();
+            });
+
+            serversContainer.addEventListener('click', (e) => {
+                const removeBtn = e.target.closest('.remove-server-btn');
+                if (removeBtn) {
+                    removeBtn.closest('.server-row').remove();
+                    updateRemoveButtons();
+                }
+            });
+
             // Fungsi Untuk Memasukkan Nilai ke Dalam Dropdown Select
             function populateSelect(elementId, items) {
                 const select = document.getElementById(elementId);
-                const firstOption = select.options[0]; // Simpan opsi placeholder "Pilih..."
+                const firstOption = select.options[0]; 
                 select.innerHTML = ''; 
                 select.appendChild(firstOption);
                 
@@ -249,42 +307,35 @@
                 });
             }
 
-            // Memuat Daftar Seri & Mengekstrak Data Kategori, Audio, Subtitle yang sudah ada
             const eSeries = document.getElementById('epSeriesSelect');
             async function loadSeriesData() {
                 const q = query(collection(db, "series"), orderBy("title", "asc"));
                 const snapshot = await getDocs(q);
                 eSeries.innerHTML = '<option value="" disabled selected>Pilih Judul Seri...</option>';
                 
-                // Gunakan Set untuk menyaring agar tidak ada data duplikat (ganda)
                 let genresSet = new Set();
                 let audiosSet = new Set();
                 let subsSet = new Set();
 
                 snapshot.forEach((doc) => {
                     const data = doc.data();
-                    
-                    // Masukkan Judul ke Dropdown Episode
                     const opt = document.createElement('option');
                     opt.value = doc.id; opt.textContent = data.title;
                     opt.dataset.title = data.title; 
                     eSeries.appendChild(opt);
 
-                    // Ekstrak data untuk dijadikan dropdown
                     if(data.genres) data.genres.split(',').forEach(i => genresSet.add(i.trim()));
                     if(data.audioLanguages) data.audioLanguages.split(',').forEach(i => audiosSet.add(i.trim()));
                     if(data.subtitleLanguages) data.subtitleLanguages.split(',').forEach(i => subsSet.add(i.trim()));
                 });
 
-                // Terapkan ke dropdown list
                 populateSelect('seriesGenre', Array.from(genresSet));
                 populateSelect('seriesAudio', Array.from(audiosSet));
                 populateSelect('seriesSubtitle', Array.from(subsSet));
             }
 
-            await loadSeriesData(); // Wajib tunggu selesai dimuat dulu
+            await loadSeriesData();
 
-            // --- LOGIKA TOMBOL TAMBAH (+) CUSTOM DROPDOWN ---
             function handleAddOption(btnId, selectId, promptText) {
                 document.getElementById(btnId).addEventListener('click', () => {
                     const newVal = prompt(promptText);
@@ -294,33 +345,24 @@
                         opt.value = newVal.trim();
                         opt.textContent = newVal.trim();
                         select.appendChild(opt);
-                        select.value = newVal.trim(); // Otomatis pilih yang baru ditambahkan
+                        select.value = newVal.trim();
                     }
                 });
             }
             handleAddOption('addGenreBtn', 'seriesGenre', 'Masukkan Genre / Kategori Baru:');
-            handleAddOption('addAudioBtn', 'seriesAudio', 'Masukkan Bahasa Audio Baru (Contoh: Japanese):');
-            handleAddOption('addSubtitleBtn', 'seriesSubtitle', 'Masukkan Bahasa Subtitle Baru (Contoh: Bahasa Indonesia):');
+            handleAddOption('addAudioBtn', 'seriesAudio', 'Masukkan Bahasa Audio Baru:');
+            handleAddOption('addSubtitleBtn', 'seriesSubtitle', 'Masukkan Bahasa Subtitle Baru:');
 
-            // --- LOGIKA OTOMATISASI PERINGATAN KONTEN BERDASARKAN RATING USIA ---
             document.getElementById('seriesAge').addEventListener('change', function(e) {
                 const warningInput = document.getElementById('seriesWarning');
-                if (e.target.value === '13+') {
-                    warningInput.value = 'Kekerasan Ringan, Bahasa Kasar Ringan';
-                } else if (e.target.value === '16+') {
-                    warningInput.value = 'Kekerasan, Bahasa Kasar, Tema Dewasa';
-                } else if (e.target.value === '18+') {
-                    warningInput.value = 'Kekerasan Ekstrem, Konten Seksual, Darah, Bahasa Kasar';
-                }
+                if (e.target.value === '13+') warningInput.value = 'Kekerasan Ringan, Bahasa Kasar Ringan';
+                else if (e.target.value === '16+') warningInput.value = 'Kekerasan, Bahasa Kasar, Tema Dewasa';
+                else if (e.target.value === '18+') warningInput.value = 'Kekerasan Ekstrem, Konten Seksual, Darah, Bahasa Kasar';
             });
 
-            // Fungsi Bantuan untuk menyeleksi otomatis dropdown saat Edit Mode
             function setSelectValue(selectId, value) {
                 const select = document.getElementById(selectId);
-                // Cek apakah opsi tersebut sudah ada di dalam dropdown
                 let optionExists = Array.from(select.options).some(opt => opt.value === value);
-                
-                // Jika tidak ada tapi punya nilai, paksa tambahkan sebagai opsi baru agar tidak error/kosong
                 if(value && !optionExists) {
                     const opt = document.createElement('option');
                     opt.value = value;
@@ -350,19 +392,43 @@
                         document.getElementById('epNumber').value = data.episodeNumber;
                         document.getElementById('epTitle').value = data.episodeTitle || '';
                         document.getElementById('epThumb').value = data.thumbnailUrl || '';
-                        document.getElementById('epEmbed').value = data.embedUrl || '';
                         
+                        // Menangani Server Embed (Mendukung struktur baru atau konversi data lama `embedUrl`)
+                        serversContainer.innerHTML = ''; // Kosongkan baris default
+                        let serversList = data.servers || [];
+                        
+                        if(serversList.length === 0 && data.embedUrl) {
+                            // Konversi otomatis data lama yang pakai single embedUrl (Gdrive lama) menjadi Google Drive
+                            serversList = [{ name: "Google Drive", url: data.embedUrl }];
+                        }
+
+                        if(serversList.length === 0) {
+                            serversList = [{ name: "Google Drive", url: "" }];
+                        }
+
+                        serversList.forEach(srv => {
+                            const row = document.createElement('div');
+                            row.className = "server-row flex gap-2 items-center bg-vs-bg/50 p-3 rounded-lg border border-vs-border";
+                            row.innerHTML = `
+                                <input type="text" placeholder="Nama Server" class="server-name w-1/3 bg-vs-bg border border-vs-border rounded-lg py-2 px-3 text-white text-sm focus:border-vs-green focus:outline-none" value="${srv.name || ''}" required />
+                                <input type="url" placeholder="URL Embed" class="server-url flex-1 bg-vs-bg border border-vs-border rounded-lg py-2 px-3 text-white text-sm focus:border-vs-green focus:outline-none" value="${srv.url || ''}" required />
+                                <button type="button" class="remove-server-btn text-red-400 hover:text-red-300 p-2" title="Hapus Server"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            `;
+                            serversContainer.appendChild(row);
+                        });
+                        updateRemoveButtons();
+                        lucide.createIcons();
+
                         document.getElementById('prev-e-series').textContent = data.seriesTitle;
                         document.getElementById('prev-e-title').textContent = `E${data.episodeNumber} - ${data.episodeTitle}`;
                         document.getElementById('prev-e-bg').style.backgroundImage = `url('${data.thumbnailUrl}')`;
                     } else {
-                        alert("Episode yang ingin diedit tidak ditemukan di Database.");
+                        alert("Episode tidak ditemukan.");
                     }
                 } catch(e) {
                     console.error("Gagal menarik data edit:", e);
                 }
             } 
-            // --- LOGIKA EDIT JUDUL SERIES ---
             else if (editSeriesId) {
                 isEditSeriesMode = true;
                 switchTab('series'); 
@@ -375,7 +441,6 @@
                     const seriesDoc = await getDoc(doc(db, "series", editSeriesId));
                     if(seriesDoc.exists()) {
                         const data = seriesDoc.data();
-                        
                         document.getElementById('seriesTitle').value = data.title || '';
                         setSelectValue('seriesGenre', data.genres);
                         setSelectValue('seriesAge', data.ageRating);
@@ -384,20 +449,35 @@
                         document.getElementById('seriesWarning').value = data.contentWarnings || '';
                         document.getElementById('seriesBanner').value = data.bannerUrl || '';
                         document.getElementById('seriesDesc').value = data.description || '';
-                    } else {
-                        alert("Judul seri tidak ditemukan di Database.");
                     }
                 } catch(e) {
-                    console.error("Gagal menarik data edit:", e);
+                    console.error("Gagal menarik data seri:", e);
                 }
             }
 
-            // --- SUBMIT FORM EPISODE ---
+            // --- SUBMIT FORM EPISODE (DENGAN MULTI-SERVER ARRAY) ---
             document.getElementById('form-episode').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const btn = document.getElementById('btn-submit-ep');
                 const origText = btn.innerHTML;
                 btn.innerHTML = 'Memproses...'; btn.disabled = true;
+
+                // Mengambil seluruh data server dari baris input yang aktif
+                const serverRows = serversContainer.querySelectorAll('.server-row');
+                const serversArray = [];
+                serverRows.forEach(row => {
+                    const name = row.querySelector('.server-name').value.trim();
+                    const url = row.querySelector('.server-url').value.trim();
+                    if(name && url) {
+                        serversArray.push({ name, url });
+                    }
+                });
+
+                if(serversArray.length === 0) {
+                    alert("Harap masukkan minimal 1 server video beserta URL-nya!");
+                    btn.innerHTML = origText; btn.disabled = false;
+                    return;
+                }
 
                 const epData = {
                     seriesId: eSeries.value, 
@@ -405,7 +485,7 @@
                     episodeNumber: Number(document.getElementById('epNumber').value), 
                     episodeTitle: document.getElementById('epTitle').value.trim(),
                     thumbnailUrl: document.getElementById('epThumb').value.trim(), 
-                    embedUrl: document.getElementById('epEmbed').value.trim()
+                    servers: serversArray // Disimpan dalam bentuk array object server
                 };
 
                 try {
@@ -418,6 +498,15 @@
                         await addDoc(collection(db, "episodes"), epData);
                         alert(`Episode ${epData.episodeNumber} berhasil diposting!`);
                         document.getElementById('form-episode').reset();
+                        // Reset server row kembali sisa 1 default
+                        serversContainer.innerHTML = `
+                            <div class="server-row flex gap-2 items-center bg-vs-bg/50 p-3 rounded-lg border border-vs-border">
+                                <input type="text" placeholder="Nama Server (Cth: Google Drive)" class="server-name w-1/3 bg-vs-bg border border-vs-border rounded-lg py-2 px-3 text-white text-sm focus:border-vs-green focus:outline-none" value="Google Drive" required />
+                                <input type="url" placeholder="URL Embed (https://...)" class="server-url flex-1 bg-vs-bg border border-vs-border rounded-lg py-2 px-3 text-white text-sm focus:border-vs-green focus:outline-none" required />
+                                <button type="button" class="remove-server-btn text-red-400 hover:text-red-300 p-2" title="Hapus Server" style="display:none;"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </div>
+                        `;
+                        lucide.createIcons();
                     }
                 } catch (error) {
                     alert("Gagal memproses. Error: " + error.message);
@@ -448,19 +537,16 @@
                    if (isEditSeriesMode) {
                        await updateDoc(doc(db, "series", editSeriesId), seriesData);
                        alert('Perubahan Judul Seri Berhasil Disimpan!');
-                       window.location.href = 'admin.html'; // Kembali ke dashboard
+                       window.location.href = 'admin.html';
                    } else {
                        seriesData.createdAt = serverTimestamp();
                        await addDoc(collection(db, "series"), seriesData);
                        alert('Judul Seri Baru Berhasil Tersimpan!'); 
                        e.target.reset(); 
-                       
-                       // Reset ulang dropdown ke posisi awal
                        document.getElementById('seriesGenre').selectedIndex = 0;
                        document.getElementById('seriesAge').selectedIndex = 0;
                        document.getElementById('seriesAudio').selectedIndex = 0;
                        document.getElementById('seriesSubtitle').selectedIndex = 0;
-
                        loadSeriesData(); 
                        switchTab('episode');
                    }

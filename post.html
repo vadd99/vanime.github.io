@@ -137,7 +137,7 @@
                         </div>
                     </form>
 
-                    <!-- FORM 2: EPISODE & MULTI-SERVER EMBED -->
+                    <!-- FORM 2: EPISODE & SERVER EMBED DINAMIS -->
                     <form id="form-episode" class="bg-vs-panel border border-vs-border rounded-xl p-6 space-y-5 shadow-xl hidden">
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-1">Pilih Judul Seri <span class="text-red-500">*</span></label>
@@ -160,26 +160,19 @@
                             <input type="text" id="epThumb" placeholder="thumbnail/1.jpg" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
                         </div>
 
-                        <!-- BAGIAN MULTI-SERVER EMBED -->
+                        <!-- BAGIAN PENGATURAN SERVER VIDEO -->
                         <div class="border-t border-vs-border pt-4 space-y-3">
                             <div class="flex items-center justify-between">
-                                <label class="block text-sm font-medium text-vs-green">Daftar Server Video (Embed) <span class="text-red-500">*</span></label>
-                                <button type="button" id="addServerBtn" class="bg-vs-hover border border-vs-border text-xs px-3 py-1.5 rounded-lg text-vs-green hover:bg-vs-green hover:text-vs-bg transition-colors flex items-center gap-1 font-bold">
-                                    <i data-lucide="plus" class="w-4 h-4"></i> Tambah Server
+                                <label class="block text-sm font-medium text-vs-green">Daftar Server & URL Embed <span class="text-red-500">*</span></label>
+                                <button type="button" id="openServerModalBtn" class="bg-vs-hover border border-vs-border text-xs px-3 py-1.5 rounded-lg text-vs-green hover:bg-vs-green hover:text-vs-bg transition-colors flex items-center gap-1 font-bold">
+                                    <i data-lucide="plus" class="w-4 h-4"></i> Tambah Server Baru
                                 </button>
                             </div>
-                            <p class="text-xs text-gray-400">Anda bisa menambahkan beberapa server seperti Google Drive, Mega, atau server alternatif lainnya.</p>
+                            <p class="text-xs text-gray-400">Masukkan link embed (iframe / direct link) untuk masing-masing server di bawah ini.</p>
                             
-                            <!-- Container tempat baris input server ditambahkan -->
-                            <div id="servers-container" class="space-y-3">
-                                <!-- Baris Server Pertama (Default) -->
-                                <div class="server-row flex gap-2 items-center bg-vs-bg/50 p-3 rounded-lg border border-vs-border">
-                                    <input type="text" placeholder="Nama Server (Cth: Google Drive)" class="server-name w-1/3 bg-vs-bg border border-vs-border rounded-lg py-2 px-3 text-white text-sm focus:border-vs-green focus:outline-none" value="Google Drive" required />
-                                    <input type="url" placeholder="URL Embed (https://...)" class="server-url flex-1 bg-vs-bg border border-vs-border rounded-lg py-2 px-3 text-white text-sm focus:border-vs-green focus:outline-none" required />
-                                    <button type="button" class="remove-server-btn text-red-400 hover:text-red-300 p-2" title="Hapus Server" style="display:none;">
-                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                    </button>
-                                </div>
+                            <!-- Container tempat kotak input URL server muncul secara dinamis -->
+                            <div id="servers-input-container" class="space-y-4">
+                                <!-- Kotak input server akan digenerate otomatis oleh Javascript di sini -->
                             </div>
                         </div>
 
@@ -215,6 +208,29 @@
         </div>
     </main>
 
+    <!-- MODAL TAMBAH NAMA SERVER -->
+    <div id="serverModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-vs-panel border border-vs-border rounded-xl p-6 w-full max-w-md shadow-2xl space-y-4 animate-[fadeIn_0.3s_ease-out]">
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i data-lucide="server" class="w-5 h-5 text-vs-green"></i> Tambah Nama Server Baru
+                </h3>
+                <button type="button" id="closeServerModal" class="text-gray-400 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Nama Server <span class="text-red-500">*</span></label>
+                <input type="text" id="modalServerNameInput" placeholder="Contoh: Mega, Doodstream, Gofile..." class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                <p class="text-xs text-gray-400 mt-1">Nama ini akan langsung tersimpan dan muncul sebagai pilihan kotak URL.</p>
+            </div>
+            <div class="flex justify-end gap-3 pt-2">
+                <button type="button" id="cancelServerModal" class="px-4 py-2 rounded-lg text-sm bg-vs-hover border border-vs-border text-gray-300 hover:text-white">Batal</button>
+                <button type="button" id="saveServerModalBtn" class="px-5 py-2 rounded-lg text-sm font-bold bg-vs-green text-vs-bg hover:bg-green-500 transition-colors">Simpan Server</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { db } from './js/firebase-init.js'; 
         import { collection, addDoc, getDocs, getDoc, doc, updateDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -227,7 +243,12 @@
             const formSeries = document.getElementById('form-series');
             const formEpisode = document.getElementById('form-episode');
             
-            // Variabel Status Edit
+            // State penampung daftar server yang aktif di form episode ini
+            // Format item: { id: '...', name: 'Google Drive', url: '...' }
+            let activeServers = [
+                { id: 'srv_default', name: 'Google Drive', url: '' }
+            ];
+
             const urlParams = new URLSearchParams(window.location.search);
             const editEpId = urlParams.get('editEp'); 
             const editSeriesId = urlParams.get('editSeries'); 
@@ -253,44 +274,94 @@
             tabSeriesBtn.addEventListener('click', () => switchTab('series'));
             tabEpisodeBtn.addEventListener('click', () => switchTab('episode'));
 
-            // --- LOGIKA TAMBAH BARIS SERVER EMBED DINAMIS ---
-            const serversContainer = document.getElementById('servers-container');
-            const addServerBtn = document.getElementById('addServerBtn');
+            // --- RENDER KOTAK INPUT URL BERDASARKAN activeServers ---
+            function renderServersInputs() {
+                const container = document.getElementById('servers-input-container');
+                container.innerHTML = '';
 
-            function updateRemoveButtons() {
-                const rows = serversContainer.querySelectorAll('.server-row');
-                rows.forEach(row => {
-                    const removeBtn = row.querySelector('.remove-server-btn');
-                    if (rows.length > 1) {
-                        removeBtn.style.display = 'block';
-                    } else {
-                        removeBtn.style.display = 'none';
-                    }
+                if (activeServers.length === 0) {
+                    container.innerHTML = '<p class="text-xs text-gray-500 italic">Belum ada server ditambahkan. Klik "Tambah Server Baru" di atas.</p>';
+                    return;
+                }
+
+                activeServers.forEach((srv, index) => {
+                    const card = document.createElement('div');
+                    card.className = "bg-vs-bg/60 border border-vs-border rounded-xl p-4 space-y-2 relative group";
+                    card.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-bold text-vs-green flex items-center gap-2">
+                                <i data-lucide="server" class="w-4 h-4"></i> ${srv.name}
+                            </span>
+                            ${activeServers.length > 1 ? `<button type="button" onclick="window.removeServerCard('${srv.id}')" class="text-red-400 hover:text-red-300 text-xs flex items-center gap-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Hapus</button>` : ''}
+                        </div>
+                        <div>
+                            <input type="url" placeholder="Masukkan URL Embed untuk ${srv.name} (https://...)" data-id="${srv.id}" value="${srv.url || ''}" class="server-url-input w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white text-sm focus:border-vs-green focus:outline-none" required />
+                        </div>
+                    `;
+                    container.appendChild(card);
                 });
+                lucide.createIcons();
             }
 
-            addServerBtn.addEventListener('click', () => {
-                const newRow = document.createElement('div');
-                newRow.className = "server-row flex gap-2 items-center bg-vs-bg/50 p-3 rounded-lg border border-vs-border";
-                newRow.innerHTML = `
-                    <input type="text" placeholder="Nama Server (Cth: Mega / Server 2)" class="server-name w-1/3 bg-vs-bg border border-vs-border rounded-lg py-2 px-3 text-white text-sm focus:border-vs-green focus:outline-none" required />
-                    <input type="url" placeholder="URL Embed (https://...)" class="server-url flex-1 bg-vs-bg border border-vs-border rounded-lg py-2 px-3 text-white text-sm focus:border-vs-green focus:outline-none" required />
-                    <button type="button" class="remove-server-btn text-red-400 hover:text-red-300 p-2" title="Hapus Server">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    </button>
-                `;
-                serversContainer.appendChild(newRow);
-                lucide.createIcons();
-                updateRemoveButtons();
+            // Fungsi global untuk menghapus server dari list
+            window.removeServerCard = function(id) {
+                activeServers = activeServers.filter(s => s.id !== id);
+                renderServersInputs();
+            };
+
+            // --- LOGIKA MODAL TAMBAH NAMA SERVER ---
+            const serverModal = document.getElementById('serverModal');
+            const openServerModalBtn = document.getElementById('openServerModalBtn');
+            const closeServerModal = document.getElementById('closeServerModal');
+            const cancelServerModal = document.getElementById('cancelServerModal');
+            const saveServerModalBtn = document.getElementById('saveServerModalBtn');
+            const modalServerNameInput = document.getElementById('modalServerNameInput');
+
+            openServerModalBtn.addEventListener('click', () => {
+                serverModal.classList.remove('hidden');
+                modalServerNameInput.value = '';
+                modalServerNameInput.focus();
             });
 
-            serversContainer.addEventListener('click', (e) => {
-                const removeBtn = e.target.closest('.remove-server-btn');
-                if (removeBtn) {
-                    removeBtn.closest('.server-row').remove();
-                    updateRemoveButtons();
+            function hideServerModal() {
+                serverModal.classList.add('hidden');
+            }
+
+            closeServerModal.addEventListener('click', hideServerModal);
+            cancelServerModal.addEventListener('click', hideServerModal);
+
+            saveServerModalBtn.addEventListener('click', () => {
+                const srvName = modalServerNameInput.value.trim();
+                if(!srvName) {
+                    alert("Nama server tidak boleh kosong!");
+                    return;
+                }
+
+                // Buat ID unik berdasarkan nama
+                const newId = 'srv_' + Date.now();
+                activeServers.push({
+                    id: newId,
+                    name: srvName,
+                    url: ''
+                });
+
+                renderServersInputs();
+                hideServerModal();
+            });
+
+            // Tangkap perubahan nilai input URL secara real-time
+            document.addEventListener('input', (e) => {
+                if (e.target.classList.contains('server-url-input')) {
+                    const id = e.target.getAttribute('data-id');
+                    const targetSrv = activeServers.find(s => s.id === id);
+                    if (targetSrv) {
+                        targetSrv.url = e.target.value.trim();
+                    }
                 }
             });
+
+            // Inisialisasi awal render input server
+            renderServersInputs();
 
             // Fungsi Untuk Memasukkan Nilai ke Dalam Dropdown Select
             function populateSelect(elementId, items) {
@@ -393,37 +464,26 @@
                         document.getElementById('epTitle').value = data.episodeTitle || '';
                         document.getElementById('epThumb').value = data.thumbnailUrl || '';
                         
-                        // Menangani Server Embed (Mendukung struktur baru atau konversi data lama `embedUrl`)
-                        serversContainer.innerHTML = ''; // Kosongkan baris default
                         let serversList = data.servers || [];
-                        
                         if(serversList.length === 0 && data.embedUrl) {
-                            // Konversi otomatis data lama yang pakai single embedUrl (Gdrive lama) menjadi Google Drive
                             serversList = [{ name: "Google Drive", url: data.embedUrl }];
                         }
-
                         if(serversList.length === 0) {
                             serversList = [{ name: "Google Drive", url: "" }];
                         }
 
-                        serversList.forEach(srv => {
-                            const row = document.createElement('div');
-                            row.className = "server-row flex gap-2 items-center bg-vs-bg/50 p-3 rounded-lg border border-vs-border";
-                            row.innerHTML = `
-                                <input type="text" placeholder="Nama Server" class="server-name w-1/3 bg-vs-bg border border-vs-border rounded-lg py-2 px-3 text-white text-sm focus:border-vs-green focus:outline-none" value="${srv.name || ''}" required />
-                                <input type="url" placeholder="URL Embed" class="server-url flex-1 bg-vs-bg border border-vs-border rounded-lg py-2 px-3 text-white text-sm focus:border-vs-green focus:outline-none" value="${srv.url || ''}" required />
-                                <button type="button" class="remove-server-btn text-red-400 hover:text-red-300 p-2" title="Hapus Server"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                            `;
-                            serversContainer.appendChild(row);
-                        });
-                        updateRemoveButtons();
-                        lucide.createIcons();
+                        // Petakan ulang ke state activeServers
+                        activeServers = serversList.map((srv, idx) => ({
+                            id: 'srv_edit_' + idx,
+                            name: srv.name || 'Server',
+                            url: srv.url || ''
+                        }));
+
+                        renderServersInputs();
 
                         document.getElementById('prev-e-series').textContent = data.seriesTitle;
                         document.getElementById('prev-e-title').textContent = `E${data.episodeNumber} - ${data.episodeTitle}`;
                         document.getElementById('prev-e-bg').style.backgroundImage = `url('${data.thumbnailUrl}')`;
-                    } else {
-                        alert("Episode tidak ditemukan.");
                     }
                 } catch(e) {
                     console.error("Gagal menarik data edit:", e);
@@ -455,26 +515,22 @@
                 }
             }
 
-            // --- SUBMIT FORM EPISODE (DENGAN MULTI-SERVER ARRAY) ---
+            // --- SUBMIT FORM EPISODE ---
             document.getElementById('form-episode').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const btn = document.getElementById('btn-submit-ep');
                 const origText = btn.innerHTML;
                 btn.innerHTML = 'Memproses...'; btn.disabled = true;
 
-                // Mengambil seluruh data server dari baris input yang aktif
-                const serverRows = serversContainer.querySelectorAll('.server-row');
                 const serversArray = [];
-                serverRows.forEach(row => {
-                    const name = row.querySelector('.server-name').value.trim();
-                    const url = row.querySelector('.server-url').value.trim();
-                    if(name && url) {
-                        serversArray.push({ name, url });
+                activeServers.forEach(srv => {
+                    if(srv.name && srv.url) {
+                        serversArray.push({ name: srv.name, url: srv.url });
                     }
                 });
 
                 if(serversArray.length === 0) {
-                    alert("Harap masukkan minimal 1 server video beserta URL-nya!");
+                    alert("Harap masukkan minimal 1 URL embed untuk server yang tersedia!");
                     btn.innerHTML = origText; btn.disabled = false;
                     return;
                 }
@@ -485,7 +541,7 @@
                     episodeNumber: Number(document.getElementById('epNumber').value), 
                     episodeTitle: document.getElementById('epTitle').value.trim(),
                     thumbnailUrl: document.getElementById('epThumb').value.trim(), 
-                    servers: serversArray // Disimpan dalam bentuk array object server
+                    servers: serversArray 
                 };
 
                 try {
@@ -498,15 +554,8 @@
                         await addDoc(collection(db, "episodes"), epData);
                         alert(`Episode ${epData.episodeNumber} berhasil diposting!`);
                         document.getElementById('form-episode').reset();
-                        // Reset server row kembali sisa 1 default
-                        serversContainer.innerHTML = `
-                            <div class="server-row flex gap-2 items-center bg-vs-bg/50 p-3 rounded-lg border border-vs-border">
-                                <input type="text" placeholder="Nama Server (Cth: Google Drive)" class="server-name w-1/3 bg-vs-bg border border-vs-border rounded-lg py-2 px-3 text-white text-sm focus:border-vs-green focus:outline-none" value="Google Drive" required />
-                                <input type="url" placeholder="URL Embed (https://...)" class="server-url flex-1 bg-vs-bg border border-vs-border rounded-lg py-2 px-3 text-white text-sm focus:border-vs-green focus:outline-none" required />
-                                <button type="button" class="remove-server-btn text-red-400 hover:text-red-300 p-2" title="Hapus Server" style="display:none;"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                            </div>
-                        `;
-                        lucide.createIcons();
+                        activeServers = [{ id: 'srv_default', name: 'Google Drive', url: '' }];
+                        renderServersInputs();
                     }
                 } catch (error) {
                     alert("Gagal memproses. Error: " + error.message);
