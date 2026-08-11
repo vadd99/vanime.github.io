@@ -57,29 +57,35 @@ window.addEventListener('layoutReady', async () => {
         } else {
             searchCountEl.innerText = `Ditemukan ${filteredResults.length} hasil yang cocok.`;
             
-            filteredResults.forEach(item => {
-                // Mengambil poster vertikal (menyesuaikan struktur database index.html Anda)
-                const poster = item.posterUrl || item.poster_url || item.bannerUrl || 'https://via.placeholder.com/300x400?text=No+Image';
-                
-                // Mengambil kategori atau genre asli dari database
-                const categoryText = item.category || item.genres || 'Animasi';
 
-                const cardHTML = `
-                    <a href="detail.html?id=${item.id}" class="search-card">
-                        <div class="search-thumb-wrapper">
-                            <img src="${poster}" alt="${item.title}" class="search-thumb">
-                        </div>
-                        <div class="search-card-info">
-                            <h3 class="search-title">${item.title}</h3>
-                            <div class="search-meta">
-                                <span class="search-category">${categoryText}</span>
-                                <span class="search-rating"><i class="fas fa-star"></i> ${item.rating || '4.5'}</span>
+        filteredResults.forEach(item => {
+            // Mengambil poster vertikal
+            const poster = item.posterUrl || item.poster_url || item.bannerUrl || 'https://via.placeholder.com/300x400?text=No+Image';
+            const genreText = item.category || item.genres || 'Animasi';
+
+            const cardHTML = `
+                <a href="detail.html?id=${item.id}" class="poster-card">
+                    <div class="poster-box">
+                        <img src="${poster}" alt="${item.title}">
+                        <div class="poster-gradient"></div>
+                        <div class="poster-content">
+                            <div class="poster-title">${item.title}</div>
+                            <div class="poster-footer">
+                                <span class="poster-rating"><i class="fas fa-star"></i> ${item.rating || '4.5'}</span>
                             </div>
                         </div>
-                    </a>
-                `;
-                resultsContainer.innerHTML += cardHTML;
-            });
+                    </div>
+                    <!-- Badge Genre di bawah poster seperti di Screenshot -->
+                    <div style="margin-top: 8px;">
+                        <span style="background: rgba(96, 211, 129, 0.1); color: var(--vadd-primary); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; text-transform: lowercase;">
+                            ${genreText}
+                        </span>
+                    </div>
+                </a>
+            `;
+            resultsContainer.innerHTML += cardHTML;
+        });
+        
         }
 
     } catch (error) {
