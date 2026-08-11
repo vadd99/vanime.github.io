@@ -171,39 +171,72 @@
     }
 }
 
-/* Server Selector Styles */
-.server-selector-container {
-    display: flex;
-    gap: 0.5rem;
-    overflow-x: auto;
-    padding-bottom: 0.2rem;
-    flex-shrink: 0;
+/* HAPUS .server-selector-container YANG LAMA JIKA MASIH ADA */
+
+/* =========================================
+   CARD SERVER SELECTOR (BARU)
+   ========================================= */
+.server-box-container {
+    background-color: rgba(26, 58, 38, 0.2); /* Warna hijau sangat gelap transparan */
+    border: 1px solid var(--vadd-border, #1a3a26);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
 }
 
-/* Custom scrollbar for horizontal server selector */
-.server-selector-container::-webkit-scrollbar { height: 4px; }
-.server-selector-container::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 4px; }
-.server-selector-container::-webkit-scrollbar-thumb { background: var(--vadd-border, #1a3a26); border-radius: 4px; }
+.server-box-header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.75rem;
+}
+
+.server-box-header span {
+    color: var(--vadd-primary, #60d381);
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.server-box-header small {
+    color: #9ca3af;
+    font-size: 0.7rem;
+    margin-top: 0.2rem;
+}
+
+.server-selector-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
 
 .server-btn {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #fff;
+    color: #d1d5db;
     padding: 0.4rem 0.8rem;
-    border-radius: 6px;
+    border-radius: 0.25rem;
     font-size: 0.75rem;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
-    white-space: nowrap;
     transition: all 0.2s;
     display: flex;
     align-items: center;
     gap: 0.4rem;
 }
 
-.server-btn:hover { background-color: rgba(255, 255, 255, 0.15); }
+.server-btn:hover { 
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
 .server-btn.active {
     background-color: var(--vadd-primary, #60d381);
     color: var(--vadd-bg, #05110a);
     border-color: var(--vadd-primary, #60d381);
+    font-weight: 800;
 }

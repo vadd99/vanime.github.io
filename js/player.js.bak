@@ -72,6 +72,7 @@ window.addEventListener('layoutReady', async () => {
     }
 
     const pageTitle = document.getElementById('page-title');
+    const epSeriesTitle = document.getElementById('ep-series-title');
     const epMainTitle = document.getElementById('ep-main-title');
     const epDesc = document.getElementById('ep-desc');
 
@@ -88,6 +89,10 @@ window.addEventListener('layoutReady', async () => {
         const currentEpNumber = Number(epData.episodeNumber);
 
         if(pageTitle) pageTitle.innerText = `E${currentEpNumber} - ${epData.episodeTitle || 'Episode'} | Vadd Studio`;
+        if (epSeriesTitle) {
+            epSeriesTitle.innerText = epData.seriesTitle || "Judul Seri";
+            epSeriesTitle.href = `detail.html?id=${currentSeriesId}`;
+        }
         if (epMainTitle) epMainTitle.innerText = `E${currentEpNumber} - ${epData.episodeTitle || 'Tanpa Judul'}`;
         
         const seriesDoc = await getDoc(doc(db, "series", currentSeriesId));
@@ -95,13 +100,13 @@ window.addEventListener('layoutReady', async () => {
             epDesc.innerText = seriesDoc.data().description || "Selamat menonton episode ini di Vadd Studio!";
         }
 
-        // --- RENDER SERVER SELECTOR CARD ---
+        // --- RENDER SERVER SELECTOR ---
         const serverSelector = document.getElementById('server-selector-container');
         
-        // AMBIL DATA SERVER
+        // AMBIL DATA SERVER (Dukung data lama 'embedUrl' atau data baru 'servers')
         let servers = epData.servers || [];
         if (servers.length === 0 && epData.embedUrl) {
-             servers = [{ name: "Google Drive", url: epData.embedUrl }]; 
+             servers = [{ name: "Google Drive", url: epData.embedUrl }]; // Fallback data lama
         }
 
         if (serverSelector && servers.length > 0) {
@@ -109,8 +114,7 @@ window.addEventListener('layoutReady', async () => {
             servers.forEach((srv, index) => {
                 const btn = document.createElement('button');
                 btn.className = `server-btn ${index === 0 ? 'active' : ''}`;
-                // Ikon bisa disesuaikan atau dihapus, di sini saya pakai ikon server
-                btn.innerHTML = `<i class="fas fa-play-circle"></i> ${srv.name}`;
+                btn.innerHTML = `<i class="fas fa-server"></i> ${srv.name}`;
                 btn.onclick = () => {
                     document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
@@ -122,7 +126,7 @@ window.addEventListener('layoutReady', async () => {
             // Render Server pertama secara default
             renderEmbed(servers[0].url);
         } else {
-             if (serverSelector) serverSelector.innerHTML = '<span style="color:#ef4444; font-size:0.8rem;">Tidak ada server yang tersedia.</span>';
+             // Fallback jika tidak ada server sama sekali
              renderEmbed("");
         }
 
@@ -137,13 +141,16 @@ window.addEventListener('layoutReady', async () => {
             let epArray = [];
             epsSnapshot.forEach(doc => epArray.push({ id: doc.id, ...doc.data() }));
             
+            // Mengurutkan episode berdasarkan nomor (1, 2, 3...)
             epArray.sort((a, b) => (a.episodeNumber || 0) - (b.episodeNumber || 0));
+
             epScrollList.innerHTML = '';
             
             epArray.forEach(ep => {
-                const isActive = ep.id === epId; 
+                const isActive = ep.id === epId; // Cek apakah ini episode yang sedang ditonton
                 const thumb = ep.thumbnailUrl || "https://via.placeholder.com/350x200?text=Eps+" + ep.episodeNumber;
                 
+                // Jika aktif, ganti ikon play menjadi ikon volume/sedang diputar
                 const iconOverlay = isActive ? 
                     `<i class="fas fa-volume-up" style="color:var(--vadd-primary);"></i>` : 
                     `<i class="fas fa-play"></i>`;
@@ -166,6 +173,7 @@ window.addEventListener('layoutReady', async () => {
             
             epSection.style.display = 'block';
 
+            // Auto-scroll list ke episode yang sedang ditonton
             setTimeout(() => {
                 const activeEl = document.getElementById('current-playing-ep');
                 if (activeEl && epScrollList) {
