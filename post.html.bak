@@ -29,6 +29,36 @@
         .tab-active { border-bottom: 2px solid #4ade80; color: #4ade80; font-weight: bold; }
         .tab-inactive { border-bottom: 2px solid transparent; color: #9ca3af; }
         .tab-inactive:hover { color: #ffffff; }
+        
+        /* Multiple Select Styles */
+        .select-multiple {
+            height: auto;
+            min-height: 2.5rem;
+        }
+        .select-multiple option {
+            padding: 0.5rem;
+            margin-bottom: 0.25rem;
+            border-radius: 0.25rem;
+        }
+        .select-multiple option:checked {
+            background-color: #1a3a26 linear-gradient(0deg, #1a3a26 0%, #1a3a26 100%);
+            color: #4ade80;
+        }
+        /* Hide scrollbar for multiple select but allow scrolling */
+        .select-multiple::-webkit-scrollbar {
+            width: 8px;
+        }
+        .select-multiple::-webkit-scrollbar-track {
+            background: #05110a; 
+            border-radius: 4px;
+        }
+        .select-multiple::-webkit-scrollbar-thumb {
+            background: #1a3a26; 
+            border-radius: 4px;
+        }
+        .select-multiple::-webkit-scrollbar-thumb:hover {
+            background: #4ade80; 
+        }
     </style>
 </head>
 <body class="bg-vs-bg text-gray-200 font-sans min-h-screen flex flex-col selection:bg-vs-green selection:text-vs-bg">
@@ -74,13 +104,17 @@
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-1">Genre / Kategori</label>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Genre / Kategori <span class="text-xs text-gray-500">(Tahan Ctrl/Cmd untuk pilih banyak)</span></label>
                                 <div class="flex gap-2">
-                                    <select id="seriesGenre" class="flex-1 w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
-                                        <option value="" disabled selected>Pilih Genre...</option>
+                                    <select id="seriesGenre" multiple size="4" class="select-multiple flex-1 w-full bg-vs-bg border border-vs-border rounded-lg py-2 px-3 text-white focus:border-vs-green focus:outline-none">
+                                        <!-- Options injected by JS -->
                                     </select>
-                                    <button type="button" id="addGenreBtn" class="bg-vs-hover border border-vs-border p-2.5 rounded-lg text-vs-green hover:bg-vs-green hover:text-vs-bg transition-colors" title="Tambah Genre Baru"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                    <div class="flex flex-col gap-2">
+                                        <button type="button" id="addGenreBtn" class="bg-vs-hover border border-vs-border p-2.5 rounded-lg text-vs-green hover:bg-vs-green hover:text-vs-bg transition-colors h-[42px]" title="Tambah Genre Baru"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                        <button type="button" id="clearGenreBtn" class="bg-vs-hover border border-vs-border p-2.5 rounded-lg text-red-400 hover:bg-red-500 hover:text-white transition-colors h-[42px]" title="Bersihkan Pilihan"><i data-lucide="x" class="w-5 h-5"></i></button>
+                                    </div>
                                 </div>
+                                <p class="text-xs text-vs-green mt-1 hidden" id="selected-genres-text">Terpilih: <span id="selected-genres-list"></span></p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-300 mb-1">Rating Usia</label>
@@ -244,7 +278,6 @@
             const formEpisode = document.getElementById('form-episode');
             
             // State penampung daftar server yang aktif di form episode ini
-            // Format item: { id: '...', name: 'Google Drive', url: '...' }
             let activeServers = [
                 { id: 'srv_default', name: 'Google Drive', url: '' }
             ];
@@ -363,12 +396,25 @@
             // Inisialisasi awal render input server
             renderServersInputs();
 
-            // Fungsi Untuk Memasukkan Nilai ke Dalam Dropdown Select
+            // Fungsi Untuk Memasukkan Nilai ke Dalam Dropdown Select (Single Select)
             function populateSelect(elementId, items) {
                 const select = document.getElementById(elementId);
                 const firstOption = select.options[0]; 
                 select.innerHTML = ''; 
                 select.appendChild(firstOption);
+                
+                items.filter(i => i).sort().forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item;
+                    opt.textContent = item;
+                    select.appendChild(opt);
+                });
+            }
+
+            // Fungsi Untuk Memasukkan Nilai ke Dalam Multiple Select (Genre)
+            function populateMultipleSelect(elementId, items) {
+                const select = document.getElementById(elementId);
+                select.innerHTML = ''; 
                 
                 items.filter(i => i).sort().forEach(item => {
                     const opt = document.createElement('option');
@@ -400,13 +446,37 @@
                     if(data.subtitleLanguages) data.subtitleLanguages.split(',').forEach(i => subsSet.add(i.trim()));
                 });
 
-                populateSelect('seriesGenre', Array.from(genresSet));
+                populateMultipleSelect('seriesGenre', Array.from(genresSet));
                 populateSelect('seriesAudio', Array.from(audiosSet));
                 populateSelect('seriesSubtitle', Array.from(subsSet));
             }
 
             await loadSeriesData();
 
+            // Handle Update Genre Selection Text
+            const seriesGenreSelect = document.getElementById('seriesGenre');
+            const selectedGenresText = document.getElementById('selected-genres-text');
+            const selectedGenresList = document.getElementById('selected-genres-list');
+
+            function updateGenreSelectionText() {
+                const selectedOptions = Array.from(seriesGenreSelect.selectedOptions).map(opt => opt.value);
+                if (selectedOptions.length > 0) {
+                    selectedGenresText.classList.remove('hidden');
+                    selectedGenresList.textContent = selectedOptions.join(', ');
+                } else {
+                    selectedGenresText.classList.add('hidden');
+                    selectedGenresList.textContent = '';
+                }
+            }
+
+            seriesGenreSelect.addEventListener('change', updateGenreSelectionText);
+
+            document.getElementById('clearGenreBtn').addEventListener('click', () => {
+                seriesGenreSelect.selectedIndex = -1; // Clear selection
+                updateGenreSelectionText();
+            });
+
+            // Handle Add Option for Single Select (Audio/Subtitle)
             function handleAddOption(btnId, selectId, promptText) {
                 document.getElementById(btnId).addEventListener('click', () => {
                     const newVal = prompt(promptText);
@@ -420,7 +490,35 @@
                     }
                 });
             }
-            handleAddOption('addGenreBtn', 'seriesGenre', 'Masukkan Genre / Kategori Baru:');
+            
+            // Handle Add Option for Multiple Select (Genre)
+            document.getElementById('addGenreBtn').addEventListener('click', () => {
+                const newVal = prompt('Masukkan Genre / Kategori Baru:');
+                if(newVal && newVal.trim() !== '') {
+                    const select = document.getElementById('seriesGenre');
+                    
+                    // Cek apakah sudah ada
+                    const exists = Array.from(select.options).some(opt => opt.value.toLowerCase() === newVal.trim().toLowerCase());
+                    
+                    if (!exists) {
+                        const opt = document.createElement('option');
+                        opt.value = newVal.trim();
+                        opt.textContent = newVal.trim();
+                        opt.selected = true; // Langsung terpilih
+                        select.appendChild(opt);
+                        updateGenreSelectionText();
+                    } else {
+                        // Jika sudah ada, langsung pilih
+                        Array.from(select.options).forEach(opt => {
+                            if (opt.value.toLowerCase() === newVal.trim().toLowerCase()) {
+                                opt.selected = true;
+                            }
+                        });
+                        updateGenreSelectionText();
+                    }
+                }
+            });
+
             handleAddOption('addAudioBtn', 'seriesAudio', 'Masukkan Bahasa Audio Baru:');
             handleAddOption('addSubtitleBtn', 'seriesSubtitle', 'Masukkan Bahasa Subtitle Baru:');
 
@@ -441,6 +539,31 @@
                     select.appendChild(opt);
                 }
                 select.value = value || '';
+            }
+
+            function setMultipleSelectValues(selectId, valuesString) {
+                const select = document.getElementById(selectId);
+                select.selectedIndex = -1; // Reset selection
+                
+                if (!valuesString) return;
+                
+                const values = valuesString.split(',').map(v => v.trim());
+                
+                values.forEach(val => {
+                    let optionExists = Array.from(select.options).some(opt => opt.value === val);
+                    if(val && !optionExists) {
+                        const opt = document.createElement('option');
+                        opt.value = val;
+                        opt.textContent = val;
+                        select.appendChild(opt);
+                    }
+                });
+
+                Array.from(select.options).forEach(opt => {
+                    if (values.includes(opt.value)) {
+                        opt.selected = true;
+                    }
+                });
             }
 
             // --- LOGIKA EDIT EPISODE ---
@@ -502,7 +625,8 @@
                     if(seriesDoc.exists()) {
                         const data = seriesDoc.data();
                         document.getElementById('seriesTitle').value = data.title || '';
-                        setSelectValue('seriesGenre', data.genres);
+                        setMultipleSelectValues('seriesGenre', data.genres);
+                        updateGenreSelectionText(); // Update the text display
                         setSelectValue('seriesAge', data.ageRating);
                         setSelectValue('seriesAudio', data.audioLanguages);
                         setSelectValue('seriesSubtitle', data.subtitleLanguages);
@@ -571,9 +695,18 @@
                const origText = btn.innerHTML;
                btn.innerHTML = 'Memproses...'; btn.disabled = true;
                
+               // Get all selected genres
+               const selectedGenres = Array.from(document.getElementById('seriesGenre').selectedOptions).map(opt => opt.value);
+               
+               if (selectedGenres.length === 0) {
+                   alert("Harap pilih minimal 1 genre!");
+                   btn.innerHTML = origText; btn.disabled = false;
+                   return;
+               }
+
                const seriesData = {
                     title: document.getElementById('seriesTitle').value.trim(), 
-                    genres: document.getElementById('seriesGenre').value || '',
+                    genres: selectedGenres.join(', '), // Save as comma separated string
                     ageRating: document.getElementById('seriesAge').value || '',
                     audioLanguages: document.getElementById('seriesAudio').value || '',
                     subtitleLanguages: document.getElementById('seriesSubtitle').value || '',
@@ -592,7 +725,8 @@
                        await addDoc(collection(db, "series"), seriesData);
                        alert('Judul Seri Baru Berhasil Tersimpan!'); 
                        e.target.reset(); 
-                       document.getElementById('seriesGenre').selectedIndex = 0;
+                       document.getElementById('seriesGenre').selectedIndex = -1;
+                       updateGenreSelectionText();
                        document.getElementById('seriesAge').selectedIndex = 0;
                        document.getElementById('seriesAudio').selectedIndex = 0;
                        document.getElementById('seriesSubtitle').selectedIndex = 0;

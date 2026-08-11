@@ -26,39 +26,45 @@
         }
     </script>
     <style>
+        :root {
+            --vs-bg: #05110a;
+            --vs-panel: #0a1f14;
+            --vs-border: #1a3a26;
+            --vs-green: #4ade80;
+        }
+        
         .tab-active { border-bottom: 2px solid #4ade80; color: #4ade80; font-weight: bold; }
         .tab-inactive { border-bottom: 2px solid transparent; color: #9ca3af; }
         .tab-inactive:hover { color: #ffffff; }
         
-        /* Multiple Select Styles */
-        .select-multiple {
-            height: auto;
-            min-height: 2.5rem;
+        /* Custom UI Genre Chips */
+        .genre-chip {
+            display: inline-flex; 
+            align-items: center; 
+            gap: 0.4rem;
+            padding: 0.35rem 0.85rem; 
+            border-radius: 9999px; 
+            font-size: 0.8rem; 
+            font-weight: 600;
+            cursor: pointer; 
+            transition: all 0.2s ease;
+            border: 1px solid var(--vs-border);
+            background-color: var(--vs-bg); 
+            color: #9ca3af;
+            user-select: none;
         }
-        .select-multiple option {
-            padding: 0.5rem;
-            margin-bottom: 0.25rem;
-            border-radius: 0.25rem;
+        .genre-chip:hover { 
+            border-color: var(--vs-green); 
+            color: white; 
         }
-        .select-multiple option:checked {
-            background-color: #1a3a26 linear-gradient(0deg, #1a3a26 0%, #1a3a26 100%);
-            color: #4ade80;
+        .genre-chip.selected {
+            background-color: rgba(74, 222, 128, 0.15); 
+            border-color: var(--vs-green); 
+            color: var(--vs-green);
         }
-        /* Hide scrollbar for multiple select but allow scrolling */
-        .select-multiple::-webkit-scrollbar {
-            width: 8px;
-        }
-        .select-multiple::-webkit-scrollbar-track {
-            background: #05110a; 
-            border-radius: 4px;
-        }
-        .select-multiple::-webkit-scrollbar-thumb {
-            background: #1a3a26; 
-            border-radius: 4px;
-        }
-        .select-multiple::-webkit-scrollbar-thumb:hover {
-            background: #4ade80; 
-        }
+        /* Ikon check tersembunyi secara default */
+        .genre-chip .check-icon { display: none; }
+        .genre-chip.selected .check-icon { display: inline-block; }
     </style>
 </head>
 <body class="bg-vs-bg text-gray-200 font-sans min-h-screen flex flex-col selection:bg-vs-green selection:text-vs-bg">
@@ -102,20 +108,23 @@
                             <input type="text" id="seriesTitle" required class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-1">Genre / Kategori <span class="text-xs text-gray-500">(Tahan Ctrl/Cmd untuk pilih banyak)</span></label>
-                                <div class="flex gap-2">
-                                    <select id="seriesGenre" multiple size="4" class="select-multiple flex-1 w-full bg-vs-bg border border-vs-border rounded-lg py-2 px-3 text-white focus:border-vs-green focus:outline-none">
-                                        <!-- Options injected by JS -->
-                                    </select>
-                                    <div class="flex flex-col gap-2">
-                                        <button type="button" id="addGenreBtn" class="bg-vs-hover border border-vs-border p-2.5 rounded-lg text-vs-green hover:bg-vs-green hover:text-vs-bg transition-colors h-[42px]" title="Tambah Genre Baru"><i data-lucide="plus" class="w-5 h-5"></i></button>
-                                        <button type="button" id="clearGenreBtn" class="bg-vs-hover border border-vs-border p-2.5 rounded-lg text-red-400 hover:bg-red-500 hover:text-white transition-colors h-[42px]" title="Bersihkan Pilihan"><i data-lucide="x" class="w-5 h-5"></i></button>
-                                    </div>
+                        <!-- KATEGORI/GENRE SECTION FULL WIDTH -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Genre / Kategori <span class="text-xs text-gray-500 font-normal ml-1">(Klik untuk memilih)</span></label>
+                            <div class="flex gap-2 items-start">
+                                <div id="genre-container" class="flex-1 flex flex-wrap gap-2 bg-vs-bg border border-vs-border rounded-lg p-3 min-h-[3.5rem] items-center">
+                                    <span class="text-gray-500 text-sm italic">Memuat genre...</span>
+                                    <!-- Genre chips di-inject via JS -->
                                 </div>
-                                <p class="text-xs text-vs-green mt-1 hidden" id="selected-genres-text">Terpilih: <span id="selected-genres-list"></span></p>
+                                <div class="flex flex-col gap-2 shrink-0">
+                                    <button type="button" id="addGenreBtn" class="bg-vs-hover border border-vs-border p-2.5 rounded-lg text-vs-green hover:bg-vs-green hover:text-vs-bg transition-colors h-[42px]" title="Tambah Genre Baru"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                    <button type="button" id="clearGenreBtn" class="bg-vs-hover border border-vs-border p-2.5 rounded-lg text-red-400 hover:bg-red-500 hover:text-white transition-colors h-[42px]" title="Bersihkan Pilihan"><i data-lucide="x" class="w-5 h-5"></i></button>
+                                </div>
                             </div>
+                        </div>
+
+                        <!-- RATING USIA & PERINGATAN KONTEN BERJEJER -->
+                        <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-300 mb-1">Rating Usia</label>
                                 <select id="seriesAge" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
@@ -125,11 +134,10 @@
                                     <option value="18+">18+ (Dewasa)</option>
                                 </select>
                             </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-1">Peringatan Konten</label>
-                            <input type="text" id="seriesWarning" placeholder="Kekerasan, Konten Seksual, Perkataan Kasar" class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Peringatan Konten</label>
+                                <input type="text" id="seriesWarning" placeholder="Kekerasan, Konten Seksual..." class="w-full bg-vs-bg border border-vs-border rounded-lg py-2.5 px-3 text-white focus:border-vs-green focus:outline-none">
+                            </div>
                         </div>
 
                         <div class="grid grid-cols-1 gap-4">
@@ -204,7 +212,6 @@
                             </div>
                             <p class="text-xs text-gray-400">Masukkan link embed (iframe / direct link) untuk masing-masing server di bawah ini.</p>
                             
-                            <!-- Container tempat kotak input URL server muncul secara dinamis -->
                             <div id="servers-input-container" class="space-y-4">
                                 <!-- Kotak input server akan digenerate otomatis oleh Javascript di sini -->
                             </div>
@@ -277,10 +284,12 @@
             const formSeries = document.getElementById('form-series');
             const formEpisode = document.getElementById('form-episode');
             
-            // State penampung daftar server yang aktif di form episode ini
-            let activeServers = [
-                { id: 'srv_default', name: 'Google Drive', url: '' }
-            ];
+            // State untuk form Episode
+            let activeServers = [{ id: 'srv_default', name: 'Google Drive', url: '' }];
+            
+            // State untuk form Seri (Genre)
+            let globalGenres = new Set();
+            let selectedGenres = new Set();
 
             const urlParams = new URLSearchParams(window.location.search);
             const editEpId = urlParams.get('editEp'); 
@@ -313,11 +322,11 @@
                 container.innerHTML = '';
 
                 if (activeServers.length === 0) {
-                    container.innerHTML = '<p class="text-xs text-gray-500 italic">Belum ada server ditambahkan. Klik "Tambah Server Baru" di atas.</p>';
+                    container.innerHTML = '<p class="text-xs text-gray-500 italic">Belum ada server ditambahkan.</p>';
                     return;
                 }
 
-                activeServers.forEach((srv, index) => {
+                activeServers.forEach((srv) => {
                     const card = document.createElement('div');
                     card.className = "bg-vs-bg/60 border border-vs-border rounded-xl p-4 space-y-2 relative group";
                     card.innerHTML = `
@@ -336,7 +345,6 @@
                 lucide.createIcons();
             }
 
-            // Fungsi global untuk menghapus server dari list
             window.removeServerCard = function(id) {
                 activeServers = activeServers.filter(s => s.id !== id);
                 renderServersInputs();
@@ -356,71 +364,109 @@
                 modalServerNameInput.focus();
             });
 
-            function hideServerModal() {
-                serverModal.classList.add('hidden');
-            }
-
+            function hideServerModal() { serverModal.classList.add('hidden'); }
             closeServerModal.addEventListener('click', hideServerModal);
             cancelServerModal.addEventListener('click', hideServerModal);
 
             saveServerModalBtn.addEventListener('click', () => {
                 const srvName = modalServerNameInput.value.trim();
-                if(!srvName) {
-                    alert("Nama server tidak boleh kosong!");
-                    return;
-                }
-
-                // Buat ID unik berdasarkan nama
-                const newId = 'srv_' + Date.now();
-                activeServers.push({
-                    id: newId,
-                    name: srvName,
-                    url: ''
-                });
-
+                if(!srvName) { alert("Nama server tidak boleh kosong!"); return; }
+                activeServers.push({ id: 'srv_' + Date.now(), name: srvName, url: '' });
                 renderServersInputs();
                 hideServerModal();
             });
 
-            // Tangkap perubahan nilai input URL secara real-time
             document.addEventListener('input', (e) => {
                 if (e.target.classList.contains('server-url-input')) {
                     const id = e.target.getAttribute('data-id');
                     const targetSrv = activeServers.find(s => s.id === id);
-                    if (targetSrv) {
-                        targetSrv.url = e.target.value.trim();
+                    if (targetSrv) targetSrv.url = e.target.value.trim();
+                }
+            });
+            renderServersInputs();
+
+            // --- LOGIKA GENRE CHIPS UI ---
+            function renderGenreChips() {
+                const container = document.getElementById('genre-container');
+                container.innerHTML = '';
+                const sortedGenres = Array.from(globalGenres).sort();
+                
+                if (sortedGenres.length === 0) {
+                    container.innerHTML = '<span class="text-gray-500 text-sm italic">Belum ada genre tersedia. Klik ikon plus untuk menambah.</span>';
+                    return;
+                }
+
+                sortedGenres.forEach(genre => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    const isSelected = selectedGenres.has(genre);
+                    btn.className = `genre-chip ${isSelected ? 'selected' : ''}`;
+                    
+                    // Gunakan inline SVG agar sangat ringan dan cepat dimuat
+                    btn.innerHTML = `
+                        ${genre} 
+                        <svg class="check-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    `;
+                    
+                    btn.onclick = () => {
+                        if (selectedGenres.has(genre)) {
+                            selectedGenres.delete(genre);
+                            btn.classList.remove('selected');
+                        } else {
+                            selectedGenres.add(genre);
+                            btn.classList.add('selected');
+                        }
+                    };
+                    container.appendChild(btn);
+                });
+            }
+
+            document.getElementById('addGenreBtn').addEventListener('click', async () => {
+                const newVal = prompt('Masukkan Genre / Kategori Baru:');
+                if(newVal && newVal.trim() !== '') {
+                    const genreName = newVal.trim();
+                    
+                    if (!globalGenres.has(genreName)) {
+                        // LANGSUNG SIMPAN KE DATABASE SECARA PERMANEN
+                        try {
+                            const btn = document.getElementById('addGenreBtn');
+                            btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin"></i>'; 
+                            btn.disabled = true;
+                            
+                            await addDoc(collection(db, "genres"), { 
+                                name: genreName, 
+                                createdAt: serverTimestamp() 
+                            });
+                            
+                            btn.innerHTML = '<i data-lucide="plus" class="w-5 h-5"></i>'; 
+                            btn.disabled = false;
+                            lucide.createIcons();
+                        } catch (e) {
+                            console.error(e);
+                            alert("Gagal menyimpan genre secara permanen ke database.");
+                            return;
+                        }
+                        globalGenres.add(genreName);
                     }
+                    
+                    selectedGenres.add(genreName);
+                    renderGenreChips();
                 }
             });
 
-            // Inisialisasi awal render input server
-            renderServersInputs();
+            document.getElementById('clearGenreBtn').addEventListener('click', () => {
+                selectedGenres.clear();
+                renderGenreChips();
+            });
 
-            // Fungsi Untuk Memasukkan Nilai ke Dalam Dropdown Select (Single Select)
             function populateSelect(elementId, items) {
                 const select = document.getElementById(elementId);
                 const firstOption = select.options[0]; 
                 select.innerHTML = ''; 
                 select.appendChild(firstOption);
-                
                 items.filter(i => i).sort().forEach(item => {
                     const opt = document.createElement('option');
-                    opt.value = item;
-                    opt.textContent = item;
-                    select.appendChild(opt);
-                });
-            }
-
-            // Fungsi Untuk Memasukkan Nilai ke Dalam Multiple Select (Genre)
-            function populateMultipleSelect(elementId, items) {
-                const select = document.getElementById(elementId);
-                select.innerHTML = ''; 
-                
-                items.filter(i => i).sort().forEach(item => {
-                    const opt = document.createElement('option');
-                    opt.value = item;
-                    opt.textContent = item;
-                    select.appendChild(opt);
+                    opt.value = item; opt.textContent = item; select.appendChild(opt);
                 });
             }
 
@@ -430,95 +476,47 @@
                 const snapshot = await getDocs(q);
                 eSeries.innerHTML = '<option value="" disabled selected>Pilih Judul Seri...</option>';
                 
-                let genresSet = new Set();
                 let audiosSet = new Set();
                 let subsSet = new Set();
 
+                // 1. Ekstrak data lama dari 'series' (Legacy mode support)
                 snapshot.forEach((doc) => {
                     const data = doc.data();
                     const opt = document.createElement('option');
                     opt.value = doc.id; opt.textContent = data.title;
-                    opt.dataset.title = data.title; 
-                    eSeries.appendChild(opt);
+                    opt.dataset.title = data.title; eSeries.appendChild(opt);
 
-                    if(data.genres) data.genres.split(',').forEach(i => genresSet.add(i.trim()));
+                    if(data.genres) data.genres.split(',').forEach(i => globalGenres.add(i.trim()));
                     if(data.audioLanguages) data.audioLanguages.split(',').forEach(i => audiosSet.add(i.trim()));
                     if(data.subtitleLanguages) data.subtitleLanguages.split(',').forEach(i => subsSet.add(i.trim()));
                 });
 
-                populateMultipleSelect('seriesGenre', Array.from(genresSet));
+                // 2. Ambil List Genre resmi dari Collection "genres" yang baru dibuat
+                try {
+                    const genresSnap = await getDocs(collection(db, "genres"));
+                    genresSnap.forEach(doc => {
+                        if(doc.data().name) globalGenres.add(doc.data().name.trim());
+                    });
+                } catch(e) {}
+
+                renderGenreChips();
                 populateSelect('seriesAudio', Array.from(audiosSet));
                 populateSelect('seriesSubtitle', Array.from(subsSet));
             }
 
             await loadSeriesData();
 
-            // Handle Update Genre Selection Text
-            const seriesGenreSelect = document.getElementById('seriesGenre');
-            const selectedGenresText = document.getElementById('selected-genres-text');
-            const selectedGenresList = document.getElementById('selected-genres-list');
-
-            function updateGenreSelectionText() {
-                const selectedOptions = Array.from(seriesGenreSelect.selectedOptions).map(opt => opt.value);
-                if (selectedOptions.length > 0) {
-                    selectedGenresText.classList.remove('hidden');
-                    selectedGenresList.textContent = selectedOptions.join(', ');
-                } else {
-                    selectedGenresText.classList.add('hidden');
-                    selectedGenresList.textContent = '';
-                }
-            }
-
-            seriesGenreSelect.addEventListener('change', updateGenreSelectionText);
-
-            document.getElementById('clearGenreBtn').addEventListener('click', () => {
-                seriesGenreSelect.selectedIndex = -1; // Clear selection
-                updateGenreSelectionText();
-            });
-
-            // Handle Add Option for Single Select (Audio/Subtitle)
             function handleAddOption(btnId, selectId, promptText) {
                 document.getElementById(btnId).addEventListener('click', () => {
                     const newVal = prompt(promptText);
                     if(newVal && newVal.trim() !== '') {
                         const select = document.getElementById(selectId);
                         const opt = document.createElement('option');
-                        opt.value = newVal.trim();
-                        opt.textContent = newVal.trim();
-                        select.appendChild(opt);
-                        select.value = newVal.trim();
+                        opt.value = newVal.trim(); opt.textContent = newVal.trim();
+                        select.appendChild(opt); select.value = newVal.trim();
                     }
                 });
             }
-            
-            // Handle Add Option for Multiple Select (Genre)
-            document.getElementById('addGenreBtn').addEventListener('click', () => {
-                const newVal = prompt('Masukkan Genre / Kategori Baru:');
-                if(newVal && newVal.trim() !== '') {
-                    const select = document.getElementById('seriesGenre');
-                    
-                    // Cek apakah sudah ada
-                    const exists = Array.from(select.options).some(opt => opt.value.toLowerCase() === newVal.trim().toLowerCase());
-                    
-                    if (!exists) {
-                        const opt = document.createElement('option');
-                        opt.value = newVal.trim();
-                        opt.textContent = newVal.trim();
-                        opt.selected = true; // Langsung terpilih
-                        select.appendChild(opt);
-                        updateGenreSelectionText();
-                    } else {
-                        // Jika sudah ada, langsung pilih
-                        Array.from(select.options).forEach(opt => {
-                            if (opt.value.toLowerCase() === newVal.trim().toLowerCase()) {
-                                opt.selected = true;
-                            }
-                        });
-                        updateGenreSelectionText();
-                    }
-                }
-            });
-
             handleAddOption('addAudioBtn', 'seriesAudio', 'Masukkan Bahasa Audio Baru:');
             handleAddOption('addSubtitleBtn', 'seriesSubtitle', 'Masukkan Bahasa Subtitle Baru:');
 
@@ -534,44 +532,15 @@
                 let optionExists = Array.from(select.options).some(opt => opt.value === value);
                 if(value && !optionExists) {
                     const opt = document.createElement('option');
-                    opt.value = value;
-                    opt.textContent = value;
-                    select.appendChild(opt);
+                    opt.value = value; opt.textContent = value; select.appendChild(opt);
                 }
                 select.value = value || '';
             }
 
-            function setMultipleSelectValues(selectId, valuesString) {
-                const select = document.getElementById(selectId);
-                select.selectedIndex = -1; // Reset selection
-                
-                if (!valuesString) return;
-                
-                const values = valuesString.split(',').map(v => v.trim());
-                
-                values.forEach(val => {
-                    let optionExists = Array.from(select.options).some(opt => opt.value === val);
-                    if(val && !optionExists) {
-                        const opt = document.createElement('option');
-                        opt.value = val;
-                        opt.textContent = val;
-                        select.appendChild(opt);
-                    }
-                });
-
-                Array.from(select.options).forEach(opt => {
-                    if (values.includes(opt.value)) {
-                        opt.selected = true;
-                    }
-                });
-            }
-
             // --- LOGIKA EDIT EPISODE ---
             if(editEpId) {
-                isEditEpMode = true;
-                switchTab('episode'); 
+                isEditEpMode = true; switchTab('episode'); 
                 document.getElementById('page-main-title').innerText = "Edit Episode";
-                
                 const btnSubmit = document.getElementById('btn-submit-ep');
                 btnSubmit.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Simpan Perubahan';
                 btnSubmit.classList.replace('bg-vs-orange', 'bg-vs-green');
@@ -581,42 +550,29 @@
                     const epDoc = await getDoc(doc(db, "episodes", editEpId));
                     if(epDoc.exists()) {
                         const data = epDoc.data();
-                        
                         eSeries.value = data.seriesId;
                         document.getElementById('epNumber').value = data.episodeNumber;
                         document.getElementById('epTitle').value = data.episodeTitle || '';
                         document.getElementById('epThumb').value = data.thumbnailUrl || '';
                         
                         let serversList = data.servers || [];
-                        if(serversList.length === 0 && data.embedUrl) {
-                            serversList = [{ name: "Google Drive", url: data.embedUrl }];
-                        }
-                        if(serversList.length === 0) {
-                            serversList = [{ name: "Google Drive", url: "" }];
-                        }
+                        if(serversList.length === 0 && data.embedUrl) serversList = [{ name: "Google Drive", url: data.embedUrl }];
+                        if(serversList.length === 0) serversList = [{ name: "Google Drive", url: "" }];
 
-                        // Petakan ulang ke state activeServers
                         activeServers = serversList.map((srv, idx) => ({
-                            id: 'srv_edit_' + idx,
-                            name: srv.name || 'Server',
-                            url: srv.url || ''
+                            id: 'srv_edit_' + idx, name: srv.name || 'Server', url: srv.url || ''
                         }));
-
                         renderServersInputs();
 
                         document.getElementById('prev-e-series').textContent = data.seriesTitle;
                         document.getElementById('prev-e-title').textContent = `E${data.episodeNumber} - ${data.episodeTitle}`;
                         document.getElementById('prev-e-bg').style.backgroundImage = `url('${data.thumbnailUrl}')`;
                     }
-                } catch(e) {
-                    console.error("Gagal menarik data edit:", e);
-                }
+                } catch(e) { console.error("Gagal menarik data edit:", e); }
             } 
             else if (editSeriesId) {
-                isEditSeriesMode = true;
-                switchTab('series'); 
+                isEditSeriesMode = true; switchTab('series'); 
                 document.getElementById('page-main-title').innerText = "Edit Judul Seri";
-                
                 const btnSubmitSeries = document.getElementById('btn-submit-series');
                 btnSubmitSeries.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Simpan Perubahan';
                 
@@ -625,8 +581,16 @@
                     if(seriesDoc.exists()) {
                         const data = seriesDoc.data();
                         document.getElementById('seriesTitle').value = data.title || '';
-                        setMultipleSelectValues('seriesGenre', data.genres);
-                        updateGenreSelectionText(); // Update the text display
+                        
+                        selectedGenres.clear();
+                        if (data.genres) {
+                            data.genres.split(',').forEach(g => {
+                                selectedGenres.add(g.trim());
+                                globalGenres.add(g.trim()); 
+                            });
+                        }
+                        renderGenreChips();
+
                         setSelectValue('seriesAge', data.ageRating);
                         setSelectValue('seriesAudio', data.audioLanguages);
                         setSelectValue('seriesSubtitle', data.subtitleLanguages);
@@ -634,9 +598,7 @@
                         document.getElementById('seriesBanner').value = data.bannerUrl || '';
                         document.getElementById('seriesDesc').value = data.description || '';
                     }
-                } catch(e) {
-                    console.error("Gagal menarik data seri:", e);
-                }
+                } catch(e) { console.error("Gagal menarik data seri:", e); }
             }
 
             // --- SUBMIT FORM EPISODE ---
@@ -648,13 +610,11 @@
 
                 const serversArray = [];
                 activeServers.forEach(srv => {
-                    if(srv.name && srv.url) {
-                        serversArray.push({ name: srv.name, url: srv.url });
-                    }
+                    if(srv.name && srv.url) serversArray.push({ name: srv.name, url: srv.url });
                 });
 
                 if(serversArray.length === 0) {
-                    alert("Harap masukkan minimal 1 URL embed untuk server yang tersedia!");
+                    alert("Harap masukkan minimal 1 URL embed untuk server!");
                     btn.innerHTML = origText; btn.disabled = false;
                     return;
                 }
@@ -683,9 +643,7 @@
                     }
                 } catch (error) {
                     alert("Gagal memproses. Error: " + error.message);
-                } finally {
-                    btn.innerHTML = origText; btn.disabled = false;
-                }
+                } finally { btn.innerHTML = origText; btn.disabled = false; }
             });
 
             // --- SUBMIT FORM SERI ---
@@ -695,10 +653,7 @@
                const origText = btn.innerHTML;
                btn.innerHTML = 'Memproses...'; btn.disabled = true;
                
-               // Get all selected genres
-               const selectedGenres = Array.from(document.getElementById('seriesGenre').selectedOptions).map(opt => opt.value);
-               
-               if (selectedGenres.length === 0) {
+               if (selectedGenres.size === 0) {
                    alert("Harap pilih minimal 1 genre!");
                    btn.innerHTML = origText; btn.disabled = false;
                    return;
@@ -706,7 +661,7 @@
 
                const seriesData = {
                     title: document.getElementById('seriesTitle').value.trim(), 
-                    genres: selectedGenres.join(', '), // Save as comma separated string
+                    genres: Array.from(selectedGenres).join(', '), // Save Set to string comma
                     ageRating: document.getElementById('seriesAge').value || '',
                     audioLanguages: document.getElementById('seriesAudio').value || '',
                     subtitleLanguages: document.getElementById('seriesSubtitle').value || '',
@@ -725,8 +680,10 @@
                        await addDoc(collection(db, "series"), seriesData);
                        alert('Judul Seri Baru Berhasil Tersimpan!'); 
                        e.target.reset(); 
-                       document.getElementById('seriesGenre').selectedIndex = -1;
-                       updateGenreSelectionText();
+                       
+                       selectedGenres.clear();
+                       renderGenreChips();
+                       
                        document.getElementById('seriesAge').selectedIndex = 0;
                        document.getElementById('seriesAudio').selectedIndex = 0;
                        document.getElementById('seriesSubtitle').selectedIndex = 0;
