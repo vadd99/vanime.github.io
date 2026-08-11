@@ -6,6 +6,7 @@
                 <i class="fas fa-bars"></i>
             </button>
             <a href="index.html" class="brand-logo">
+                <!-- Memanggil logo.png dari repository Anda -->
                 <img src="logo.png" alt="Vadd Studio Logo" class="brand-image">
                 <span class="brand-text">vadd<span>studio</span></span>
             </a>
@@ -19,27 +20,7 @@
         <div class="nav-right">
             <div class="nav-right-icons">
                 <button aria-label="Pencarian"><i class="fas fa-search"></i></button>
-                
-                <!-- CONTAINER PROFIL USER -->
-                <div class="user-profile-container" style="position: relative;">
-                    <button class="user-avatar" id="btn-user-avatar" aria-label="Profil" style="cursor: pointer;">
-                        <i class="fas fa-user"></i>
-                    </button>
-                    
-                    <!-- DROPDOWN MENU PROFIL (Tersembunyi secara default) -->
-                    <div id="profile-dropdown" class="profile-dropdown-menu" style="display: none;">
-                        <div class="profile-header">
-                            <span id="user-display-name" style="font-weight: bold; font-size: 14px; color: white; display: block;">Guest</span>
-                            <span id="user-display-email" style="font-size: 11px; color: #9ca3af;">Silakan Login</span>
-                        </div>
-                        <hr style="border-color: #1a3a26; margin: 5px 0;">
-                        <a href="auth.html" id="menu-login" class="dropdown-item"><i class="fas fa-sign-in-alt"></i> Masuk / Daftar</a>
-                        <a href="#" id="menu-daftarku" class="dropdown-item" style="display:none;"><i class="fas fa-bookmark"></i> Daftarku</a>
-                        <a href="admin.html" id="menu-admin" class="dropdown-item" style="display:none;"><i class="fas fa-tachometer-alt"></i> Dashboard Admin</a>
-                        <button id="menu-logout" class="dropdown-item" style="display:none; width: 100%; text-align: left;"><i class="fas fa-sign-out-alt"></i> Keluar</button>
-                    </div>
-                </div>
-
+                <button class="user-avatar" aria-label="Profil"><i class="fas fa-user"></i></button>
             </div>
         </div>
     </div>
@@ -70,7 +51,7 @@
     </div>
 </div>
 
-<!-- TARGET KONTEN HALAMAN -->
+<!-- TARGET KONTEN HALAMAN (Template ID "page-content" akan masuk ke sini) -->
 <div id="main-content-target"></div>
 
 <!-- Footer Bawah -->
@@ -110,3 +91,5 @@
         </div>
     </div>
 </footer>
+
+
