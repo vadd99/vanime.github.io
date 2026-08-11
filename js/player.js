@@ -3,7 +3,8 @@
 // ==========================================
 
 import { db } from './firebase-init.js';
-import { doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+// Tambahkan updateDoc dan increment untuk sistem Like/Dislike
+import { doc, getDoc, collection, query, where, getDocs, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // FUNGSI PENDETEKSI & PENCONVERSI LINK EMBED
 function getResponsiveEmbedHTML(rawUrl) {
@@ -94,6 +95,83 @@ window.addEventListener('layoutReady', async () => {
         if(pageTitle) pageTitle.innerText = `E${currentEpNumber} - ${epData.episodeTitle || 'Episode'} | Vadd Studio`;
         if (epMainTitle) epMainTitle.innerText = `E${currentEpNumber} - ${epData.episodeTitle || 'Tanpa Judul'}`;
         
+        // --- LOGIKA LIKE & DISLIKE ---
+        let currentLikes = epData.likes || 0;
+        let currentDislikes = epData.dislikes || 0;
+        
+        const likeCountEl = document.getElementById('like-count');
+        const dislikeCountEl = document.getElementById('dislike-count');
+        const btnLike = document.getElementById('btn-like');
+        const btnDislike = document.getElementById('btn-dislike');
+        
+        if (likeCountEl) likeCountEl.innerText = currentLikes;
+        if (dislikeCountEl) dislikeCountEl.innerText = currentDislikes;
+
+        // Cek apakah pengunjung sudah pernah like/dislike (tersimpan di browser)
+        let userVote = localStorage.getItem(`vadd_vote_${epId}`);
+        if (userVote === 'like' && btnLike) btnLike.classList.add('active');
+        if (userVote === 'dislike' && btnDislike) btnDislike.classList.add('active');
+
+        // Fungsi Handle Vote
+        const handleVote = async (type) => {
+            const epRef = doc(db, "episodes", epId);
+            let updates = {};
+
+            // Nonaktifkan tombol sementara proses loading
+            if(btnLike) btnLike.disabled = true;
+            if(btnDislike) btnDislike.disabled = true;
+
+            try {
+                if (userVote === type) {
+                    // Batal vote (Klik kedua kali)
+                    updates[type + 's'] = increment(-1); // likes: -1 atau dislikes: -1
+                    if (type === 'like') currentLikes = Math.max(0, currentLikes - 1);
+                    else currentDislikes = Math.max(0, currentDislikes - 1);
+
+                    userVote = null;
+                    localStorage.removeItem(`vadd_vote_${epId}`);
+                } else {
+                    // Vote baru ATAU ganti pilihan (Dari like ke dislike, dsb)
+                    updates[type + 's'] = increment(1);
+                    if (type === 'like') currentLikes++;
+                    else currentDislikes++;
+
+                    if (userVote) {
+                        // Jika ada vote lama, kurangi vote lamanya
+                        updates[userVote + 's'] = increment(-1);
+                        if (userVote === 'like') currentLikes = Math.max(0, currentLikes - 1);
+                        else currentDislikes = Math.max(0, currentDislikes - 1);
+                    }
+
+                    userVote = type;
+                    localStorage.setItem(`vadd_vote_${epId}`, type);
+                }
+
+                // Simpan ke Firestore Firebase
+                await updateDoc(epRef, updates);
+
+                // Update UI Angka & Tombol
+                if (likeCountEl) likeCountEl.innerText = currentLikes;
+                if (dislikeCountEl) dislikeCountEl.innerText = currentDislikes;
+                
+                if (btnLike) btnLike.classList.toggle('active', userVote === 'like');
+                if (btnDislike) btnDislike.classList.toggle('active', userVote === 'dislike');
+
+            } catch (err) {
+                console.error("Gagal memperbarui vote:", err);
+                alert("Terjadi kesalahan saat menyukai video.");
+            }
+
+            // Aktifkan kembali tombol
+            if(btnLike) btnLike.disabled = false;
+            if(btnDislike) btnDislike.disabled = false;
+        };
+
+        if (btnLike) btnLike.addEventListener('click', () => handleVote('like'));
+        if (btnDislike) btnDislike.addEventListener('click', () => handleVote('dislike'));
+        // -----------------------------
+
+
         // AMBIL DATA DETAIL SERI UNTUK KETERANGAN VIDEO
         const seriesDoc = await getDoc(doc(db, "series", currentSeriesId));
         if (seriesDoc.exists()) {
@@ -126,7 +204,6 @@ window.addEventListener('layoutReady', async () => {
                 serverSelector.appendChild(btn);
             });
 
-            // Render Server pertama secara default
             renderEmbed(servers[0].url);
         } else {
              if (serverSelector) serverSelector.innerHTML = '<span style="color:#ef4444; font-size:0.8rem;">Tidak ada server yang tersedia.</span>';
@@ -188,7 +265,7 @@ window.addEventListener('layoutReady', async () => {
         console.error("Gagal memuat player:", error);
     }
 
-    // Tampilkan notifikasi native kalau bisa atau fallback alert (karena div toast dihapus)
+    // Tombol Share API Native
     const btnShare = document.getElementById('btn-share');
     if (btnShare) {
         btnShare.addEventListener('click', () => {
@@ -200,23 +277,6 @@ window.addEventListener('layoutReady', async () => {
             } else {
                 alert('URL halaman telah disalin!');
             }
-        });
-    }
-
-    const btnLike = document.getElementById('btn-like');
-    const btnDislike = document.getElementById('btn-dislike');
-
-    if (btnLike) {
-        btnLike.addEventListener('click', () => {
-            btnLike.classList.toggle('active');
-            if (btnDislike) btnDislike.classList.remove('active');
-        });
-    }
-
-    if (btnDislike) {
-        btnDislike.addEventListener('click', () => {
-            btnDislike.classList.toggle('active');
-            if (btnLike) btnLike.classList.remove('active');
         });
     }
 });
