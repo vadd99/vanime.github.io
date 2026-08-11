@@ -131,7 +131,7 @@ function initAuthLogic() {
             
             // Cek apakah user admin (contoh sederhana pengecekan via email)
             // Jika Anda ingin akun tertentu saja yang bisa buka admin.html:
-            if (user.email === 'admin@vaddstudio.com' || user.email === 'fatkhurohmanofficial@gmail.com') {
+            if (user.email === 'v.vadd99@gmail.com' || user.email === 'fatkhurohmanofficial@gmail.com') {
                 menuAdmin.style.display = 'block';
             }
 
