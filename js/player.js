@@ -73,7 +73,11 @@ window.addEventListener('layoutReady', async () => {
 
     const pageTitle = document.getElementById('page-title');
     const epMainTitle = document.getElementById('ep-main-title');
-    const epDesc = document.getElementById('ep-desc');
+    
+    const metaAudio = document.getElementById('meta-audio');
+    const metaSub = document.getElementById('meta-sub');
+    const metaAge = document.getElementById('meta-age');
+    const metaWarning = document.getElementById('meta-warning');
 
     try {
         const epDoc = await getDoc(doc(db, "episodes", epId));
@@ -90,15 +94,19 @@ window.addEventListener('layoutReady', async () => {
         if(pageTitle) pageTitle.innerText = `E${currentEpNumber} - ${epData.episodeTitle || 'Episode'} | Vadd Studio`;
         if (epMainTitle) epMainTitle.innerText = `E${currentEpNumber} - ${epData.episodeTitle || 'Tanpa Judul'}`;
         
+        // AMBIL DATA DETAIL SERI UNTUK KETERANGAN VIDEO
         const seriesDoc = await getDoc(doc(db, "series", currentSeriesId));
-        if (seriesDoc.exists() && epDesc) {
-            epDesc.innerText = seriesDoc.data().description || "Selamat menonton episode ini di Vadd Studio!";
+        if (seriesDoc.exists()) {
+            const seriesData = seriesDoc.data();
+            if(metaAudio) metaAudio.innerText = seriesData.audioLanguages || 'Tidak diketahui';
+            if(metaSub) metaSub.innerText = seriesData.subtitleLanguages || 'Tidak diketahui';
+            if(metaAge) metaAge.innerText = seriesData.ageRating || 'SU';
+            if(metaWarning) metaWarning.innerText = seriesData.contentWarnings || 'Tidak ada peringatan khusus';
         }
 
         // --- RENDER SERVER SELECTOR CARD ---
         const serverSelector = document.getElementById('server-selector-container');
         
-        // AMBIL DATA SERVER
         let servers = epData.servers || [];
         if (servers.length === 0 && epData.embedUrl) {
              servers = [{ name: "Google Drive", url: epData.embedUrl }]; 
@@ -109,7 +117,6 @@ window.addEventListener('layoutReady', async () => {
             servers.forEach((srv, index) => {
                 const btn = document.createElement('button');
                 btn.className = `server-btn ${index === 0 ? 'active' : ''}`;
-                // Ikon bisa disesuaikan atau dihapus, di sini saya pakai ikon server
                 btn.innerHTML = `<i class="fas fa-play-circle"></i> ${srv.name}`;
                 btn.onclick = () => {
                     document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
@@ -181,12 +188,19 @@ window.addEventListener('layoutReady', async () => {
         console.error("Gagal memuat player:", error);
     }
 
-    const toast = document.getElementById('vadd-toast');
-    function showToast(msg) {
-        if (!toast) return;
-        toast.textContent = msg;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 2500);
+    // Tampilkan notifikasi native kalau bisa atau fallback alert (karena div toast dihapus)
+    const btnShare = document.getElementById('btn-share');
+    if (btnShare) {
+        btnShare.addEventListener('click', () => {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Tonton di Vadd Studio',
+                    url: window.location.href
+                }).catch(() => {});
+            } else {
+                alert('URL halaman telah disalin!');
+            }
+        });
     }
 
     const btnLike = document.getElementById('btn-like');

@@ -66,25 +66,17 @@
             <!-- 2. Informasi Episode -->
             <div class="player-info-container">
 
-                <!-- CARD PEMILIH SERVER PINDAH KE SINI -->
                 <div class="server-box-container">
                     <div class="server-box-header">
                         <span><i class="fas fa-server"></i> Pilih Server</span>
                         <small>Ganti server lain jika video tidak dapat diputar.</small>
                     </div>
                     <div class="server-selector-grid" id="server-selector-container">
-                        <!-- Tombol server disuntikkan via JS -->
                         <span style="color:#9ca3af; font-size:0.8rem;">Memuat daftar server...</span>
                     </div>
                 </div>
 
-                <!-- JUDUL EPISODE -->
                 <h1 class="episode-main-title" id="ep-main-title">Memuat Episode...</h1>
-
-                <div class="episode-tags">
-                    <span class="age-tag">14+</span>
-                    <span class="sub-status"><i class="fas fa-closed-captioning"></i> Dengan Takarir</span>
-                </div>
 
                 <div class="interaction-toolbar">
                     <div class="like-dislike-group">
@@ -98,18 +90,18 @@
                     </div>
                     
                     <div class="action-tools">
-                         <!-- Kosong -->
+                         <button class="toolbar-btn circle-btn" title="Bagikan" id="btn-share"><i class="fas fa-share-alt"></i></button>
                     </div>
                 </div>
 
-                <div class="episode-description">
-                    <p id="ep-desc">Sedang mengambil deskripsi dari database...</p>
-                </div>
-
                 <div class="content-warning-box">
-                    <h3 class="warning-title">Peringatan Konten</h3>
-                    <p class="warning-tags">14+</p>
-                    <p class="warning-details">Konten Animasi, Aksi</p>
+                    <h3 class="warning-title">Keterangan Video</h3>
+                    <div class="video-meta-details">
+                        <p><strong><i class="fas fa-microphone-alt"></i> Audio:</strong> <span id="meta-audio">Memuat...</span></p>
+                        <p><strong><i class="fas fa-closed-captioning"></i> Takarir (Sub):</strong> <span id="meta-sub">Memuat...</span></p>
+                        <p><strong><i class="fas fa-user-shield"></i> Rating Usia:</strong> <span id="meta-age" class="warning-tags">Memuat...</span></p>
+                        <p><strong><i class="fas fa-exclamation-triangle"></i> Peringatan:</strong> <span id="meta-warning">Memuat...</span></p>
+                    </div>
                 </div>
 
                 <!-- DAFTAR SEMUA EPISODE (DENGAN SCROLL) -->
@@ -126,7 +118,6 @@
 
             </div>
 
-            <div id="vadd-toast">Notifikasi!</div>
         </div>
     </template>
 
