@@ -15,6 +15,12 @@ window.addEventListener('layoutReady', async () => {
     const seriesContainer = document.getElementById('series-grid-container');
     const popularContainer = document.getElementById('popular-series-container');
 
+    // Fungsi kecil untuk mengambil genre pertama saja
+    const getFirstGenre = (genreString) => {
+        if (!genreString) return 'Animasi';
+        return genreString.split(',')[0].trim();
+    };
+
     try {
         // --- 1. MENGAMBIL SEMUA DATA SERIES DARI FIREBASE ---
         const q = query(collection(db, "series")); 
@@ -36,8 +42,8 @@ window.addEventListener('layoutReady', async () => {
 
         // --- 2. LOGIKA PENYORTIRAN UNTUK "PALING POPULER" ---
         let popularData = [...seriesData].sort((a, b) => {
-            const viewsA = a.views || 0;
-            const viewsB = b.views || 0;
+            const viewsA = a.views || a.total_views || 0; // Tambahan fallback ke total_views
+            const viewsB = b.views || b.total_views || 0;
             
             if (viewsB !== viewsA) {
                 return viewsB - viewsA; 
@@ -62,7 +68,7 @@ window.addEventListener('layoutReady', async () => {
             popularContainer.innerHTML = ''; 
             popularData.slice(0, 10).forEach((item, index) => { 
                 const imgUrl = item.bannerUrl || item.banner_url || "https://images.unsplash.com/photo-1560930950-5ce206df77ab?auto=format&fit=crop&q=80&w=300";
-                const views = item.views || 0;
+                const views = item.views || item.total_views || 0; // Tambahan fallback ke total_views
                 
                 // Menempatkan badge di kanan atas agar tidak tertutup teks di desain portrait
                 let badgeHtml = '';
@@ -72,7 +78,9 @@ window.addEventListener('layoutReady', async () => {
                     badgeHtml = `<div class="badge-tag tag-primary" style="top:0.5rem; right:0.5rem; left:auto;">BARU</div>`;
                 }
 
-                // Menggunakan .poster-card agar bentuknya tegak (portrait)
+                // Ganti item.category menjadi item.genres menggunakan fungsi getFirstGenre
+                const mainGenre = getFirstGenre(item.genres || item.category);
+
                 const cardHTML = `
                     <div class="poster-card" onclick="window.location.href='detail.html?id=${item.id}'" style="cursor:pointer; min-width: 160px; max-width: 200px; flex: 0 0 auto;">
                         <div class="poster-box">
@@ -82,7 +90,7 @@ window.addEventListener('layoutReady', async () => {
                             <div class="poster-content">
                                 <h3 class="poster-title">${item.title}</h3>
                                 <div class="poster-footer">
-                                    <span class="badge-outline">${item.category || 'Animasi'}</span>
+                                    <span class="badge-outline">${mainGenre}</span>
                                     ${views > 0 ? `<span style="color:var(--vadd-gold); font-size: 0.7rem;"><i class="fas fa-eye"></i> ${views}</span>` : ''}
                                 </div>
                             </div>
@@ -107,6 +115,9 @@ window.addEventListener('layoutReady', async () => {
             exploreData.forEach(item => {
                 const imgUrl = item.bannerUrl || item.banner_url || "https://images.unsplash.com/photo-1560930950-5ce206df77ab?auto=format&fit=crop&q=80&w=300";
                 
+                // Ganti item.category menjadi item.genres menggunakan fungsi getFirstGenre
+                const mainGenre = getFirstGenre(item.genres || item.category);
+
                 const cardHTML = `
                     <div class="poster-card" onclick="window.location.href='detail.html?id=${item.id}'" style="cursor:pointer;">
                         <div class="poster-box">
@@ -115,7 +126,7 @@ window.addEventListener('layoutReady', async () => {
                             <div class="poster-content">
                                 <h3 class="poster-title">${item.title}</h3>
                                 <div class="poster-footer">
-                                    <span class="badge-outline">${item.category || 'Animasi'}</span>
+                                    <span class="badge-outline">${mainGenre}</span>
                                 </div>
                             </div>
                         </div>

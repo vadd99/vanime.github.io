@@ -29,7 +29,6 @@ window.addEventListener('layoutReady', async () => {
     const elPageTitle = document.getElementById('page-title');
     const elBanner = document.getElementById('detail-banner');
     const elTitle = document.getElementById('detail-title');
-    const elCat = document.getElementById('detail-category');
     const elDesc = document.getElementById('synopsis-text');
     const elEpContainer = document.getElementById('episode-container');
     const btnWatchHero = document.getElementById('btn-watch-hero');
@@ -57,7 +56,11 @@ window.addEventListener('layoutReady', async () => {
 
         if(elPageTitle) elPageTitle.innerText = `${sd.title} - Vadd Studio`;
         if(elBanner) elBanner.src = sd.bannerUrl || sd.banner_url || "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&q=80&w=1600";
-        if(elTitle) elTitle.innerHTML = `${sd.title} <span style="display:block; font-size:14px; margin-top:8px; color:var(--color-green); letter-spacing:2px; font-weight:700;">${sd.category ? sd.category.toUpperCase() : 'ANIMASI'}</span>`;
+        
+        // PERBAIKAN DI SINI: Ganti sd.category menjadi sd.genres
+        const mainGenreText = sd.genres ? sd.genres.split(',')[0].trim().toUpperCase() : (sd.category ? sd.category.toUpperCase() : 'ANIMASI');
+        
+        if(elTitle) elTitle.innerHTML = `${sd.title} <span style="display:block; font-size:14px; margin-top:8px; color:var(--color-green); letter-spacing:2px; font-weight:700;">${mainGenreText}</span>`;
         if(elDesc) elDesc.innerText = sd.description || "Tidak ada sinopsis tersedia untuk judul ini.";
 
         // --- SET METADATA EXTRA (JIKA ADA) ---
