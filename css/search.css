@@ -1,0 +1,108 @@
+/* ==========================================
+   STYLESHEET KHUSUS PENCARIAN (css/search.css)
+   ========================================== */
+
+.search-page-wrapper {
+    max-width: 1280px;
+    margin: 100px auto 4rem auto; /* Jarak atas 100px agar tidak tertutup fixed navbar */
+    padding: 0 1rem;
+    min-height: 50vh; /* Memastikan footer tidak naik jika hasil kosong */
+}
+
+.search-header {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--vadd-card, #0a1f14);
+    padding-bottom: 1.25rem;
+}
+
+.search-header h2 {
+    color: #ffffff;
+    font-size: 1.8rem;
+    font-weight: 800;
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* Grid Layout untuk Poster/Card */
+.search-grid {
+    display: grid;
+    /* Grid dinamis: minimal 140px, maksimal menyesuaikan layar */
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Card Series */
+.search-card {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    transition: transform 0.2s ease, opacity 0.2s;
+    background-color: rgba(255, 255, 255, 0.02);
+    padding: 0.4rem;
+    border-radius: 10px;
+    border: 1px solid transparent;
+}
+
+.search-card:hover {
+    transform: translateY(-5px);
+    background-color: rgba(10, 31, 20, 0.5);
+    border-color: var(--vadd-primary, #4ade80);
+}
+
+.search-thumb {
+    width: 100%;
+    aspect-ratio: 3 / 4; /* Rasio poster vertikal khas anime/film */
+    border-radius: 6px;
+    object-fit: cover;
+    background-color: var(--vadd-card);
+}
+
+.search-title {
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.3;
+    /* Membatasi teks maksimal 2 baris, sisanya "..." */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.search-meta {
+    color: #9ca3af;
+    font-size: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-category {
+    color: var(--vadd-accent, #f97316);
+    font-weight: bold;
+}
+
+/* Loading & Empty States */
+.loading-state, .empty-state {
+    grid-column: 1 / -1; /* Memenuhi semua grid kolom */
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #9ca3af;
+    font-size: 1.1rem;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: var(--vadd-card);
+    margin-bottom: 1rem;
+    display: block;
+}
+
+/* Media Queries Desktop Lebih Besar */
+@media (min-width: 768px) {
+    .search-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 2rem;
+    }
+}
