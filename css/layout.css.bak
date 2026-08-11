@@ -102,3 +102,55 @@ footer.footer { background-color: var(--vadd-nav); border-top: 1px solid var(--v
     .footer-grid { grid-template-columns: repeat(3, 1fr); }
     .footer-bottom { flex-direction: row; }
 }
+/* ==========================================
+   STYLING UNTUK USER PROFILE DROPDOWN
+   ========================================== */
+.profile-dropdown-menu {
+    position: absolute;
+    top: 45px;
+    right: 0;
+    width: 200px;
+    background-color: var(--vadd-card); /* Warna #0a1f14 */
+    border: 1px solid var(--vadd-border, #1a3a26);
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+    overflow: hidden;
+    z-index: 100;
+}
+
+.profile-header {
+    padding: 12px 15px;
+    background-color: rgba(5, 18, 10, 0.5); /* Warna #05110a dengan opacity */
+}
+
+.dropdown-item {
+    display: block;
+    padding: 10px 15px;
+    color: #d1d5db;
+    text-decoration: none;
+    font-size: 13px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.dropdown-item i {
+    width: 20px;
+    text-align: center;
+    margin-right: 8px;
+    color: var(--vadd-primary, #4ade80);
+}
+
+.dropdown-item:hover {
+    background-color: rgba(96, 211, 129, 0.15); /* Hijau transparan */
+    color: white;
+}
+
+#menu-logout:hover {
+    background-color: rgba(244, 63, 94, 0.15); /* Merah transparan */
+    color: #f43f5e;
+}
+#menu-logout:hover i {
+    color: #f43f5e;
+}

@@ -154,3 +154,82 @@ footer.footer { background-color: var(--vadd-nav); border-top: 1px solid var(--v
 #menu-logout:hover i {
     color: #f43f5e;
 }
+
+/* ==========================================
+   STYLING UNTUK FITUR PENCARIAN HEADER
+   ========================================== */
+.search-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+    height: 32px; /* Menyesuaikan tinggi ikon avatar */
+}
+
+#btn-search-icon {
+    transition: opacity 0.2s ease;
+    z-index: 2;
+}
+
+.search-input-wrapper {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    background-color: rgba(10, 31, 20, 0.95);
+    border: 1px solid var(--vadd-primary, #4ade80);
+    border-radius: 20px;
+    padding: 0;
+    width: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, padding 0.3s ease;
+    pointer-events: none;
+    z-index: 10;
+    backdrop-filter: blur(5px);
+}
+
+.search-input-wrapper.active {
+    width: 260px;
+    padding: 4px 12px;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#search-input {
+    background: transparent;
+    border: none;
+    color: white;
+    outline: none;
+    width: 100%;
+    font-size: 0.85rem;
+    padding: 4px 5px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+#search-input::placeholder {
+    color: #9ca3af;
+}
+
+#btn-close-search {
+    color: var(--vadd-accent, #f97316);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0 5px;
+    transition: transform 0.2s;
+}
+
+#btn-close-search:hover {
+    transform: scale(1.2);
+}
+
+/* Responsif untuk HP agar search bar tidak kepanjangan */
+@media (max-width: 768px) {
+    .search-input-wrapper.active {
+        width: 180px; 
+    }
+}
+

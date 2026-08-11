@@ -72,6 +72,42 @@ function initLayoutInteractions() {
     if (menuBtn) menuBtn.addEventListener('click', openSidebar);
     if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
     if (overlay) overlay.addEventListener('click', closeSidebar);
+    
+    // ==========================================
+    // LOGIKA PENCARIAN (SEARCH BAR)
+    // ==========================================
+    const btnSearchIcon = document.getElementById('btn-search-icon');
+    const searchWrapper = document.getElementById('search-input-wrapper');
+    const btnCloseSearch = document.getElementById('btn-close-search');
+    const searchInput = document.getElementById('search-input');
+
+    if(btnSearchIcon && searchWrapper && btnCloseSearch && searchInput) {
+        // Buka Search Bar
+        btnSearchIcon.addEventListener('click', () => {
+            searchWrapper.classList.add('active');
+            btnSearchIcon.style.opacity = '0';
+            setTimeout(() => { searchInput.focus(); }, 300);
+        });
+
+        // Tutup Search Bar
+        btnCloseSearch.addEventListener('click', () => {
+            searchWrapper.classList.remove('active');
+            btnSearchIcon.style.opacity = '1';
+            searchInput.value = '';
+        });
+
+        // Eksekusi Pencarian saat tekan tombol "Enter"
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const query = searchInput.value.trim();
+                if (query !== '') {
+                    // Arahkan ke halaman pencarian dengan parameter query
+                    window.location.href = `search.html?q=${encodeURIComponent(query)}`;
+                }
+            }
+        });
+    }        
 }
 
 

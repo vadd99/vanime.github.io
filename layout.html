@@ -17,8 +17,16 @@
             </div>
         </div>
         <div class="nav-right">
-            <div class="nav-right-icons">
-                <button aria-label="Pencarian"><i class="fas fa-search"></i></button>
+<div class="nav-right-icons">
+    
+    <!-- FITUR PENCARIAN (BARU) -->
+    <div class="search-container">
+        <button aria-label="Pencarian" id="btn-search-icon"><i class="fas fa-search"></i></button>
+        <div class="search-input-wrapper" id="search-input-wrapper">
+            <input type="text" id="search-input" placeholder="Cari judul..." autocomplete="off">
+            <button id="btn-close-search" aria-label="Tutup"><i class="fas fa-times"></i></button>
+        </div>
+    </div>
                 
                 <!-- CONTAINER PROFIL USER -->
                 <div class="user-profile-container" style="position: relative;">
