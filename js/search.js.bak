@@ -5,16 +5,20 @@
 import { db } from './firebase-init.js';
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+// Tunggu hingga elemen layout (navbar, dll) selesai dimuat oleh main.js
 window.addEventListener('layoutReady', async () => {
     console.log("Halaman Pencarian Dimuat!");
 
+    // 1. Ambil Parameter "q" (Query) dari URL (contoh: search.html?q=rakudai)
     const urlParams = new URLSearchParams(window.location.search);
     const queryParam = urlParams.get('q');
     
+    // Elemen DOM
     const queryTextEl = document.getElementById('search-query-text');
     const searchCountEl = document.getElementById('search-count');
     const resultsContainer = document.getElementById('search-results-container');
 
+    // Jika user mengakses halaman ini tanpa kata kunci sama sekali
     if (!queryParam || queryParam.trim() === '') {
         queryTextEl.innerText = "Tidak ada kata kunci";
         searchCountEl.innerText = "Masukkan kata kunci pada kolom pencarian di menu atas.";
@@ -27,9 +31,12 @@ window.addEventListener('layoutReady', async () => {
         return;
     }
 
+    // Set teks header
     queryTextEl.innerText = `"${queryParam}"`;
 
     try {
+        // 2. Ambil seluruh data Seri/Film dari Firebase
+        // Karena Firestore tidak punya Full-Text search, kita filter secara manual di client (sangat cepat untuk ribuan data)
         const querySnapshot = await getDocs(collection(db, "series"));
         const allSeries = [];
         
@@ -37,14 +44,18 @@ window.addEventListener('layoutReady', async () => {
             allSeries.push({ id: doc.id, ...doc.data() });
         });
 
+        // 3. Logika Filter (Cocokkan kata kunci dengan Judul atau Deskripsi)
         const keyword = queryParam.toLowerCase().trim();
         const filteredResults = allSeries.filter(series => {
             const title = (series.title || "").toLowerCase();
             const desc = (series.description || "").toLowerCase();
+            
+            // Akan me-return TRUE jika judul atau deskripsi mengandung kata kunci yang diketik
             return title.includes(keyword) || desc.includes(keyword);
         });
 
-        resultsContainer.innerHTML = ''; 
+        // 4. Render Hasil ke HTML
+        resultsContainer.innerHTML = ''; // Bersihkan loading spinner
 
         if (filteredResults.length === 0) {
             searchCountEl.innerText = "0 hasil ditemukan.";
@@ -57,23 +68,18 @@ window.addEventListener('layoutReady', async () => {
         } else {
             searchCountEl.innerText = `Ditemukan ${filteredResults.length} hasil yang cocok.`;
             
+            // Looping data yang cocok untuk dibuatkan Card
             filteredResults.forEach(item => {
-                // Mengambil poster vertikal (menyesuaikan struktur database index.html Anda)
-                const poster = item.posterUrl || item.poster_url || item.bannerUrl || 'https://via.placeholder.com/300x400?text=No+Image';
+                const banner = item.bannerUrl || 'https://via.placeholder.com/300x400?text=No+Image';
                 
-                // Mengambil kategori atau genre asli dari database
-                const categoryText = item.category || item.genres || 'Animasi';
-
                 const cardHTML = `
                     <a href="detail.html?id=${item.id}" class="search-card">
-                        <div class="search-thumb-wrapper">
-                            <img src="${poster}" alt="${item.title}" class="search-thumb">
-                        </div>
-                        <div class="search-card-info">
+                        <img src="${banner}" alt="${item.title}" class="search-thumb">
+                        <div>
                             <h3 class="search-title">${item.title}</h3>
                             <div class="search-meta">
-                                <span class="search-category">${categoryText}</span>
-                                <span class="search-rating"><i class="fas fa-star"></i> ${item.rating || '4.5'}</span>
+                                <span class="search-category">${item.category || 'Animasi'}</span>
+                                <span><i class="fas fa-star" style="color:#facc15;"></i> ${item.rating || '4.5'}</span>
                             </div>
                         </div>
                     </a>
@@ -88,7 +94,7 @@ window.addEventListener('layoutReady', async () => {
         resultsContainer.innerHTML = `
             <div class="empty-state" style="color: #ef4444;">
                 <i class="fas fa-exclamation-triangle"></i>
-                Maaf, gagal menyambung ke server database.
+                Maaf, gagal menyambung ke server database. Silakan periksa koneksi internet Anda.
             </div>
         `;
     }
