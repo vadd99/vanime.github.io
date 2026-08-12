@@ -25,7 +25,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         // 5. Inisialisasi Logika Autentikasi secara dinamis agar tidak error "import outside module"
         await initAuthLogic();
 
-        // 6. Beri sinyal ke script lokal halaman bahwa layout sudah selesai
+        // 6. Inisialisasi Daftar Kategori/Genre untuk Sidebar dan Desktop Menu
+        await initSidebarGenres();
+
+        // 7. Beri sinyal ke script lokal halaman bahwa layout sudah selesai
         window.dispatchEvent(new Event('layoutReady'));
 
     } catch (error) {
@@ -108,6 +111,31 @@ function initLayoutInteractions() {
             }
         });
     }        
+
+    // ==========================================
+    // LOGIKA SIDEBAR MENU ACTIVE (Otomatis)
+    // ==========================================
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const sidebarItems = document.querySelectorAll('.sidebar-item');
+    
+    // Ambil menu link langsung di desktop (mengabaikan dropdown kategori)
+    const desktopMenuItems = document.querySelectorAll('.desktop-menu > a'); 
+    
+    // Ganti class active di Sidebar HP
+    sidebarItems.forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('href') === currentPage) {
+            item.classList.add('active');
+        }
+    });
+
+    // Ganti class active di Menu Desktop (Navbar Atas)
+    desktopMenuItems.forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('href') === currentPage) {
+            item.classList.add('active');
+        }
+    });
 }
 
 
@@ -214,5 +242,62 @@ async function initAuthLogic() {
                 alert("Terjadi kesalahan saat keluar: " + error.message);
             });
         });
+    }
+}
+
+// ==========================================
+// FUNGSI MEMUAT GENRE KE SIDEBAR & NAVBAR
+// ==========================================
+async function initSidebarGenres() {
+    const sidebarGenreContainer = document.getElementById('sidebar-genre-list');
+    const desktopGenreContainer = document.getElementById('desktop-genre-list'); 
+    
+    if (!sidebarGenreContainer && !desktopGenreContainer) return;
+
+    try {
+        const firebaseInit = await import('./firebase-init.js');
+        const db = firebaseInit.db;
+        
+        const firestore = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+        const collection = firestore.collection;
+        const getDocs = firestore.getDocs;
+
+        // Ambil data genre dari database
+        const genresSnap = await getDocs(collection(db, "genres"));
+        let genresArray = [];
+        
+        genresSnap.forEach(doc => {
+            const data = doc.data();
+            if(data.name) genresArray.push(data.name.trim());
+        });
+
+        // Urutkan abjad
+        genresArray.sort();
+        
+        // Bersihkan loading
+        if(sidebarGenreContainer) sidebarGenreContainer.innerHTML = '';
+        if(desktopGenreContainer) desktopGenreContainer.innerHTML = '';
+
+        if(genresArray.length === 0) {
+            const emptyMsg = '<span style="color:#9ca3af; font-size:0.8rem; padding: 10px;">Belum ada kategori.</span>';
+            if(sidebarGenreContainer) sidebarGenreContainer.innerHTML = emptyMsg;
+            if(desktopGenreContainer) desktopGenreContainer.innerHTML = emptyMsg;
+            return;
+        }
+
+        // Looping injeksi data ke 2 tempat sekaligus
+        genresArray.forEach(genre => {
+            const urlSafeGenre = encodeURIComponent(genre);
+            const htmlContent = `<a href="search.html?q=${urlSafeGenre}" class="genre-item">${genre}</a>`;
+            
+            if(sidebarGenreContainer) sidebarGenreContainer.innerHTML += htmlContent;
+            if(desktopGenreContainer) desktopGenreContainer.innerHTML += htmlContent;
+        });
+
+    } catch (error) {
+        console.error("Gagal memuat kategori:", error);
+        const errorMsg = '<span style="color:#ef4444; font-size:0.8rem; padding: 10px;">Gagal memuat koneksi.</span>';
+        if(sidebarGenreContainer) sidebarGenreContainer.innerHTML = errorMsg;
+        if(desktopGenreContainer) desktopGenreContainer.innerHTML = errorMsg;
     }
 }

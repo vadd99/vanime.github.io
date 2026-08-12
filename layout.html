@@ -9,9 +9,19 @@
                 <img src="logo.png" alt="Vadd Studio Logo" class="brand-image">
                 <span class="brand-text">vadd<span>anime</span></span>
             </a>
+            <!-- Temukan bagian desktop-menu dan ubah menjadi ini -->
             <div class="desktop-menu">
-                <a href="#" class="active">Jelajahi</a>
-                <a href="#">Kategori <i class="fas fa-chevron-down" style="font-size: 0.6rem;"></i></a>
+                <a href="index.html" class="active">Jelajahi</a>
+                
+                <!-- DROPDOWN KATEGORI (BARU) -->
+                <div class="desktop-dropdown-container">
+                    <a href="#" class="desktop-dropdown-toggle">Kategori <i class="fas fa-chevron-down" style="font-size: 0.6rem;"></i></a>
+                    <!-- Wadah daftar genre desktop -->
+                    <div class="desktop-dropdown-menu" id="desktop-genre-list">
+                        <span style="color:#9ca3af; font-size:0.85rem; padding: 10px;">Memuat kategori...</span>
+                    </div>
+                </div>
+
                 <a href="#">Film Pendek</a>
                 <a href="#">Berita</a>
             </div>
@@ -59,11 +69,13 @@
     <div class="sidebar-header">
         <div class="brand-logo">
             <img src="logo.png" alt="Vadd Studio Logo" class="brand-image" style="width: 36px; height: 36px;">
-            <span class="brand-text" style="font-size: 1.1rem;">vadd<span>studio</span></span>
+            <span class="brand-text" style="font-size: 1.1rem;">vadd<span>anime</span></span>
         </div>
         <button id="sidebar-close-btn" class="sidebar-close"><i class="fas fa-times"></i></button>
     </div>
+    
     <div class="sidebar-body">
+        <!-- Section Menu Utama -->
         <div>
             <p class="sidebar-group-title">Menu Utama</p>
             <div class="sidebar-menu-list">
@@ -72,11 +84,23 @@
                 <a href="lates.html" class="sidebar-item"><i class="fas fa-clock" style="width:20px; color:var(--vadd-light);"></i> Rilis Terbaru</a>
             </div>
         </div>
+
+        <!-- Section Kategori / Genre (BARU) -->
+        <div style="margin-top: 1.5rem;">
+            <p class="sidebar-group-title">Kategori</p>
+            <div id="sidebar-genre-list" class="sidebar-genre-grid">
+                <span style="color:#9ca3af; font-size:0.85rem; padding: 0 10px;">
+                    <i class="fas fa-spinner fa-spin"></i> Memuat kategori...
+                </span>
+            </div>
+        </div>
     </div>
+    
     <div class="sidebar-footer">
         <p>Vadd Studio v1.0.0</p>
     </div>
 </div>
+
 
 <!-- TARGET KONTEN HALAMAN -->
 <div id="main-content-target"></div>
