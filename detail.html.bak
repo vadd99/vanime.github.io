@@ -35,7 +35,8 @@
 
                     <div class="meta-info-bar">
                         <span class="age-badge" id="hero-age-badge">13+</span>
-                        <!-- Teks Sub | Dub dan titik pemisahnya sudah dihapus di sini -->
+                        <i class="fas fa-circle meta-dot"></i>
+                        <span id="hero-sub-dub">Sub | Dub</span>
                     </div>
 
                     <div class="rating-box" id="rating-container">
