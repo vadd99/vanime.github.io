@@ -12,7 +12,7 @@ window.addEventListener('layoutReady', async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const seriesId = urlParams.get('id');
     
-    // Variabel penampung data seri agar bisa diakses oleh fungsi Bookmark nanti
+    // Variabel penampung data seri
     let currentSeriesData = {};
 
     if (!seriesId) {
@@ -56,8 +56,8 @@ window.addEventListener('layoutReady', async () => {
             return;
         }
 
-        const sd = docSnap.data(); // sd = seriesData
-        currentSeriesData = sd; // Simpan ke variabel global script ini
+        const sd = docSnap.data(); 
+        currentSeriesData = sd; 
 
         if(elPageTitle) elPageTitle.innerText = `${sd.title} - Vadd Studio`;
         if(elBanner) elBanner.src = sd.bannerUrl || sd.banner_url || "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&q=80&w=1600";
@@ -172,21 +172,93 @@ window.addEventListener('layoutReady', async () => {
     }
 
     // ==========================================
+    // UI MODAL KUSTOM: PERINGATAN LOGIN
+    // ==========================================
+    function showLoginPromptModal() {
+        // Cek jika modal sudah pernah dibuka agar tidak ganda
+        if (document.getElementById('vadd-login-modal')) return;
+
+        // Bikin overlay background gelap
+        const overlay = document.createElement('div');
+        overlay.id = 'vadd-login-modal';
+        overlay.style.position = 'fixed';
+        overlay.style.inset = '0';
+        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        overlay.style.backdropFilter = 'blur(5px)';
+        overlay.style.zIndex = '9999';
+        overlay.style.display = 'flex';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        overlay.style.opacity = '0';
+        overlay.style.transition = 'opacity 0.3s ease';
+
+        // Bikin kotak putih (panel) modalnya
+        const box = document.createElement('div');
+        box.style.backgroundColor = '#0a1f14'; // Warna bg panel (var(--vs-panel))
+        box.style.border = '1px solid #1a3a26';
+        box.style.borderRadius = '16px';
+        box.style.padding = '24px';
+        box.style.maxWidth = '320px';
+        box.style.width = '90%';
+        box.style.textAlign = 'center';
+        box.style.boxShadow = '0 10px 30px rgba(0,0,0,0.8)';
+        box.style.transform = 'translateY(20px) scale(0.95)';
+        box.style.transition = 'all 0.3s ease';
+
+        // Isi konten modal (HTML)
+        box.innerHTML = `
+            <div style="width: 50px; height: 50px; background: rgba(74, 222, 128, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                <i class="fas fa-lock" style="font-size: 1.25rem; color: #4ade80;"></i>
+            </div>
+            <h3 style="color: #ffffff; font-size: 1.25rem; font-weight: bold; margin-bottom: 8px;">Anda Belum Login</h3>
+            <p style="color: #9ca3af; font-size: 0.9rem; margin-bottom: 24px; line-height: 1.5;">Silakan login terlebih dahulu untuk menyimpan judul ini ke Daftarku.</p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button id="btn-cancel-login" style="flex: 1; padding: 10px 0; border-radius: 8px; border: 1px solid #1a3a26; background: transparent; color: #d1d5db; cursor: pointer; font-weight: 600; transition: background 0.2s;">Batal</button>
+                <button id="btn-go-login" style="flex: 1; padding: 10px 0; border-radius: 8px; border: none; background: #4ade80; color: #05110a; cursor: pointer; font-weight: 700; transition: opacity 0.2s;">Login</button>
+            </div>
+        `;
+
+        overlay.appendChild(box);
+        document.body.appendChild(overlay);
+
+        // Kasih efek transisi animasi saat masuk
+        requestAnimationFrame(() => {
+            overlay.style.opacity = '1';
+            box.style.transform = 'translateY(0) scale(1)';
+        });
+
+        // Event listener saat tombol dibatalkan/ditutup
+        const closeModal = () => {
+            overlay.style.opacity = '0';
+            box.style.transform = 'translateY(20px) scale(0.95)';
+            setTimeout(() => overlay.remove(), 300); // Hapus elemen dari DOM setelah animasi
+        };
+
+        document.getElementById('btn-cancel-login').addEventListener('click', closeModal);
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) closeModal(); // Tutup saat klik di luar kotak
+        });
+
+        // Event listener ke halaman Auth
+        document.getElementById('btn-go-login').addEventListener('click', () => {
+            window.location.href = 'auth.html';
+        });
+    }
+
+    // ==========================================
     // LOGIKA DAFTARKU (BOOKMARK) DENGAN FIREBASE
     // ==========================================
     let currentUser = null;
 
-    // 1. Cek Status Bookmark saat Pertama Kali Load Halaman
+    // Cek Status Bookmark saat Pertama Kali Load Halaman
     onAuthStateChanged(auth, async (user) => {
         currentUser = user;
         
         if (user && seriesId) {
             try {
-                // Cek ke dalam koleksi 'bookmarks' milik user ini
                 const bookmarkRef = doc(db, "users", user.uid, "bookmarks", seriesId);
                 const bookmarkSnap = await getDoc(bookmarkRef);
                 
-                // Jika data ditemukan, berarti sudah di-bookmark! Ubah tampilan tombol.
                 if (bookmarkSnap.exists()) {
                     document.querySelectorAll('.toggle-bookmark').forEach(btn => {
                         btn.classList.add('active');
@@ -206,27 +278,25 @@ window.addEventListener('layoutReady', async () => {
         }
     });
 
-    // 2. Logika Saat Tombol Daftarku di Klik
+    // Logika Saat Tombol Daftarku di Klik
     const bookmarkBtns = document.querySelectorAll('.toggle-bookmark');
     bookmarkBtns.forEach(btn => {
         btn.addEventListener('click', async (e) => {
             e.preventDefault();
             
-            // Cek apakah user sudah login
+            // CEK LOGIN: Jika belum login, tampilkan Modal Pop-Up Kustom
             if (!currentUser) {
-                alert("Silakan login terlebih dahulu menggunakan menu di pojok kanan atas untuk menyimpan Daftarku.");
-                return; // Batalkan proses jika belum login
+                showLoginPromptModal();
+                return;
             }
             
             const isCurrentlyBookmarked = btn.classList.contains('active');
             const bookmarkRef = doc(db, "users", currentUser.uid, "bookmarks", seriesId);
             
             try {
-                // Jika SEBELUMNYA sudah aktif (berarti ini proses BATAL SIMPAN)
                 if (isCurrentlyBookmarked) {
-                    await deleteDoc(bookmarkRef); // Hapus dari database Firebase
+                    await deleteDoc(bookmarkRef); 
                     
-                    // Kembalikan semua tombol ke tampilan semula (tidak aktif)
                     document.querySelectorAll('.toggle-bookmark').forEach(b => {
                         b.classList.remove('active');
                         const icon = b.querySelector('i');
@@ -237,10 +307,7 @@ window.addEventListener('layoutReady', async () => {
                     });
                     showToast('Dihapus dari Daftarku');
                     
-                } 
-                // Jika SEBELUMNYA belum aktif (berarti ini proses SIMPAN BARU)
-                else {
-                    // Simpan data minimal yang cukup untuk halaman 'Daftarku' nanti
+                } else {
                     await setDoc(bookmarkRef, {
                         seriesId: seriesId,
                         title: currentSeriesData.title || "Tanpa Judul", 
@@ -249,7 +316,6 @@ window.addEventListener('layoutReady', async () => {
                         savedAt: new Date()
                     });
                     
-                    // Ubah semua tombol ke tampilan aktif (centang/terisi)
                     document.querySelectorAll('.toggle-bookmark').forEach(b => {
                         b.classList.add('active');
                         const icon = b.querySelector('i');
