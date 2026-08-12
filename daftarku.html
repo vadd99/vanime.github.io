@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftarku - Vadd Studio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Montserrat:wght@500;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- CSS Modular -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/search.css"> <!-- Re-use CSS Search -->
+</head>
+<body>
+
+    <!-- Wadah Layout (Header, Sidebar, Footer akan disuntikkan ke sini) -->
+    <div id="layout-wrapper"></div>
+
+    <!-- Konten Spesifik Halaman Daftarku -->
+    <template id="page-content">
+        <div class="search-page-wrapper">
+            <div class="search-header">
+                <h2>Koleksi <span style="color: var(--vadd-primary);">Daftarku</span></h2>
+                <p id="daftarku-count" style="color: #9ca3af; font-size: 0.9rem; margin-top: 5px;">Memeriksa status akun...</p>
+            </div>
+
+            <!-- Grid Hasil Bookmark -->
+            <div class="search-grid" id="daftarku-results-container">
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i> Memuat daftar simpanan Anda...
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Script Wajib -->
+    <script src="js/main.js"></script>
+    <script type="module" src="js/daftarku.js"></script>    
+</body>
+</html>
