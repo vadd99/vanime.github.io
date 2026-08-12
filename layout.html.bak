@@ -52,7 +52,7 @@
                         </div>
                         <hr style="border-color: #1a3a26; margin: 5px 0;">
                         <a href="auth.html" id="menu-login" class="dropdown-item"><i class="fas fa-sign-in-alt"></i> Masuk / Daftar</a>
-                        <a href="#" id="menu-daftarku" class="dropdown-item" style="display:none;"><i class="fas fa-bookmark"></i> Daftarku</a>
+                        <a href="daftarku.html" id="menu-daftarku" class="dropdown-item" style="display:none;"><i class="fas fa-bookmark"></i> Daftarku</a>
                         <a href="admin.html" id="menu-admin" class="dropdown-item" style="display:none;"><i class="fas fa-tachometer-alt"></i> Dashboard Admin</a>
                         <button id="menu-logout" class="dropdown-item" style="display:none; width: 100%; text-align: left;"><i class="fas fa-sign-out-alt"></i> Keluar</button>
                     </div>
