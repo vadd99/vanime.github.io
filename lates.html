@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rilis Terbaru - Vadd Studio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Montserrat:wght@500;700;800;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/search.css">            
+</head>
+<body>
+    <div id="layout-wrapper"></div>
+
+    <template id="page-content">
+        <div class="search-page-wrapper">
+            <div class="search-header">
+                <h2>Rilis Terbaru <i class="fas fa-clock" style="color: var(--vadd-light);"></i></h2>
+                <p style="color: #9ca3af; font-size: 0.9rem; margin-top: 5px;">Koleksi anime dan film yang baru saja ditambahkan.</p>
+            </div>
+
+            <div class="search-grid" id="latest-container">
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i> Memuat rilis terbaru...
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="js/main.js"></script>
+    <script type="module" src="js/latest.js"></script>    
+</body>
+</html>
