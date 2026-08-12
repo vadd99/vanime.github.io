@@ -262,19 +262,39 @@ async function initSidebarGenres() {
         const collection = firestore.collection;
         const getDocs = firestore.getDocs;
 
-        // Ambil data genre dari database
-        const genresSnap = await getDocs(collection(db, "genres"));
-        let genresArray = [];
-        
-        genresSnap.forEach(doc => {
+        // Kita gunakan Set agar tidak ada nama genre yang dobel
+        const uniqueGenres = new Set();
+
+        // 1. Ambil genre langsung dari daftar seri yang ada (Lebih akurat)
+        const seriesSnap = await getDocs(collection(db, "series"));
+        seriesSnap.forEach(doc => {
             const data = doc.data();
-            if(data.name) genresArray.push(data.name.trim());
+            const genreString = data.genres || data.category;
+            
+            if (genreString) {
+                // Pecah berdasarkan koma, lalu bersihkan spasi
+                genreString.split(',').forEach(g => {
+                    const cleanGenre = g.trim();
+                    if (cleanGenre !== '') uniqueGenres.add(cleanGenre);
+                });
+            }
         });
 
-        // Urutkan abjad
-        genresArray.sort();
+        // 2. Ambil juga dari koleksi "genres" (berjaga-jaga jika ada genre kosong/baru dibuat)
+        try {
+            const genresSnap = await getDocs(collection(db, "genres"));
+            genresSnap.forEach(doc => {
+                const data = doc.data();
+                if(data.name) uniqueGenres.add(data.name.trim());
+            });
+        } catch (e) {
+            console.warn("Info: Koleksi referensi 'genres' kosong atau belum dibuat.");
+        }
+
+        // Ubah Set menjadi Array dan urutkan sesuai abjad
+        let genresArray = Array.from(uniqueGenres).sort((a, b) => a.localeCompare(b));
         
-        // Bersihkan loading
+        // Bersihkan loading state
         if(sidebarGenreContainer) sidebarGenreContainer.innerHTML = '';
         if(desktopGenreContainer) desktopGenreContainer.innerHTML = '';
 
