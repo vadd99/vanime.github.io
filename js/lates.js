@@ -1,8 +1,21 @@
+// ==========================================
+// SCRIPT LOGIKA RILIS TERBARU (js/lates.js)
+// ==========================================
+
 import { db } from './firebase-init.js';
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 window.addEventListener('layoutReady', async () => {
+    // Memastikan ID sesuai dengan yang ada di lates.html
     const container = document.getElementById('latest-container');
+
+    if (!container) return; // Mencegah error jika elemen tidak ada
+
+    // Fungsi kecil untuk mengambil genre pertama (Sama seperti index.js)
+    const getFirstGenre = (genreString) => {
+        if (!genreString) return 'Animasi';
+        return genreString.split(',')[0].trim();
+    };
 
     try {
         const querySnapshot = await getDocs(collection(db, "series"));
@@ -12,9 +25,12 @@ window.addEventListener('layoutReady', async () => {
             seriesArray.push({ id: doc.id, ...doc.data() });
         });
 
-        // Jika Anda memiliki field waktu seperti createdAt, bisa di-sort. 
-        // Jika belum ada, kita balik urutannya atau tampilkan apa adanya.
-        seriesArray.reverse(); 
+        // SORTING AKURAT: Berdasarkan waktu upload terbaru (Sama seperti index.js)
+        seriesArray.sort((a, b) => {
+            const timeA = (a.createdAt && typeof a.createdAt.toMillis === 'function') ? a.createdAt.toMillis() : 0;
+            const timeB = (b.createdAt && typeof b.createdAt.toMillis === 'function') ? b.createdAt.toMillis() : 0;
+            return timeB - timeA;
+        });
 
         container.innerHTML = '';
 
@@ -23,23 +39,26 @@ window.addEventListener('layoutReady', async () => {
             return;
         }
 
+        // Render card
         seriesArray.forEach(item => {
-            const poster = item.posterUrl || item.poster_url || item.bannerUrl || 'https://via.placeholder.com/300x400?text=No+Image';
+            const imgUrl = item.bannerUrl || item.banner_url || "https://images.unsplash.com/photo-1560930950-5ce206df77ab?auto=format&fit=crop&q=80&w=300";
+            const mainGenre = getFirstGenre(item.genres || item.category);
 
+            // Struktur HTML disamakan 100% dengan poster-card di index.js
             const cardHTML = `
-                <a href="detail.html?id=${item.id}" class="poster-card">
+                <div class="poster-card" onclick="window.location.href='detail.html?id=${item.id}'" style="cursor:pointer;">
                     <div class="poster-box">
-                        <img src="${poster}" alt="${item.title}">
+                        <img src="${imgUrl}" alt="${item.title}">
                         <div class="poster-gradient"></div>
                         <div class="poster-content">
-                            <div class="poster-title">${item.title}</div>
+                            <h3 class="poster-title">${item.title}</h3>
                             <div class="poster-footer">
-                                <span class="poster-rating"><i class="fas fa-star"></i> ${item.rating || '4.5'}</span>
-                                <span style="font-size: 0.65rem; color: var(--vadd-primary);">Baru</span>
+                                <span class="badge-outline">${mainGenre}</span>
+                                <span style="color:var(--vadd-primary); font-size: 0.65rem; font-weight: 800; letter-spacing: 0.05em;">BARU</span>
                             </div>
                         </div>
                     </div>
-                </a>
+                </div>
             `;
             container.innerHTML += cardHTML;
         });
