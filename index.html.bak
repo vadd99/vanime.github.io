@@ -23,33 +23,25 @@
     <template id="page-content">
         <div class="home-page-wrapper">
             
-            <!-- Hero Section (Slider Banner Atas) -->
+            <!-- Hero Section (Banner Atas Dinamis) -->
             <header class="hero">
-                <!-- Background slider img -->
                 <div class="hero-bg">
-                    <img id="hero-banner-img" src="" alt="Latar Belakang Hero">
+                    <img id="hero-banner-img" src="https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?auto=format&fit=crop&q=80&w=2000" alt="Latar Belakang Hero">
                     <div class="hero-gradient"></div>
                     <div class="hero-gradient-side"></div>
                 </div>
 
                 <div class="hero-content-wrapper">
                     <div class="hero-box">
-                        <!-- Tanda kecil di atas judul -->
-                        <div class="hero-badge" id="hero-badge-text">RILIS BARU</div>
                         <h1 class="hero-title" id="hero-title-text">Memuat...</h1>
                         <p class="hero-desc" id="hero-desc-text">
-                            Silakan tunggu, sedang memuat data terbaru dari Vadd Studio...
+                            Silakan tunggu, sedang memuat data dari database Vadd Studio...
                         </p>
                         <div class="hero-buttons">
-                            <a href="#" id="hero-play-btn" class="btn-primary"><i class="fas fa-play"></i> Tonton Sekarang</a>
-                            <a href="#" id="hero-detail-btn" class="btn-secondary"><i class="fas fa-info-circle"></i> Info Detail</a>
+                            <a href="#" id="hero-play-btn" class="btn-primary"><i class="fas fa-play"></i> Mulai Menonton</a>
+                            <a href="#" class="btn-secondary"><i class="fas fa-bookmark"></i> Tambahkan</a>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Navigasi Dots untuk Slider -->
-                <div class="hero-slider-nav" id="hero-slider-dots">
-                    <!-- Dots akan diisi oleh JS -->
                 </div>
             </header>
 
@@ -72,7 +64,7 @@
                 <!-- Section: Terbaru (Grid Vertical) -->
                 <section>
                     <div class="section-header">
-                        <h2 class="section-title border-accent">Jelajahi Semua Animasi</h2>
+                        <h2 class="section-title border-accent">Terbaru</h2>
                     </div>
                     <div class="poster-grid" id="series-grid-container">
                         <div style="color:#9ca3af; padding: 20px 0;">Memuat daftar judul animasi...</div>
@@ -82,7 +74,6 @@
             </main>
         </div>
     </template>
-
 
     <!-- Script Utama -->
     <script src="js/main.js"></script>

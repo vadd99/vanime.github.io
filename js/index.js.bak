@@ -8,25 +8,21 @@ import { collection, getDocs, query } from "https://www.gstatic.com/firebasejs/1
 window.addEventListener('layoutReady', async () => {
     console.log("Vadd Studio: Halaman Utama (Index) sukses dimuat, mengambil data...");
 
-    // DOM Elements Hero
     const heroImg = document.getElementById('hero-banner-img');
     const heroTitle = document.getElementById('hero-title-text');
     const heroDesc = document.getElementById('hero-desc-text');
     const heroBtn = document.getElementById('hero-play-btn');
-    const heroDetailBtn = document.getElementById('hero-detail-btn');
-    const heroBadge = document.getElementById('hero-badge-text');
-    const sliderDotsContainer = document.getElementById('hero-slider-dots');
-    
-    // DOM Elements Content
     const seriesContainer = document.getElementById('series-grid-container');
     const popularContainer = document.getElementById('popular-series-container');
 
+    // Fungsi kecil untuk mengambil genre pertama saja
     const getFirstGenre = (genreString) => {
         if (!genreString) return 'Animasi';
         return genreString.split(',')[0].trim();
     };
 
     try {
+        // --- 1. MENGAMBIL SEMUA DATA SERIES DARI FIREBASE ---
         const q = query(collection(db, "series")); 
         const snapshot = await getDocs(q);
         
@@ -35,100 +31,46 @@ window.addEventListener('layoutReady', async () => {
             seriesData.push({ id: doc.id, ...doc.data() });
         });
 
+        // Jika database kosong
         if(seriesData.length === 0) {
             if(heroTitle) heroTitle.innerHTML = "Belum Ada Judul";
-            if(heroDesc) heroDesc.innerHTML = "Admin belum menambahkan seri animasi apapun.";
-            if(seriesContainer) seriesContainer.innerHTML = "<div style='color:#9ca3af;'>Tidak ada judul tersedia.</div>";
-            if(popularContainer) popularContainer.innerHTML = "<div style='color:#9ca3af;'>Tidak ada judul populer.</div>";
+            if(heroDesc) heroDesc.innerHTML = "Admin belum menambahkan seri animasi apapun ke dalam database.";
+            if(seriesContainer) seriesContainer.innerHTML = "<div style='color:#9ca3af;'>Tidak ada judul yang tersedia.</div>";
+            if(popularContainer) popularContainer.innerHTML = "<div style='color:#9ca3af;'>Tidak ada judul populer saat ini.</div>";
             return;
         }
 
-        // 1. DATA UNTUK SLIDER HERO (TERBARU RILIS - AMBIL 4 ITEM)
-        let newReleaseData = [...seriesData].sort((a, b) => {
-            const timeA = (a.createdAt && typeof a.createdAt.toMillis === 'function') ? a.createdAt.toMillis() : 0;
-            const timeB = (b.createdAt && typeof b.createdAt.toMillis === 'function') ? b.createdAt.toMillis() : 0;
-            return timeB - timeA;
-        }).slice(0, 4); // Ambil 4 terbawah
-
-        // LOGIKA SLIDER HERO
-        let currentSlide = 0;
-        let slideInterval;
-
-        function renderHeroSlide(index) {
-            if(!newReleaseData[index]) return;
-            const data = newReleaseData[index];
-            
-            // Efek transisi halus pada gambar
-            if (heroImg) {
-                heroImg.style.opacity = 0;
-                setTimeout(() => {
-                    heroImg.src = data.bannerUrl || data.banner_url || "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?auto=format&fit=crop&q=80&w=2000";
-                    heroImg.style.opacity = 0.6;
-                }, 300);
-            }
-
-            if (heroTitle) heroTitle.innerHTML = data.title;
-            if (heroDesc) heroDesc.innerHTML = data.description || "Tonton keseruan animasi ini hanya di Vadd Studio.";
-            
-            // Ubah badge jadi Genre
-            if (heroBadge) heroBadge.innerHTML = getFirstGenre(data.genres || data.category).toUpperCase();
-            
-            if (heroBtn) heroBtn.href = `detail.html?id=${data.id}`;
-            if (heroDetailBtn) heroDetailBtn.href = `detail.html?id=${data.id}`;
-
-            // Update Dots Active State
-            document.querySelectorAll('.hero-dot').forEach((dot, idx) => {
-                dot.classList.toggle('active', idx === index);
-            });
-        }
-
-        // Buat Dots Navigasi
-        if (sliderDotsContainer && newReleaseData.length > 1) {
-            sliderDotsContainer.innerHTML = '';
-            newReleaseData.forEach((_, idx) => {
-                const dot = document.createElement('div');
-                dot.className = `hero-dot ${idx === 0 ? 'active' : ''}`;
-                dot.addEventListener('click', () => {
-                    currentSlide = idx;
-                    renderHeroSlide(currentSlide);
-                    resetInterval();
-                });
-                sliderDotsContainer.appendChild(dot);
-            });
-        }
-
-        function nextSlide() {
-            currentSlide = (currentSlide + 1) % newReleaseData.length;
-            renderHeroSlide(currentSlide);
-        }
-
-        function resetInterval() {
-            clearInterval(slideInterval);
-            slideInterval = setInterval(nextSlide, 5000); // Ganti gambar tiap 5 detik
-        }
-
-        // Inisialisasi Slide Pertama
-        if (newReleaseData.length > 0) {
-            renderHeroSlide(0);
-            if (newReleaseData.length > 1) resetInterval();
-        }
-
-        // --- 2. RENDER SECTION "PALING POPULER" (CAROUSEL POTRAIT) ---
+        // --- 2. LOGIKA PENYORTIRAN UNTUK "PALING POPULER" ---
         let popularData = [...seriesData].sort((a, b) => {
-            const viewsA = a.views || a.total_views || 0; 
+            const viewsA = a.views || a.total_views || 0; // Tambahan fallback ke total_views
             const viewsB = b.views || b.total_views || 0;
-            if (viewsB !== viewsA) return viewsB - viewsA; 
+            
+            if (viewsB !== viewsA) {
+                return viewsB - viewsA; 
+            }
+            
             const timeA = (a.createdAt && typeof a.createdAt.toMillis === 'function') ? a.createdAt.toMillis() : 0;
             const timeB = (b.createdAt && typeof b.createdAt.toMillis === 'function') ? b.createdAt.toMillis() : 0;
             return timeB - timeA;
         });
 
+        // --- 3. SET HERO BANNER (ATAS) ---
+        const topSeries = popularData[0]; 
+        
+        if (heroImg) heroImg.src = topSeries.bannerUrl || topSeries.banner_url || "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?auto=format&fit=crop&q=80&w=2000";
+        if (heroTitle) heroTitle.innerHTML = topSeries.title;
+        if (heroDesc) heroDesc.innerHTML = topSeries.description || "Tonton keseruan animasi ini hanya di Vadd Studio.";
+        if (heroBtn) heroBtn.href = `detail.html?id=${topSeries.id}`;
+
+
+        // --- 4. RENDER SECTION "PALING POPULER" (CAROUSEL POTRAIT) ---
         if (popularContainer) {
             popularContainer.innerHTML = ''; 
             popularData.slice(0, 10).forEach((item, index) => { 
                 const imgUrl = item.bannerUrl || item.banner_url || "https://images.unsplash.com/photo-1560930950-5ce206df77ab?auto=format&fit=crop&q=80&w=300";
-                const views = item.views || item.total_views || 0;
+                const views = item.views || item.total_views || 0; // Tambahan fallback ke total_views
                 
+                // Menempatkan badge di kanan atas agar tidak tertutup teks di desain portrait
                 let badgeHtml = '';
                 if (index === 0 && views > 0) {
                     badgeHtml = `<div class="badge-tag tag-accent" style="top:0.5rem; right:0.5rem; left:auto;">#1 POPULER</div>`;
@@ -136,10 +78,11 @@ window.addEventListener('layoutReady', async () => {
                     badgeHtml = `<div class="badge-tag tag-primary" style="top:0.5rem; right:0.5rem; left:auto;">BARU</div>`;
                 }
 
+                // Ganti item.category menjadi item.genres menggunakan fungsi getFirstGenre
                 const mainGenre = getFirstGenre(item.genres || item.category);
 
                 const cardHTML = `
-                    <div class="carousel-portrait-card" onclick="window.location.href='detail.html?id=${item.id}'">
+                    <div class="poster-card" onclick="window.location.href='detail.html?id=${item.id}'" style="cursor:pointer; min-width: 160px; max-width: 200px; flex: 0 0 auto;">
                         <div class="poster-box">
                             <img src="${imgUrl}" alt="${item.title}">
                             <div class="poster-gradient"></div>
@@ -158,9 +101,10 @@ window.addEventListener('layoutReady', async () => {
             });
         }
 
-        // --- 3. RENDER SECTION "JELAJAHI" (SEMUA JUDUL) ---
+
+        // --- 5. RENDER SECTION "TERBARU" (GRID POTRAIT) ---
+        // Urutkan berdasarkan waktu upload terbaru
         if (seriesContainer) {
-            // Kita tampilkan semua berdasarkan terbaru (seperti sebelumnya)
             let exploreData = [...seriesData].sort((a, b) => {
                 const timeA = (a.createdAt && typeof a.createdAt.toMillis === 'function') ? a.createdAt.toMillis() : 0;
                 const timeB = (b.createdAt && typeof b.createdAt.toMillis === 'function') ? b.createdAt.toMillis() : 0;
@@ -170,10 +114,12 @@ window.addEventListener('layoutReady', async () => {
             seriesContainer.innerHTML = '';
             exploreData.forEach(item => {
                 const imgUrl = item.bannerUrl || item.banner_url || "https://images.unsplash.com/photo-1560930950-5ce206df77ab?auto=format&fit=crop&q=80&w=300";
+                
+                // Ganti item.category menjadi item.genres menggunakan fungsi getFirstGenre
                 const mainGenre = getFirstGenre(item.genres || item.category);
 
                 const cardHTML = `
-                    <div class="poster-card" onclick="window.location.href='detail.html?id=${item.id}'">
+                    <div class="poster-card" onclick="window.location.href='detail.html?id=${item.id}'" style="cursor:pointer;">
                         <div class="poster-box">
                             <img src="${imgUrl}" alt="${item.title}">
                             <div class="poster-gradient"></div>
@@ -193,7 +139,7 @@ window.addEventListener('layoutReady', async () => {
     } catch (error) {
         console.error("Gagal mengambil data dari Firebase:", error);
         if(heroTitle) heroTitle.innerHTML = "Terjadi Kesalahan";
-        if(heroDesc) heroDesc.innerHTML = "Gagal memuat data dari database.";
+        if(heroDesc) heroDesc.innerHTML = "Gagal memuat data dari database. Silakan periksa koneksi internet Anda.";
         if(seriesContainer) seriesContainer.innerHTML = "<div style='color:#ef4444;'>Gagal memuat daftar judul.</div>";
         if(popularContainer) popularContainer.innerHTML = "<div style='color:#ef4444;'>Gagal memuat daftar populer.</div>";
     }
