@@ -57,7 +57,7 @@ window.addEventListener('layoutReady', async () => {
         if(elPageTitle) elPageTitle.innerText = `${sd.title} - Vadd Studio`;
         if(elBanner) elBanner.src = sd.bannerUrl || sd.banner_url || "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&q=80&w=1600";
         
-        // PERBAIKAN DI SINI: Ganti sd.category menjadi sd.genres
+        // Ganti sd.category menjadi sd.genres agar sesuai dengan struktur database baru
         const mainGenreText = sd.genres ? sd.genres.split(',')[0].trim().toUpperCase() : (sd.category ? sd.category.toUpperCase() : 'ANIMASI');
         
         if(elTitle) elTitle.innerHTML = `${sd.title} <span style="display:block; font-size:14px; margin-top:8px; color:var(--color-green); letter-spacing:2px; font-weight:700;">${mainGenreText}</span>`;
@@ -174,21 +174,34 @@ window.addEventListener('layoutReady', async () => {
         setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
+    // --- LOGIKA TOMBOL DAFTARKU / BOOKMARK ---
     const bookmarkBtns = document.querySelectorAll('.toggle-bookmark');
     bookmarkBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
             btn.classList.toggle('active');
             const icon = btn.querySelector('i');
+            
             if (icon) {
-                if (icon.classList.contains('far')) {
-                    icon.classList.replace('far', 'fas');
-                    showToast('Berhasil ditambahkan ke Daftarku!');
-                } else if (icon.classList.contains('fas') && !icon.classList.contains('fa-plus')) {
-                    icon.classList.replace('fas', 'far');
-                    showToast('Dihapus dari Daftarku');
-                } else {
-                    showToast('Berhasil ditambahkan ke Daftarku!');
+                // Logika untuk ikon Bookmark (berada di sticky bar mobile)
+                if (icon.classList.contains('fa-bookmark')) {
+                    if (icon.classList.contains('far')) {
+                        icon.classList.replace('far', 'fas');
+                        showToast('Berhasil ditambahkan ke Daftarku!');
+                    } else {
+                        icon.classList.replace('fas', 'far');
+                        showToast('Dihapus dari Daftarku');
+                    }
+                } 
+                // Logika untuk ikon Plus/Check (berada di bawah judul)
+                else if (icon.classList.contains('fa-plus') || icon.classList.contains('fa-check')) {
+                    if (icon.classList.contains('fa-plus')) {
+                        icon.classList.replace('fa-plus', 'fa-check');
+                        showToast('Berhasil ditambahkan ke Daftarku!');
+                    } else {
+                        icon.classList.replace('fa-check', 'fa-plus');
+                        showToast('Dihapus dari Daftarku');
+                    }
                 }
             }
         });

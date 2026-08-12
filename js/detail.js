@@ -2,14 +2,18 @@
 // SCRIPT LOGIKA DETAIL FILM (js/detail.js)
 // ==========================================
 
-import { db } from './firebase-init.js';
-import { doc, getDoc, collection, query, where, getDocs, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { db, auth } from './firebase-init.js';
+import { doc, getDoc, collection, query, where, getDocs, updateDoc, increment, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 window.addEventListener('layoutReady', async () => {
     console.log("Halaman Detail berhasil dimuat beserta layout!");
 
     const urlParams = new URLSearchParams(window.location.search);
     const seriesId = urlParams.get('id');
+    
+    // Variabel penampung data seri agar bisa diakses oleh fungsi Bookmark nanti
+    let currentSeriesData = {};
 
     if (!seriesId) {
         alert("ID Series tidak ditemukan!");
@@ -53,36 +57,31 @@ window.addEventListener('layoutReady', async () => {
         }
 
         const sd = docSnap.data(); // sd = seriesData
+        currentSeriesData = sd; // Simpan ke variabel global script ini
 
         if(elPageTitle) elPageTitle.innerText = `${sd.title} - Vadd Studio`;
         if(elBanner) elBanner.src = sd.bannerUrl || sd.banner_url || "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&q=80&w=1600";
         
-        // Ganti sd.category menjadi sd.genres agar sesuai dengan struktur database baru
         const mainGenreText = sd.genres ? sd.genres.split(',')[0].trim().toUpperCase() : (sd.category ? sd.category.toUpperCase() : 'ANIMASI');
         
         if(elTitle) elTitle.innerHTML = `${sd.title} <span style="display:block; font-size:14px; margin-top:8px; color:var(--color-green); letter-spacing:2px; font-weight:700;">${mainGenreText}</span>`;
         if(elDesc) elDesc.innerText = sd.description || "Tidak ada sinopsis tersedia untuk judul ini.";
 
-        // --- SET METADATA EXTRA (JIKA ADA) ---
-        // Usia di Banner Atas
+        // --- SET METADATA EXTRA ---
         if (elHeroAge) elHeroAge.innerText = sd.ageRating || '13+';
 
-        // Set Audio
         if (sd.audioLanguages && elAudio) {
             elAudio.querySelector('span').innerText = sd.audioLanguages;
             elAudio.style.display = 'block';
         }
-        // Set Subtitle / Takarir
         if (sd.subtitleLanguages && elSubtitle) {
             elSubtitle.querySelector('span').innerText = sd.subtitleLanguages;
             elSubtitle.style.display = 'block';
         }
-        // Set Peringatan Konten
         if (sd.contentWarnings && elWarnings) {
             elWarnings.querySelector('span').innerHTML = `<span style="background-color:rgba(255,255,255,0.1); padding:1px 4px; border-radius:3px; color:#fff; font-size:10px; font-weight:bold; margin-right:4px;">${sd.ageRating || '13+'}</span> ${sd.contentWarnings}`;
             elWarnings.style.display = 'block';
         }
-        // Set Genre Lengkap
         if (sd.genres && elGenre) {
             elGenre.querySelector('span').innerText = sd.genres;
             elGenre.style.display = 'block';
@@ -147,17 +146,15 @@ window.addEventListener('layoutReady', async () => {
         }
     } catch (error) {
         console.error("Error Detail Firebase:", error);
-        if(elEpContainer) elEpContainer.innerHTML = '<div style="color:#ef4444; padding: 20px;">Gagal memuat episode.</div>';
+        if(elEpContainer) elEpContainer.innerHTML = '<div style="color:#ef4444; padding: 20px;">Gagal memuat data.</div>';
     }
 
-    // --- LOGIKA UI BUKA/TUTUP SINOPSIS & METADATA ---
+    // --- LOGIKA UI BUKA/TUTUP SINOPSIS ---
     const btnToggleSynopsis = document.getElementById('btn-toggle-synopsis');
     const synopsisWrapper = document.getElementById('synopsis-wrapper');
-    
     if (btnToggleSynopsis && synopsisWrapper) {
         btnToggleSynopsis.addEventListener('click', () => {
             synopsisWrapper.classList.toggle('expanded');
-            
             if (synopsisWrapper.classList.contains('expanded')) {
                 btnToggleSynopsis.innerHTML = 'LEBIH SEDIKIT DETAIL <i class="fas fa-chevron-up icon-arrow"></i>';
             } else {
@@ -174,35 +171,98 @@ window.addEventListener('layoutReady', async () => {
         setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
-    // --- LOGIKA TOMBOL DAFTARKU / BOOKMARK ---
+    // ==========================================
+    // LOGIKA DAFTARKU (BOOKMARK) DENGAN FIREBASE
+    // ==========================================
+    let currentUser = null;
+
+    // 1. Cek Status Bookmark saat Pertama Kali Load Halaman
+    onAuthStateChanged(auth, async (user) => {
+        currentUser = user;
+        
+        if (user && seriesId) {
+            try {
+                // Cek ke dalam koleksi 'bookmarks' milik user ini
+                const bookmarkRef = doc(db, "users", user.uid, "bookmarks", seriesId);
+                const bookmarkSnap = await getDoc(bookmarkRef);
+                
+                // Jika data ditemukan, berarti sudah di-bookmark! Ubah tampilan tombol.
+                if (bookmarkSnap.exists()) {
+                    document.querySelectorAll('.toggle-bookmark').forEach(btn => {
+                        btn.classList.add('active');
+                        const icon = btn.querySelector('i');
+                        if (icon) {
+                            if (icon.classList.contains('fa-bookmark')) {
+                                icon.classList.replace('far', 'fas');
+                            } else if (icon.classList.contains('fa-plus')) {
+                                icon.classList.replace('fa-plus', 'fa-check');
+                            }
+                        }
+                    });
+                }
+            } catch (err) {
+                console.error("Gagal mengecek status bookmark:", err);
+            }
+        }
+    });
+
+    // 2. Logika Saat Tombol Daftarku di Klik
     const bookmarkBtns = document.querySelectorAll('.toggle-bookmark');
     bookmarkBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', async (e) => {
             e.preventDefault();
-            btn.classList.toggle('active');
-            const icon = btn.querySelector('i');
             
-            if (icon) {
-                // Logika untuk ikon Bookmark (berada di sticky bar mobile)
-                if (icon.classList.contains('fa-bookmark')) {
-                    if (icon.classList.contains('far')) {
-                        icon.classList.replace('far', 'fas');
-                        showToast('Berhasil ditambahkan ke Daftarku!');
-                    } else {
-                        icon.classList.replace('fas', 'far');
-                        showToast('Dihapus dari Daftarku');
-                    }
+            // Cek apakah user sudah login
+            if (!currentUser) {
+                alert("Silakan login terlebih dahulu menggunakan menu di pojok kanan atas untuk menyimpan Daftarku.");
+                return; // Batalkan proses jika belum login
+            }
+            
+            const isCurrentlyBookmarked = btn.classList.contains('active');
+            const bookmarkRef = doc(db, "users", currentUser.uid, "bookmarks", seriesId);
+            
+            try {
+                // Jika SEBELUMNYA sudah aktif (berarti ini proses BATAL SIMPAN)
+                if (isCurrentlyBookmarked) {
+                    await deleteDoc(bookmarkRef); // Hapus dari database Firebase
+                    
+                    // Kembalikan semua tombol ke tampilan semula (tidak aktif)
+                    document.querySelectorAll('.toggle-bookmark').forEach(b => {
+                        b.classList.remove('active');
+                        const icon = b.querySelector('i');
+                        if(icon) {
+                            if (icon.classList.contains('fa-bookmark')) icon.classList.replace('fas', 'far');
+                            else if (icon.classList.contains('fa-check')) icon.classList.replace('fa-check', 'fa-plus');
+                        }
+                    });
+                    showToast('Dihapus dari Daftarku');
+                    
                 } 
-                // Logika untuk ikon Plus/Check (berada di bawah judul)
-                else if (icon.classList.contains('fa-plus') || icon.classList.contains('fa-check')) {
-                    if (icon.classList.contains('fa-plus')) {
-                        icon.classList.replace('fa-plus', 'fa-check');
-                        showToast('Berhasil ditambahkan ke Daftarku!');
-                    } else {
-                        icon.classList.replace('fa-check', 'fa-plus');
-                        showToast('Dihapus dari Daftarku');
-                    }
+                // Jika SEBELUMNYA belum aktif (berarti ini proses SIMPAN BARU)
+                else {
+                    // Simpan data minimal yang cukup untuk halaman 'Daftarku' nanti
+                    await setDoc(bookmarkRef, {
+                        seriesId: seriesId,
+                        title: currentSeriesData.title || "Tanpa Judul", 
+                        bannerUrl: currentSeriesData.bannerUrl || currentSeriesData.banner_url || "",
+                        genre: currentSeriesData.genres || currentSeriesData.category || "",
+                        savedAt: new Date()
+                    });
+                    
+                    // Ubah semua tombol ke tampilan aktif (centang/terisi)
+                    document.querySelectorAll('.toggle-bookmark').forEach(b => {
+                        b.classList.add('active');
+                        const icon = b.querySelector('i');
+                        if(icon) {
+                            if (icon.classList.contains('fa-bookmark')) icon.classList.replace('far', 'fas');
+                            else if (icon.classList.contains('fa-plus')) icon.classList.replace('fa-plus', 'fa-check');
+                        }
+                    });
+                    showToast('Berhasil ditambahkan ke Daftarku!');
                 }
+            } catch (err) {
+                console.error("Gagal mengubah status Daftarku:", err);
+                alert("Terjadi kesalahan saat menyimpan data ke server.");
             }
         });
     });
