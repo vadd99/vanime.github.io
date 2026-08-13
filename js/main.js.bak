@@ -22,13 +22,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         // 4. Inisialisasi logika interaktif (Navbar Scroll & Sidebar Toggle)
         initLayoutInteractions();
 
-        // 5. Jalankan Auth & Load Genre secara PARALEL (Bersamaan agar pemuatan super cepat)
-        await Promise.all([
-            initAuthLogic(),
-            initSidebarGenres()
-        ]);
+        // 5. Inisialisasi Logika Autentikasi secara dinamis agar tidak error "import outside module"
+        await initAuthLogic();
 
-        // 6. Beri sinyal ke script lokal halaman bahwa layout sudah selesai
+        // 6. Inisialisasi Daftar Kategori/Genre untuk Sidebar dan Desktop Menu
+        await initSidebarGenres();
+
+        // 7. Beri sinyal ke script lokal halaman bahwa layout sudah selesai
         window.dispatchEvent(new Event('layoutReady'));
 
     } catch (error) {
@@ -139,7 +139,7 @@ function initLayoutInteractions() {
 }
 
 
-// --- FUNGSI LOGIKA AUTENTIKASI ---
+// --- FUNGSI BARU: LOGIKA AUTENTIKASI ---
 async function initAuthLogic() {
     let auth, onAuthStateChanged, signOut;
     
@@ -246,7 +246,7 @@ async function initAuthLogic() {
 }
 
 // ==========================================
-// FUNGSI MEMUAT GENRE KE SIDEBAR & NAVBAR (RINGAN)
+// FUNGSI MEMUAT GENRE KE SIDEBAR & NAVBAR
 // ==========================================
 async function initSidebarGenres() {
     const sidebarGenreContainer = document.getElementById('sidebar-genre-list');
@@ -265,12 +265,31 @@ async function initSidebarGenres() {
         // Kita gunakan Set agar tidak ada nama genre yang dobel
         const uniqueGenres = new Set();
 
-        // HANYA membaca koleksi "genres" yang kecil & ringan (Tidak lagi memindai seluruh "series")
-        const genresSnap = await getDocs(collection(db, "genres"));
-        genresSnap.forEach(doc => {
+        // 1. Ambil genre langsung dari daftar seri yang ada (Lebih akurat)
+        const seriesSnap = await getDocs(collection(db, "series"));
+        seriesSnap.forEach(doc => {
             const data = doc.data();
-            if(data.name) uniqueGenres.add(data.name.trim());
+            const genreString = data.genres || data.category;
+            
+            if (genreString) {
+                // Pecah berdasarkan koma, lalu bersihkan spasi
+                genreString.split(',').forEach(g => {
+                    const cleanGenre = g.trim();
+                    if (cleanGenre !== '') uniqueGenres.add(cleanGenre);
+                });
+            }
         });
+
+        // 2. Ambil juga dari koleksi "genres" (berjaga-jaga jika ada genre kosong/baru dibuat)
+        try {
+            const genresSnap = await getDocs(collection(db, "genres"));
+            genresSnap.forEach(doc => {
+                const data = doc.data();
+                if(data.name) uniqueGenres.add(data.name.trim());
+            });
+        } catch (e) {
+            console.warn("Info: Koleksi referensi 'genres' kosong atau belum dibuat.");
+        }
 
         // Ubah Set menjadi Array dan urutkan sesuai abjad
         let genresArray = Array.from(uniqueGenres).sort((a, b) => a.localeCompare(b));
